@@ -30,6 +30,8 @@ Templates use Mustache-style placeholders:
 | `personality_traits` | `.brand/overview.md` → Brand Personality → Traits | `impeccable.md.tmpl` |
 | `personality_description` | `.brand/overview.md` → Brand Personality → Description | `impeccable.md.tmpl` |
 | `primary_audience` | `.brand/overview.md` → Audience → Primary | `impeccable.md.tmpl` |
+| `audience_context` | `.brand/overview.md` → Audience → Context (conditional) | `impeccable.md.tmpl` |
+| `use_cases` | `.brand/overview.md` → Audience → Key use cases | `impeccable.md.tmpl` |
 | `visual_direction` | `.brand/overview.md` → Visual Language → Direction | `impeccable.md.tmpl` |
 | `design_principles` | `.brand/overview.md` → Visual Language → Principles | `impeccable.md.tmpl` |
 | `signature_elements` | `.brand/overview.md` → Visual Language → Signature | `impeccable.md.tmpl` |

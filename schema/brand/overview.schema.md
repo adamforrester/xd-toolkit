@@ -40,6 +40,7 @@ Who the brand speaks to. Agents use this to calibrate complexity, tone, and desi
 | `Primary audience` | required | Who the main users/customers are — demographics, psychographics, or behavioral description |
 | `Secondary audiences` | optional | Other important audience segments |
 | `Audience context` | optional | Key insight about the audience that should influence design (e.g., "primarily mobile, often in a hurry") |
+| `Key use cases` | optional | Primary tasks users perform — the jobs they're trying to get done (e.g., "order food for pickup", "check loyalty points", "browse the menu"). Used by Impeccable's context gathering protocol. |
 
 ### Visual Language (required)
 
@@ -80,6 +81,7 @@ Wendy's doesn't take itself too seriously, but it takes its food seriously. The 
 ## Audience
 **Primary:** Fast-food consumers ages 18-35 who value quality and personality over pure convenience
 **Context:** Mobile-first ordering. Often browsing during commute or downtime. Short attention spans, high design literacy from social media.
+**Key use cases:** Order food for pickup or delivery, browse the menu, check Wendy's Rewards points, find a nearby location, customize an order
 
 ## Visual Language
 **Direction:** High-energy, photography-forward, bold color blocking. The red is *the* red — it's warm, not aggressive. Layouts are confident with strong hierarchy and minimal decoration.
