@@ -1,0 +1,17 @@
+{
+  "name": "xd-toolkit",
+  "version": "0.1.0",
+  "private": true,
+  "description": "End-to-end toolkit for XD practitioners to produce brand-consistent digital products using AI agents",
+  "workspaces": [
+    "packages/cli"
+  ],
+  "scripts": {
+    "build": "npm run build --workspace=packages/cli",
+    "test": "npm test --workspace=packages/cli"
+  },
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}

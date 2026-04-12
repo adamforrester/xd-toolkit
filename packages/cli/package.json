@@ -1,0 +1,28 @@
+{
+  "name": "@vml-xd/brand-toolkit",
+  "version": "0.1.0",
+  "description": "CLI for scaffolding brand-consistent XD projects with AI agent support",
+  "type": "module",
+  "bin": {
+    "vml-brand": "./bin/vml-brand.js"
+  },
+  "scripts": {
+    "build": "echo 'TODO: add build step'",
+    "test": "echo 'TODO: add tests'"
+  },
+  "keywords": [
+    "brand",
+    "design-system",
+    "ai-agents",
+    "claude",
+    "cursor",
+    "figma",
+    "xd"
+  ],
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "dependencies": {},
+  "devDependencies": {}
+}
