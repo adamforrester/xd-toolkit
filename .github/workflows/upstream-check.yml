@@ -1,0 +1,141 @@
+name: Check Upstream Dependencies
+
+on:
+  schedule:
+    - cron: "0 9 * * 1" # Every Monday at 9am UTC
+  workflow_dispatch: # Manual trigger
+
+permissions:
+  contents: write
+  issues: write
+
+jobs:
+  check-upstream:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Check upstream repos for new releases
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+
+          VERSIONS_FILE=".github/upstream-versions.json"
+          KNOWN=$(cat "$VERSIONS_FILE")
+          UPDATED="$KNOWN"
+          HAS_CHANGES=false
+
+          # Each entry: "repo|display_name|category"
+          # Categories: skills (affects what we ship to projects),
+          #             mcp (agent tooling), cli-tool (extraction/analysis)
+          REPOS=(
+            "pbakaus/impeccable|Impeccable|skills"
+            "murphytrueman/design-system-ops|Design System Ops|skills"
+            "southleft/figma-console-mcp|Figma Console MCP|mcp"
+            "DirectedEdges/specs|specs CLI|cli-tool"
+            "microsoft/playwright-mcp|Playwright MCP|mcp"
+            "JustasMonkev/mcp-accessibility-scanner|A11y Scanner MCP|mcp"
+            "figma/community-resources|Figma Community Skills|skills"
+          )
+
+          for entry in "${REPOS[@]}"; do
+            IFS='|' read -r repo name category <<< "$entry"
+            echo "Checking $name ($repo)..."
+
+            # Try releases first, fall back to tags
+            version=""
+            release_url=""
+            release_notes=""
+
+            release_json=$(gh api "repos/$repo/releases/latest" 2>/dev/null || echo "")
+            if [ -n "$release_json" ] && echo "$release_json" | jq -e '.tag_name' > /dev/null 2>&1; then
+              version=$(echo "$release_json" | jq -r '.tag_name')
+              release_url=$(echo "$release_json" | jq -r '.html_url')
+              release_notes=$(echo "$release_json" | jq -r '.body // "No release notes."' | head -c 2000)
+            else
+              # Fall back to latest tag
+              tag_json=$(gh api "repos/$repo/tags?per_page=1" 2>/dev/null || echo "[]")
+              if [ "$tag_json" != "[]" ] && echo "$tag_json" | jq -e '.[0].name' > /dev/null 2>&1; then
+                version=$(echo "$tag_json" | jq -r '.[0].name')
+                release_url="https://github.com/$repo/releases/tag/$version"
+                release_notes="(Tag only — no release notes available.)"
+              else
+                echo "  No releases or tags found for $repo, skipping."
+                continue
+              fi
+            fi
+
+            known_version=$(echo "$KNOWN" | jq -r --arg r "$repo" '.[$r] // ""')
+
+            if [ "$version" != "$known_version" ] && [ -n "$version" ]; then
+              echo "  New version: $known_version -> $version"
+
+              if [ -z "$known_version" ]; then
+                title="⬆️ $name: initial tracking at $version"
+                old_display="(first check)"
+              else
+                title="⬆️ $name updated: $known_version → $version"
+                old_display="$known_version"
+              fi
+
+              # Create issue
+              body=$(cat <<ISSUE_EOF
+          ## Upstream Update: $name
+
+          | | |
+          |---|---|
+          | **Repository** | [$repo](https://github.com/$repo) |
+          | **Category** | \`$category\` |
+          | **Previous version** | $old_display |
+          | **New version** | $version |
+          | **Release** | $release_url |
+
+          ### What this means
+
+          $(if [ "$category" = "skills" ]; then
+            echo "**Skills update** — may add new skills, change existing skill behavior, or update skill metadata. Check if this affects what we ship to client projects via \`xd-brand init\` / \`xd-brand update\`."
+          elif [ "$category" = "mcp" ]; then
+            echo "**MCP update** — may add new tools, change tool behavior, or fix bugs. Check if setup docs or practitioner instructions need updating."
+          elif [ "$category" = "cli-tool" ]; then
+            echo "**CLI tool update** — may change output format, add new commands, or fix extraction bugs. Check if Brand Factory skills that orchestrate this tool need updating."
+          fi)
+
+          ### Release notes
+
+          <details>
+          <summary>Click to expand</summary>
+
+          $release_notes
+
+          </details>
+
+          ---
+          *Opened automatically by upstream-check workflow.*
+          ISSUE_EOF
+              )
+
+              gh issue create \
+                --title "$title" \
+                --body "$body" \
+                --label "upstream-update" || echo "  Failed to create issue (label may not exist yet)"
+
+              UPDATED=$(echo "$UPDATED" | jq --arg r "$repo" --arg v "$version" '. + {($r): $v}')
+              HAS_CHANGES=true
+            else
+              echo "  Up to date ($version)"
+            fi
+          done
+
+          # Write updated versions
+          echo "$UPDATED" | jq --sort-keys '.' > "$VERSIONS_FILE"
+
+          # Commit if changed
+          if [ "$HAS_CHANGES" = true ]; then
+            git config user.name "github-actions[bot]"
+            git config user.email "github-actions[bot]@users.noreply.github.com"
+            git add "$VERSIONS_FILE"
+            git commit -m "chore: update upstream version tracking"
+            git push
+          fi
