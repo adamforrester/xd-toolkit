@@ -53,14 +53,25 @@ Colors assigned by meaning, not appearance.
 | `Error` | required | Token name + hex |
 | `Info` | required | Token name + hex |
 
-### Color Usage Rules (required)
+### Color Application Context (required)
 
-Constraints agents must follow when applying color.
+Where each color appears in the UI. Values alone aren't enough — agents need to know *how* colors are used, not just what they are. Without this, agents make plausible but wrong decisions (e.g., full-bleed primary backgrounds when primary is meant for accents).
 
 | Field | Required | Description |
 |-------|----------|-------------|
-| `Rules` | required | Explicit rules: minimum contrast ratios, where primary color can/cannot be used, background restrictions, text color constraints |
+| `Background rules` | required | Which colors can be used as page/section/component backgrounds. Be specific about primary color: is it for full-bleed backgrounds, color-block accents, or never as a background? |
+| `Text color rules` | required | Which colors for headings, body, secondary text, links, on-dark-background text |
+| `Accent usage` | required | Where primary/secondary colors appear as accents: CTAs, badges, icons, borders, highlights |
 | `Combinations` | optional | Approved color pairings and combinations to avoid |
+
+### Color Technical Constraints (required)
+
+Accessibility and technical rules for color application.
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `Contrast rules` | required | Minimum contrast ratios for text, large text, UI components (WCAG AA/AAA targets) |
+| `Restrictions` | required | Hard constraints: max colors per component, color-semantic conflicts to avoid (e.g., "don't use brand red for errors") |
 
 ### Dark Mode (optional)
 
@@ -108,10 +119,29 @@ Red is the brand. It's warm, energetic, and unmistakable. The palette supports r
 | `color-error` | #D32F2F | Errors, destructive actions. Distinct from brand red (cooler, more urgent). |
 | `color-info` | #1565C0 | Informational states, links, interactive elements |
 
-## Usage Rules
+## Application Context
+**Backgrounds:**
+- Page backgrounds: `color-white` or `color-neutral-50` only
+- Section backgrounds: `color-white`, `color-neutral-50`, or `color-primary` as a narrow color-block accent strip (not full-bleed). Red backgrounds are for small contained areas (badges, banners, promotional strips) — never full page sections.
+- Card backgrounds: `color-white` with `color-neutral-200` border or subtle shadow
+- Hero sections: white or neutral-50 background. Red appears as accent (CTA button, headline underline) not as the section background.
+
+**Text:**
+- Headings: `color-neutral-900` on light backgrounds, `color-white` on red accent areas
+- Body: `color-neutral-900` (primary), `color-neutral-700` (secondary)
+- Links: `color-info` with underline on hover
+
+**Accents (where primary red appears):**
+- Primary CTA buttons (filled red)
+- Badges, tags, and promotional labels
+- Active/selected states (nav items, tabs)
+- Icon highlights and small graphic elements
+- The Wendy cameo and brand marks
+- NOT as full-section or full-page backgrounds
+
+## Technical Constraints
 - Minimum contrast: 4.5:1 for normal text, 3:1 for large text (WCAG AA)
-- `color-primary` on white: 4.6:1 — passes AA for large text only. Use `color-primary-dark` for small text.
+- `color-primary` on white: 4.6:1 — passes AA for large text only. Use `color-primary-dark` for small text on white.
 - Never use brand red for error states — use `color-error` (distinct hue avoids confusion)
 - Maximum 3 colors per component (excluding neutrals)
-- Background surfaces: only `color-white`, `color-neutral-50`, or `color-primary` (for hero sections)
 ```

@@ -22,6 +22,16 @@ Each `.schema.md` file in this directory documents one `.brand/` file. Schemas u
 - **Fields** use `(required)` or `(optional)` markers and specify expected content type
 - **Examples** — short illustrative snippets
 
+## Key Design Principle: Values Need Application Context
+
+Token files must include **where and how** values are used, not just the values themselves. Agents make plausible but wrong decisions when given values without usage context (e.g., using brand red as a full-bleed background when it's meant for accents).
+
+Every token schema file should have two layers:
+1. **Application context** — where each value appears in the UI (backgrounds, text, accents, components)
+2. **Technical constraints** — accessibility rules, hard limits, restrictions
+
+This was validated in Layer 1 routing tests: color values + contrast ratios alone produced a full-bleed red hero (correct color, wrong application). Adding "red is for accents and CTAs, not section backgrounds" fixed the behavior.
+
 ## Directory Map
 
 ```

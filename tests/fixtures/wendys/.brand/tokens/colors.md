@@ -30,9 +30,28 @@ Red is the brand. It's warm, energetic, and unmistakable. The palette supports r
 | `color-error` | #D32F2F | Errors, destructive actions. Distinct from brand red (cooler, more urgent). |
 | `color-info` | #1565C0 | Informational states, links, interactive elements |
 
-## Usage Rules
+## Application Context
+**Backgrounds:**
+- Page backgrounds: `color-white` or `color-neutral-50` only
+- Section backgrounds: `color-white`, `color-neutral-50`, or `color-primary` as a narrow color-block accent strip (not full-bleed). Red backgrounds are for small contained areas (badges, banners, promotional strips) — never full page sections.
+- Card backgrounds: `color-white` with `color-neutral-200` border or subtle shadow
+- Hero sections: white or neutral-50 background. Red appears as accent (CTA button, headline underline) not as the section background.
+
+**Text:**
+- Headings: `color-neutral-900` on light backgrounds, `color-white` on red accent areas
+- Body: `color-neutral-900` (primary), `color-neutral-700` (secondary)
+- Links: `color-info` with underline on hover
+
+**Accents (where primary red appears):**
+- Primary CTA buttons (filled red)
+- Badges, tags, and promotional labels
+- Active/selected states (nav items, tabs)
+- Icon highlights and small graphic elements
+- The Wendy cameo and brand marks
+- NOT as full-section or full-page backgrounds
+
+## Technical Constraints
 - Minimum contrast: 4.5:1 for normal text, 3:1 for large text (WCAG AA)
-- `color-primary` on white: 4.6:1 — passes AA for large text only. Use `color-primary-dark` for small text.
+- `color-primary` on white: 4.6:1 — passes AA for large text only. Use `color-primary-dark` for small text on white.
 - Never use brand red for error states — use `color-error` (distinct hue avoids confusion)
 - Maximum 3 colors per component (excluding neutrals)
-- Background surfaces: only `color-white`, `color-neutral-50`, or `color-primary` (for hero sections)
