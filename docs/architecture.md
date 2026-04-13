@@ -70,7 +70,7 @@ The `.brand/` directory — structured markdown and JSON files containing brand-
 
 ## Category 1: The MCP Stack
 
-Nine MCP servers organized by pipeline phase. A practitioner installs all of these once and they're available across every project.
+Ten MCP servers organized by pipeline phase. Nine are installed per-practitioner and available across every project. One (Firecrawl) is scoped to the Brand Factory and only needed by practitioners running client onboarding.
 
 ### Design Phase
 
@@ -257,6 +257,33 @@ claude mcp add context7 -s user -- npx -y @context7/mcp
 }
 ```
 
+### Brand Factory Phase
+
+#### Firecrawl MCP
+- **What:** Web scraping and content extraction. Converts web pages into structured markdown. Supports site crawling, single-page scraping, and content extraction with CSS selectors.
+- **Why essential for Brand Factory:** Enables voice extraction — scraping 30-50 copy samples from a client's live site (headlines, CTAs, body copy, error messages, navigation labels, microcopy) for `/brand-analyze` to infer voice and tone. Also used for general content ingestion during brand analysis.
+- **License:** Firecrawl terms (free tier: 500 credits/month)
+- **Scoped to:** Brand Factory skills only. Not required for day-to-day build work.
+
+**Installation:**
+```bash
+# Claude Code
+claude mcp add firecrawl -s user \
+  -e FIRECRAWL_API_KEY=fc_KEY \
+  -- npx -y firecrawl-mcp
+
+# All tools (config file)
+{
+  "mcpServers": {
+    "firecrawl": {
+      "command": "npx",
+      "args": ["-y", "firecrawl-mcp"],
+      "env": { "FIRECRAWL_API_KEY": "fc_KEY" }
+    }
+  }
+}
+```
+
 ### MCP Installation Summary
 
 | MCP | Install Command (Claude Code) | Auth Required | Phase |
@@ -270,8 +297,9 @@ claude mcp add context7 -s user -- npx -y @context7/mcp
 | Vercel | `claude mcp add vercel -s user --transport http https://mcp.vercel.com` | Vercel OAuth | Deploy |
 | Netlify | `claude mcp add netlify -s user -- npx -y @netlify/mcp` | Netlify OAuth | Deploy |
 | Context7 | `claude mcp add context7 -s user -- npx -y @context7/mcp` | None | Context |
+| Firecrawl | `claude mcp add firecrawl -s user -e FIRECRAWL_API_KEY=... -- npx -y firecrawl-mcp` | Firecrawl API key | Brand Factory |
 
-**Total practitioner setup time:** ~30-45 minutes (one-time). Requires: Node.js 18+, Figma PAT, GitHub PAT, Vercel/Netlify accounts.
+**Total practitioner setup time:** ~30-45 minutes (one-time). Requires: Node.js 18+, Figma PAT, GitHub PAT, Vercel/Netlify accounts. Brand Factory practitioners also need: Firecrawl API key.
 
 ---
 
@@ -462,10 +490,12 @@ This extension will be developed in a future phase once the core toolkit, Brand 
 
 These are personal skills for the practitioners who run client onboarding. Not every team member needs them.
 
+**Prerequisites:** Firecrawl MCP (voice extraction), specs CLI, Layout CLI — installed per-practitioner alongside the standard MCP stack.
+
 | Skill | Trigger | What It Does |
 |-------|---------|--------------|
-| `/brand-extract` | User | Orchestrates extraction pipeline: specs CLI (Figma component anatomy) + Layout CLI (CSS tokens from URLs) + Figma MCP (variable inventory). Stores structured output. |
-| `/brand-analyze` | User | Core analysis: reads extraction output + brand guide PDF (multimodal) + screenshots. Synthesizes into `.brand/` directory. Auto-generates `.impeccable.md`. Scores completeness. |
+| `/brand-extract` | User | Orchestrates extraction pipeline: specs CLI (Figma component anatomy) + Layout CLI (CSS tokens from URLs) + Figma MCP (variable inventory) + Firecrawl MCP (voice extraction — scrapes 30-50 copy samples from live site grouped by type: headlines, CTAs, body copy, error messages, navigation labels, microcopy, social posts). Supports `--public-only` flag for pitch scenarios (skips Figma/specs, runs only Layout CLI + Firecrawl against public URLs). Stores structured output for `/brand-analyze`. |
+| `/brand-analyze` | User | Core analysis: reads extraction output + brand guide PDF (multimodal) + screenshots. Synthesizes into `.brand/` directory. Auto-generates `.impeccable.md`. Scores completeness. **Voice inference:** reads copy samples from extraction, infers formality level, sentence structure patterns, vocabulary preferences, humor/seriousness spectrum, active vs. passive voice, user address mode (you/we/brand name), error/negative state handling. Outputs to `.brand/voice.md` with source samples cited for human validation. Every inference marked with confidence: HIGH (directly observed pattern) / MEDIUM (inferred from limited samples) / LOW (guessed from single instance). Supports `--mode pitch` (minimum tier + confidence markers only) and `--mode comprehensive` (full analysis + existing codebase integration). |
 | `/brand-audit` | User | Evaluates output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces brand adherence score. |
 | `/brand-score` | User | Completeness scoring across all brand package dimensions (modeled on Layout.design's 0-100 approach). |
 | `/brand-refresh` | User | Re-analyzes updated assets, produces diff against existing brand package. |
@@ -702,20 +732,37 @@ npm install -g @uselayout/cli
 
 ```bash
 # Initialize project with Core Toolkit
-vml-brand init --client "ClientName"
+xd-brand init --client "ClientName" --mode standard
+
+# Mode options:
+#   --mode pitch          Minimum tier only. Adds disclaimer headers to all
+#                         .brand/ files. Skips workflows/ and specs/.
+#   --mode standard       Default. Standard tier scaffold.
+#   --mode comprehensive  Full tier with knowledge capture scaffolding.
+
+# All commands support --json for machine-readable output:
+#   xd-brand init --client "Name" --json   → { "created": [...], "tier": "standard" }
+#   xd-brand score --json                  → { "tier": "standard", "completeness": 72, "gaps": [...] }
+#   xd-brand doctor --json                 → { "mcps": { "configured": [...], "missing": [...] } }
+#   xd-brand validate --json               → { "valid": true, "warnings": [...] }
+
+# Upgrade from pitch to standard (after winning the pitch):
+#   xd-brand upgrade --tier standard
+#   Preserves existing .brand/ files, adds empty scaffolds for higher tier,
+#   removes pitch-mode disclaimers.
 
 # This creates:
 # .claude/skills/    ← Impeccable (18) + Vercel engineering skills (2)
 # .cursor/skills/    ← Same (for Cursor users)
 # .agents/skills/    ← Same (for VS Code Copilot / Codex users)
 # .gemini/skills/    ← Same (for Gemini CLI users)
-# .brand/            ← Empty scaffold
+# .brand/            ← Empty scaffold (depth varies by mode)
 # CLAUDE.md          ← Brand routing instructions
 # AGENTS.md          ← Cross-tool equivalent
 # .cursorrules       ← Cursor equivalent
 # .github/copilot-instructions.md ← VS Code Copilot equivalent
 # .impeccable.md     ← Empty (populated by /brand-analyze)
-# .brandrc.yaml      ← Configuration template
+# .brandrc.yaml      ← Configuration (includes mode and tier)
 
 # Add Storybook MCP if project uses Storybook
 npx storybook add @storybook/addon-mcp
@@ -849,6 +896,7 @@ These are third-party tools we use as-is. We configure them, document how to set
 | Vercel MCP | Vercel | Configure per-practitioner. Document setup. |
 | Netlify MCP | Netlify | Configure per-practitioner. Document setup. |
 | Context7 MCP | Community | Configure per-practitioner. Document setup. |
+| Firecrawl MCP | Firecrawl | Configure per-practitioner (Brand Factory only). Used for voice extraction — scraping copy samples from live sites. |
 | specs CLI | Nathan Curtis / DirectedEdges | Install globally. Brand Factory orchestrates it; DS Pack uses it for ongoing analysis. |
 | Layout CLI | Layout.design | Install globally when stable. Brand Factory orchestrates it. |
 | UX Research Pack (3 skills) | Community | Curate and package for optional installation. |
@@ -860,10 +908,10 @@ These are the components we build from scratch. This is where our development ef
 | # | Deliverable | What It Is | Effort |
 |---|------------|-----------|--------|
 | **C1** | **`.brand/` schema specification** | Documented spec for every file in the brand package: what fields, what format, required vs. optional, tiered completeness model (minimum → standard → comprehensive) | 3-5 days |
-| **C2** | **`vml-brand` CLI** | Node.js CLI with commands: `init` (scaffold project), `update` (refresh skills), `validate` (check completeness). Copies skills to all tool directories, generates instruction files from templates, checks for required MCPs. | 5-8 days |
+| **C2** | **`xd-brand` CLI** | Node.js CLI with commands: `init` (scaffold project), `update` (refresh skills), `validate` (check completeness), `doctor` (MCP verification), `score` (completeness), `upgrade` (tier promotion). Supports `--mode pitch/standard/comprehensive` and `--json` flag for machine-readable output on all commands. Copies skills to all tool directories, generates instruction files from templates. | 5-8 days |
 | **C3** | **CLAUDE.md template** | The brand routing instructions — ~40-50 lines that tell agents when to load which brand files. Plus AGENTS.md, .cursorrules, copilot-instructions.md equivalents. | 1-2 days |
-| **C4** | **`/brand-extract` skill** | Orchestrates the extraction pipeline: runs specs CLI against Figma files, Layout CLI against URLs, Figma MCP for variable inventory. Stores structured output for `/brand-analyze`. | 3-5 days |
-| **C5** | **`/brand-analyze` skill** | The core analysis skill. Reads extraction output + brand guide PDF (multimodal) + screenshots. Synthesizes into `.brand/` directory files. Auto-generates `.impeccable.md` from overview. Scores completeness and flags gaps. This is the most complex custom component. | 5-8 days |
+| **C4** | **`/brand-extract` skill** | Orchestrates the extraction pipeline: specs CLI (Figma component anatomy) + Layout CLI (CSS tokens from URLs) + Figma MCP (variable inventory) + Firecrawl MCP (voice extraction — 30-50 copy samples from live site). Supports `--public-only` flag for pitch scenarios. Stores structured output for `/brand-analyze`. | 3-5 days |
+| **C5** | **`/brand-analyze` skill** | The core analysis skill. Reads extraction output + brand guide PDF (multimodal) + screenshots + copy samples. Synthesizes into `.brand/` directory files. Auto-generates `.impeccable.md` from overview. Infers voice from copy samples with confidence levels (HIGH/MEDIUM/LOW). Supports `--mode pitch` (minimum tier only) and `--mode comprehensive` (full analysis + existing codebase integration). Flags contradictions between sources. This is the most complex custom component. | 5-8 days |
 | **C6** | **`/brand-score` skill** | Completeness scoring across all brand package dimensions. Modeled on Layout.design's 0-100 approach. Reports which tier the package is at. | 2-3 days |
 | **C7** | **`/brand-audit` skill** | Evaluates agent output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces a brand adherence score. | 3-5 days |
 | **C8** | **`/brand-refresh` skill** | Re-runs analysis against updated client assets. Produces diff against existing brand package. Human reviews changes before committing. | 2-3 days |
@@ -919,7 +967,11 @@ These are the components we build from scratch. This is where our development ef
 - `/scope` — project scoping skill (work started in separate thread)
 - Additional manager/ops skills TBD (resource planning, capacity, team health)
 
+**DS Consulting (Scenario D):**
+- `/ds-scope` — Design system consulting deliverable generator. Reads DS Pack audit outputs (triage, token-audit, component-audit, system-health, naming-audit, drift-detection) and produces: executive summary (system maturity, key risks, competitive position), gap analysis (what's missing, broken, outdated), remediation phases with effort estimates, and a scope document for the consulting engagement. Existing DS scoping work will be ported into this skill.
+
 **Infrastructure improvements:**
+- Multi-agent orchestration — Claude Code's native subagent capability enables parallel extraction, parallel analysis, and parallel audit within skills. Not a Phase 1 concern, but a future optimization for reducing Brand Factory wall-clock time.
 - MCP server for brand intelligence (serve `.brand/` via MCP for very large brand systems)
 - Visual regression integration (Applitools/Percy)
 - Voice/tone automated scoring
@@ -972,3 +1024,15 @@ vml-brand update
 | 6 | **Default deployment platform?** | Netlify (free tier allows commercial use). Vercel for Next.js projects where performance matters. Support both — practitioner picks per project. |
 | 7 | **MCP server for brand intelligence?** | Not yet. File-based loading works until brand packages exceed useful context window size. Build MCP when we hit that limit. |
 | 8 | **Practitioners without Claude Code?** | Cursor/VS Code get full skill + MCP support. Claude.ai Projects with brand knowledge is the fallback for non-editor users. |
+
+---
+
+## Testing & Agency Scenarios
+
+See `docs/testing-and-scenarios.md` for the complete testing strategy and agency scenario definitions:
+
+- **Testing:** Five-layer validation strategy (routing → Impeccable integration → MCP stack → Brand Factory → E2E)
+- **Scenario A:** New client onboarding (standard mode)
+- **Scenario B:** Pitch / no direct access (pitch mode)
+- **Scenario C:** Existing client / established relationship (comprehensive mode)
+- **Scenario D:** Design system consulting / assessment (DS Pack + extraction pipeline → consulting deliverable)

@@ -7,7 +7,7 @@ An end-to-end suite of tools for Experience Design (XD) practitioners to produce
 See `docs/architecture.md` for the full architecture document covering:
 - Three packages (Core Toolkit, Brand Factory, Brand Packages)
 - Four component categories (MCP Servers, Skills, Instruction Files, Data Files)
-- The MCP stack (9 servers across Design, Build/Test, Deploy, Context phases)
+- The MCP stack (10 servers across Design, Build/Test, Deploy, Context, Brand Factory phases)
 - The skills stack (Impeccable 18 skills + engineering + Brand Factory)
 - The `.brand/` directory structure and loading strategy
 - The E2E pipeline (Design -> Build -> Test -> Deploy)
@@ -17,7 +17,7 @@ See `docs/architecture.md` for the full architecture document covering:
 
 ```
 packages/
-  cli/              # vml-brand CLI (C2) — init, update, validate, doctor
+  cli/              # xd-brand CLI (C2) — init, update, validate, doctor, score, upgrade
   core/             # Package 1: Core Toolkit skills + instruction file templates
   brand-factory/    # Package 2: Brand Factory skills
 schema/
@@ -26,7 +26,8 @@ extensions/
   ds-pack/          # Optional: Design System Ops (21 skills)
   ux-research-pack/ # Optional: UX Research Pack (3 skills)
 docs/
-  architecture.md   # Full architecture & workflow document
+  architecture.md           # Full architecture & workflow document
+  testing-and-scenarios.md  # Testing strategy & agency scenarios (A/B/C/D)
 ```
 
 ## Build Order
