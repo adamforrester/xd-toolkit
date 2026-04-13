@@ -38,6 +38,7 @@ jobs:
             "microsoft/playwright-mcp|Playwright MCP|mcp"
             "JustasMonkev/mcp-accessibility-scanner|A11y Scanner MCP|mcp"
             "figma/community-resources|Figma Community Skills|skills"
+            "Owl-Listener/designer-skills|Designer Skills Pack|skills"
           )
 
           for entry in "${REPOS[@]}"; do

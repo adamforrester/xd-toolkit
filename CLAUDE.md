@@ -24,7 +24,7 @@ schema/
   brand/            # C1: .brand/ directory schema specification
 extensions/
   ds-pack/          # Optional: Design System Ops (21 skills)
-  ux-research-pack/ # Optional: UX Research Pack (3 skills)
+  designer-skills/  # Optional: Designer Skills Pack (63 skills, 8 plugins)
 docs/
   architecture.md           # Full architecture & workflow document
   testing-and-scenarios.md  # Testing strategy & agency scenarios (A/B/C/D)

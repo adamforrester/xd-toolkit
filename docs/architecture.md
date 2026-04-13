@@ -27,7 +27,9 @@ It's built for an agency context: multiple brands, multiple practitioners, varia
 │  ┌────────────────────────────────────────────────────────────┐   │
 │  │  EXTENSIONS (optional, per-practitioner)                   │   │
 │  │  ○ DS Pack — Design System Ops (21 skills) + community    │   │
-│  │  ○ UX Research Pack — research methodology + synthesis    │   │
+│  │  ○ Designer Skills Pack — 63 skills, 8 plugins (research,│   │
+│  │    strategy, UI, interaction, prototyping, ops, toolkit,  │   │
+│  │    design systems)                                        │   │
 │  │  ○ XD Manager Pack — reviews, scoping, ops (future)      │   │
 │  └────────────────────────────────────────────────────────────┘   │
 │                                                                  │
@@ -348,7 +350,7 @@ Impeccable already covers UX execution comprehensively:
 
 No additional UX skills are needed in the core toolkit for vibe coding workflows.
 
-For dedicated UX research and strategy work, see the **UX Research Pack** extension below.
+For dedicated UX research, strategy, and design ops work, see the **Designer Skills Pack** extension below.
 
 #### Engineering Quality Skills (curated, per-project)
 
@@ -363,33 +365,46 @@ For dedicated UX research and strategy work, see the **UX Research Pack** extens
 |-------|--------|--------------|
 | `/figma-plugin-dev` | **Custom (previously built)** | Figma plugin development — two-context architecture (sandbox vs. UI iframe), message passing protocol, NEVER/ALWAYS rules preventing common LLM mistakes, code organization (plugin/ui/shared), TypeScript config, build setup with esbuild. Auto-triggers on any Figma plugin work. 501 lines. |
 
-### Extension: UX Research Pack (Optional)
+### Extension: Designer Skills Pack (Optional)
 
-For UX practitioners doing dedicated research, strategy, and synthesis work — not needed for day-to-day vibe coding but valuable for the UX team's broader practice.
+A comprehensive collection of 63 skills, 27 commands, and 8 plugins covering the full UX/UI design practice — research, strategy, UI design, interaction design, prototyping, design ops, and more. Powered by **Owl-Listener/designer-skills** (664 GitHub stars, MIT license).
 
-Installed **per-practitioner** (personal skills directory), not per-project.
+Not needed for day-to-day vibe coding but valuable for the UX team's broader practice: dedicated research, strategy work, design ops, and structured handoffs.
 
-| Skill | Source | What It Does |
-|-------|--------|--------------|
-| `/ux-designer` | szilu/ux-designer-skill | 24 reference files covering Nielsen heuristics, Gestalt principles, Fitts's/Hick's/Miller's laws, information architecture, responsive patterns, form design, navigation, data visualization. 10,700+ lines of UX theory. Auto-triggers on UX topics. |
-| `/design-research` | Community | JTBD methodology, personas, customer segments, design principles, design roadmaps, research discussion guides |
-| `/ux-research-synthesis` | Community | Thematic analysis, affinity mapping from usability sessions. Severity scoring. Transforms raw research notes into structured reports with prioritized findings. |
+Installed **per-practitioner**, not per-project.
+
+**The 8 plugins:**
+
+| Plugin | Skills | Commands | What It Does |
+|--------|--------|----------|-------------|
+| design-research | 10 | 4 | Personas, empathy maps, journey maps, JTBD, interviews, usability testing, card sorting, diary studies |
+| ux-strategy | 8 | 3 | Competitive analysis, design principles, north star vision, stakeholder alignment, metrics, opportunity framework |
+| ui-design | 9 | 4 | Color systems, typography, layout grids, responsive, data viz, iconography, illustration style |
+| interaction-design | 7 | 3 | State machines, micro-animation, gesture design, loading patterns, error handling |
+| prototyping-testing | 8 | 4 | Prototype fidelity, usability testing, heuristic evaluation, A/B experiment design |
+| design-ops | 7 | 3 | Developer handoff specs (token-first), sprint planning, design critique, QA checklists, version control |
+| designer-toolkit | 6 | 3 | UX writing, design rationale, presentations, case studies, system adoption |
+| design-systems | 8 | 3 | Token architecture, component specs, theming, documentation (lighter weight overlap with DS Ops) |
 
 **Installation:**
 ```bash
-# Claude Code (personal)
-cp -r ux-research-pack/* ~/.claude/skills/
+# Claude Code (recommended)
+claude install github:Owl-Listener/designer-skills
 
-# Cursor / VS Code (personal)
-# Copy to personal skills directory if supported,
-# or add to a shared "ux-tools" repo that UX practitioners clone
+# Manual
+git clone https://github.com/Owl-Listener/designer-skills.git
+# Follow repo installation instructions
 ```
 
 **When to use vs. core Impeccable:**
 - Building a feature? → `/shape` (Impeccable) handles discovery + design brief
-- Doing foundational user research for a new product? → `/design-research` + `/ux-research-synthesis`
-- Need theoretical backing for a design decision? → `/ux-designer` reference files
-- Reviewing existing UI quality? → `/critique` (Impeccable) covers heuristics + cognitive load
+- Doing user research? → `/design-research:discover` chains persona → empathy → journey → synthesis
+- Need strategy work? → `/ux-strategy:strategize`
+- Planning a sprint? → `/design-ops:plan-sprint`
+- Handing off to devs? → `/design-ops:handoff` generates complete handoff package
+- Running a design critique? → `/critique` (Impeccable) for quality + `design-ops` critique for structured feedback
+- Competitive analysis? → `/ux-strategy:benchmark`
+- Reviewing UI quality? → `/critique` (Impeccable) covers heuristics + cognitive load
 
 ### Extension: Design System Pack (Optional)
 
@@ -899,7 +914,7 @@ These are third-party tools we use as-is. We configure them, document how to set
 | Firecrawl MCP | Firecrawl | Configure per-practitioner (Brand Factory only). Used for voice extraction — scraping copy samples from live sites. |
 | specs CLI | Nathan Curtis / DirectedEdges | Install globally. Brand Factory orchestrates it; DS Pack uses it for ongoing analysis. |
 | Layout CLI | Layout.design | Install globally when stable. Brand Factory orchestrates it. |
-| UX Research Pack (3 skills) | Community | Curate and package for optional installation. |
+| Designer Skills Pack (63 skills, 27 commands, 8 plugins) | Owl-Listener/designer-skills (664 stars) | Install per-practitioner. Covers research, strategy, UI, interaction, prototyping, design ops, toolkit, design systems. |
 
 ### Things We Create (Custom Development Required)
 
@@ -957,7 +972,7 @@ These are the components we build from scratch. This is where our development ef
 | 13 | Set up public GitHub repo | Repo structure, README, releases, npm package publishing | 1-2 days |
 | 14 | Write practitioner docs | **C9** — setup, workflow, onboarding, troubleshooting guides | 3-5 days |
 | 15 | Package DS Pack | Bundle Design System Ops (21 skills) + Figma community skills + installation guide as optional extension | 1-2 days |
-| 16 | Package UX Research Pack | Curate, test, document the optional extension | 1-2 days |
+| 16 | Package Designer Skills Pack | Test integration, document the optional extension, verify no conflicts with Impeccable | 1-2 days |
 | 17 | Claude.ai Project templates | Pre-configured Projects with brand knowledge for non-Code users | 1-2 days |
 
 ### Phase 4+ (Future)

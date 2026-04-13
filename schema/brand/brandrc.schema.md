@@ -49,7 +49,7 @@ References to source materials for the Brand Factory extraction pipeline.
 
 | Field | Required | Type | Description |
 |-------|----------|------|-------------|
-| `extensions` | optional | string[] | Active extensions: `ds-pack`, `ux-research-pack` |
+| `extensions` | optional | string[] | Active extensions: `ds-pack`, `designer-skills` |
 
 ---
 
