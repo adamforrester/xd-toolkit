@@ -17,14 +17,14 @@ See `docs/architecture.md` for the full architecture document covering:
 
 ```
 packages/
-  cli/              # xd-brand CLI (C2) — init, update, validate, doctor, score, upgrade
+  cli/              # xd-toolkit CLI (C2) — setup, init, doctor, update, score
   core/             # Package 1: Core Toolkit skills + instruction file templates
   brand-factory/    # Package 2: Brand Factory skills
 schema/
   brand/            # C1: .brand/ directory schema specification
 extensions/
   ds-pack/          # Optional: Design System Ops (21 skills)
-  designer-skills/  # Optional: Designer Skills Pack (63 skills, 8 plugins)
+  ux-design-skills/  # Optional: UX Design Skills Pack (63 skills, 8 plugins)
 docs/
   architecture.md           # Full architecture & workflow document
   testing-and-scenarios.md  # Testing strategy & agency scenarios (A/B/C/D)

@@ -3,7 +3,7 @@
 **Purpose:** Project-level configuration for the brand toolkit. Controls CLI behavior, declares which brand tier the project targets, and stores references to external assets (Figma files, URLs, etc.) used by the Brand Factory.
 
 **Location:** Project root (alongside `CLAUDE.md`)
-**Created by:** `vml-brand init`
+**Created by:** `xd-toolkit init`
 **Used by:** CLI commands (`validate`, `update`, `doctor`), Brand Factory skills (`/brand-extract`, `/brand-analyze`)
 
 ---
@@ -58,7 +58,7 @@ References to source materials for the Brand Factory extraction pipeline. Drives
 
 | Field | Required | Type | Description |
 |-------|----------|------|-------------|
-| `extensions` | optional | string[] | Active extensions: `ds-pack`, `designer-skills` |
+| `extensions` | optional | string[] | Active extensions: `ds-pack`, `ux-design-skills` |
 
 ---
 
@@ -113,9 +113,9 @@ extensions:
 
 ## Validation Rules
 
-The `vml-brand validate` command checks:
+The `xd-toolkit validate` command checks:
 1. `client` and `tier` are present
 2. `tier` value is one of: `minimum`, `standard`, `comprehensive`
 3. If `tier` is `standard` or `comprehensive`, the corresponding `.brand/` files exist
-4. If `sources.figma_file_ids` is set, the Figma MCP is configured (via `vml-brand doctor`)
+4. If `sources.figma_file_ids` is set, the Figma MCP is configured (via `xd-toolkit doctor`)
 5. If `deploy.platform` is set, the corresponding MCP is configured

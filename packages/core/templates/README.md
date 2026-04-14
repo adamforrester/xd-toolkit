@@ -68,7 +68,7 @@ Impeccable skills read `.impeccable.md` from the project root via their own buil
 
 ## Rendering
 
-The CLI (`xd-brand init` / `xd-brand update`) renders templates:
+The CLI (`xd-toolkit init` / `xd-toolkit update`) renders templates:
 
 1. Read `.brandrc.yaml` for project variables
 2. For router templates (CLAUDE.md, AGENTS.md, etc.): substitute `client`, `project`, `deploy_platform`

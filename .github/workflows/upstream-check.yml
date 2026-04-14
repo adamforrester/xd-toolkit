@@ -38,7 +38,7 @@ jobs:
             "microsoft/playwright-mcp|Playwright MCP|mcp"
             "dequelabs/axe-mcp-server-public|Deque axe MCP (watch for maturity)|mcp"
             "figma/community-resources|Figma Community Skills|skills"
-            "Owl-Listener/designer-skills|Designer Skills Pack|skills"
+            "Owl-Listener/designer-skills|UX Design Skills Pack|skills"
           )
 
           for entry in "${REPOS[@]}"; do
@@ -96,7 +96,7 @@ jobs:
           ### What this means
 
           $(if [ "$category" = "skills" ]; then
-            echo "**Skills update** — may add new skills, change existing skill behavior, or update skill metadata. Check if this affects what we ship to client projects via \`xd-brand init\` / \`xd-brand update\`."
+            echo "**Skills update** — may add new skills, change existing skill behavior, or update skill metadata. Check if this affects what we ship to client projects via \`xd-toolkit init\` / \`xd-toolkit update\`."
           elif [ "$category" = "mcp" ]; then
             echo "**MCP update** — may add new tools, change tool behavior, or fix bugs. Check if setup docs or practitioner instructions need updating."
           elif [ "$category" = "cli-tool" ]; then

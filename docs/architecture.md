@@ -27,7 +27,7 @@ It's built for an agency context: multiple brands, multiple practitioners, varia
 │  ┌────────────────────────────────────────────────────────────┐   │
 │  │  EXTENSIONS (optional, per-practitioner)                   │   │
 │  │  ○ DS Pack — Design System Ops (21 skills) + community    │   │
-│  │  ○ Designer Skills Pack — 63 skills, 8 plugins (research,│   │
+│  │  ○ UX Design Skills Pack — 63 skills, 8 plugins (research,│   │
 │  │    strategy, UI, interaction, prototyping, ops, toolkit,  │   │
 │  │    design systems)                                        │   │
 │  │  ○ XD Manager Pack — reviews, scoping, ops (future)      │   │
@@ -322,7 +322,7 @@ Impeccable already covers UX execution comprehensively:
 
 No additional UX skills are needed in the core toolkit for vibe coding workflows.
 
-For dedicated UX research, strategy, and design ops work, see the **Designer Skills Pack** extension below.
+For dedicated UX research, strategy, and design ops work, see the **UX Design Skills Pack** extension below.
 
 #### Engineering Quality Skills (curated, per-project)
 
@@ -337,7 +337,7 @@ For dedicated UX research, strategy, and design ops work, see the **Designer Ski
 |-------|--------|--------------|
 | `/figma-plugin-dev` | **Custom (previously built)** | Figma plugin development — two-context architecture (sandbox vs. UI iframe), message passing protocol, NEVER/ALWAYS rules preventing common LLM mistakes, code organization (plugin/ui/shared), TypeScript config, build setup with esbuild. Auto-triggers on any Figma plugin work. 501 lines. |
 
-### Extension: Designer Skills Pack (Optional)
+### Extension: UX Design Skills Pack (Optional)
 
 A comprehensive collection of 63 skills, 27 commands, and 8 plugins covering the full UX/UI design practice — research, strategy, UI design, interaction design, prototyping, design ops, and more. Powered by **Owl-Listener/designer-skills** (664 GitHub stars, MIT license).
 
@@ -685,79 +685,162 @@ and quality validation — in a single session.
 
 ---
 
+## Figma-Only Workflow (Designing on Canvas, Not Coding)
+
+The toolkit supports a design-only workflow where practitioners use Claude Code + Figma MCPs to design directly on the Figma canvas with brand awareness. No source code required.
+
+**How it works:** A designer creates (or references) a client brand directory, opens Claude Code in that directory, and uses the Figma MCPs to build screens on canvas using the client's component library, variables, and tokens — all guided by the `.brand/` package.
+
+The agent doesn't just answer questions about the brand — it actively builds screens in Figma using actual library components and correct variable bindings.
+
+**Example workflow:**
+1. Designer opens Claude Code in `~/clients/wendys/`
+2. Designer has Figma open with the design file and component library
+3. Designer: "Design a notification preferences screen for the Wendy's app in my open Figma file. Use the component library and follow the brand system."
+4. Claude Code reads `.brand/` for composition patterns and token rules
+5. Figma Console MCP reads available components and variables from the open file
+6. Figma Official/Console MCP creates the frame on canvas using actual library components and correct variable bindings
+7. Designer reviews, iterates: "Make the toggles use the secondary color" → Claude Code checks `.brand/tokens/colors.md`, applies the correct variable
+
+**Project setup for Figma-only work:**
+
+```bash
+npx xd-toolkit init --client "Wendy's" --figma-only
+```
+
+This creates a minimal project: `.brand/`, `CLAUDE.md`, `.impeccable.md`, `.brandrc.yaml`. No `src/` scaffold, no code-standards workflow, no deploy workflow. Just brand context for Figma work.
+
+The `.brand/` package provides the design intent. The Figma MCPs provide the hands. The project directory doesn't need any source code — it's purely a brand context container for Figma work.
+
+---
+
 ## Installation: Per-Agent Setup
 
 ### Claude Code (Primary Target)
 
 Claude Code has the richest support: progressive disclosure, plugin marketplace, subagent execution, skill auto-triggering, and MCP configuration.
 
-**One-time practitioner setup (~30 min):**
+#### Command: `xd-toolkit setup` (global, once per practitioner)
+
+Assumes Claude Code is already installed. Handles everything else.
 
 ```bash
-# 1. Install MCPs (user-scoped — available across all projects)
-claude mcp add figma -s user -- npx -y @anthropic-ai/figma-mcp@latest
-claude mcp add figma-console -s user \
-  -e FIGMA_ACCESS_TOKEN=figd_TOKEN \
-  -e ENABLE_MCP_APPS=true \
-  -- npx -y figma-console-mcp@latest
-claude mcp add playwright -s user -- npx -y @playwright/mcp@latest
-claude mcp add github -s user \
-  -e GITHUB_PERSONAL_ACCESS_TOKEN=ghp_TOKEN \
-  -- npx -y @modelcontextprotocol/server-github
-claude mcp add vercel -s user --transport http https://mcp.vercel.com
-claude mcp add netlify -s user -- npx -y @netlify/mcp
-claude mcp add context7 -s user -- npx -y @context7/mcp
-# Storybook MCP is project-scoped (see per-project setup)
-
-# 2. Install Brand Factory skills (personal — for onboarding practitioners only)
-# Option A: Plugin marketplace
-/plugin marketplace add vml/brand-factory
-
-# Option B: Manual
-cp -r brand-factory-skills/* ~/.claude/skills/
-
-# 3. Install prerequisite CLIs
-npm install -g @directededges/specs-cli
-npm install -g @uselayout/cli
+npx xd-toolkit setup
 ```
 
-**Per-project setup (when starting a new client project):**
+**What it does:**
+1. Checks Node.js version (18+ required)
+2. Prompts for which packages to install:
+   - **Core Toolkit** (always included) — Impeccable 18 skills, engineering quality 2 skills, figma-plugin-dev 1 skill, 7 MCP servers
+   - **UX Design Skills Pack** (optional) — 63 skills, 27 commands for research, strategy, interaction design, design ops
+   - **Design System Pack** (optional) — 21 skills for DS governance, auditing, documentation
+   - **Brand Factory** (optional) — skills for generating .brand/ packages from client assets. For practitioners who run client onboarding.
+3. Collects tokens (Figma PAT, GitHub PAT) with links to where to get them
+4. Installs MCP servers (7 core + optional Firecrawl for Brand Factory)
+5. Installs selected skill packs
+6. Verifies everything with a health check
+7. Reports what's installed and ready
+
+See `docs/setup-guide.md` for the full step-by-step practitioner guide.
+
+#### Command: `xd-toolkit init` (per project)
+
+Scaffolds a new project for a specific client.
 
 ```bash
-# Initialize project with Core Toolkit
-xd-brand init --client "ClientName" --mode standard
+npx xd-toolkit init
+# Interactive prompts:
+#   ? Client name: Wendy's
+#   ? Mode: [standard] / pitch / comprehensive
+#   ? Live website URL: https://wendys.com
+#   ? Figma file URL (optional):
+#   ? Social profiles (optional): https://x.com/wendys
+#   ? Use existing brand package? [no] / path to existing .brand/
+```
 
-# Mode options:
-#   --mode pitch          Minimum tier only. Adds disclaimer headers to all
-#                         .brand/ files. Skips workflows/ and specs/.
-#   --mode standard       Default. Standard tier scaffold.
-#   --mode comprehensive  Full tier with knowledge capture scaffolding.
+**Mode options:**
+- `--mode pitch` — Minimum tier only. Adds disclaimer headers to .brand/ files. Skips workflows/ and specs/.
+- `--mode standard` — Default. Standard tier scaffold.
+- `--mode comprehensive` — Full tier with knowledge capture scaffolding.
+- `--figma-only` — Brand context for Figma design work. No src/ scaffold, no code-standards workflow, no deploy workflow. Just .brand/, CLAUDE.md, .impeccable.md, .brandrc.yaml.
 
-# All commands support --json for machine-readable output:
-#   xd-brand init --client "Name" --json   → { "created": [...], "tier": "standard" }
-#   xd-brand score --json                  → { "tier": "standard", "completeness": 72, "gaps": [...] }
-#   xd-brand doctor --json                 → { "mcps": { "configured": [...], "missing": [...] } }
-#   xd-brand validate --json               → { "valid": true, "warnings": [...] }
+**Creates:**
+- `.brand/` directory (empty scaffold, depth varies by mode)
+- `.claude/skills/` with Core Toolkit skills
+- `.cursor/skills/` with same (for Cursor users)
+- `.agents/skills/` with same (for VS Code Copilot / Codex users)
+- `.gemini/skills/` with same (for Gemini CLI users)
+- `CLAUDE.md`, `AGENTS.md`, `.cursorrules`, `.github/copilot-instructions.md`
+- `.impeccable.md` (empty, populated by /brand-analyze)
+- `.brandrc.yaml` with client config and source URLs
 
-# Upgrade from pitch to standard (after winning the pitch):
-#   xd-brand upgrade --tier standard
-#   Preserves existing .brand/ files, adds empty scaffolds for higher tier,
-#   removes pitch-mode disclaimers.
+**Shared brand packages across multiple projects:**
 
-# This creates:
-# .claude/skills/    ← Impeccable (18) + Vercel engineering skills (2)
-# .cursor/skills/    ← Same (for Cursor users)
-# .agents/skills/    ← Same (for VS Code Copilot / Codex users)
-# .gemini/skills/    ← Same (for Gemini CLI users)
-# .brand/            ← Empty scaffold (depth varies by mode)
-# CLAUDE.md          ← Brand routing instructions
-# AGENTS.md          ← Cross-tool equivalent
-# .cursorrules       ← Cursor equivalent
-# .github/copilot-instructions.md ← VS Code Copilot equivalent
-# .impeccable.md     ← Empty (populated by /brand-analyze)
-# .brandrc.yaml      ← Configuration (includes mode and tier)
+```bash
+# First project — creates .brand/ at client level
+cd ~/clients/wendys
+npx xd-toolkit init --client "Wendy's"
 
-# Add Storybook MCP if project uses Storybook
+# Second project — references the existing .brand/
+cd ~/clients/wendys/app
+npx xd-toolkit init --client "Wendy's" --brand-path ../.brand
+```
+
+When `--brand-path` is used:
+- Don't create a new `.brand/` directory in the project
+- `CLAUDE.md` routing rules point to the `--brand-path` location (e.g., `../.brand/overview.md`)
+- `.impeccable.md` still lives in the project root (generated from the shared `.brand/overview.md`)
+- Skills are still copied per-project (repos need to be self-contained)
+
+Recommended directory structure for multi-project clients:
+```
+~/clients/wendys/
+├── .brand/                    ← Shared brand package
+├── homepage/
+│   ├── .claude/skills/
+│   ├── CLAUDE.md              ← Points to ../.brand/
+│   └── src/
+└── app/
+    ├── .claude/skills/
+    ├── CLAUDE.md              ← Points to ../.brand/
+    └── src/
+```
+
+#### Command: `xd-toolkit doctor` (verification)
+
+Checks both global and project health.
+
+```bash
+npx xd-toolkit doctor        # Human-readable output
+npx xd-toolkit doctor --json  # Machine-readable output
+```
+
+**Global checks:** Node.js version, Claude Code installed, MCP servers connected, skill packs installed.
+**Project checks** (if run inside a project): `.brand/` directory exists and has minimum-tier files, `CLAUDE.md` exists and references valid `.brand/` files, `.brandrc.yaml` is valid.
+
+Output: clear pass/fail for each check with fix instructions.
+
+#### Command: `xd-toolkit update`
+
+Updates Core Toolkit skills without overwriting `.brand/` or project-specific customizations. Re-deploys to all tool directories.
+
+#### Command: `xd-toolkit score`
+
+Reports brand package completeness: which tier (minimum/standard/comprehensive), percentage complete, specific gaps.
+
+```bash
+npx xd-toolkit score          # Human-readable
+npx xd-toolkit score --json   # → { "tier": "standard", "completeness": 72, "gaps": [...] }
+```
+
+#### All commands support `--json`
+
+Every command outputs structured JSON when `--json` is passed. Makes the CLI composable — other agents and tools can consume output programmatically.
+
+#### Storybook MCP (project-scoped)
+
+Not part of global setup. Install per-project when the project uses Storybook:
+```bash
 npx storybook add @storybook/addon-mcp
 npx mcp-add --type http --url "http://localhost:6006/mcp" --scope project
 ```
@@ -773,7 +856,7 @@ Both editors use the same MCP configuration format and the same skills architect
 | MCP config (global) | `~/.cursor/mcp.json` | VS Code settings or `code --add-mcp` CLI |
 | MCP config (project) | `.cursor/mcp.json` | `.vscode/mcp.json` |
 
-`vml-brand init` generates all of these. Both editors get identical skill content.
+`xd-toolkit init` generates all of these. Both editors get identical skill content.
 
 **One-time setup (same for both):**
 ```bash
@@ -803,13 +886,13 @@ Both editors use the same MCP configuration format and the same skills architect
 code --add-mcp '{"name":"playwright","command":"npx","args":["@playwright/mcp@latest"]}'
 ```
 
-**Per-project:** `vml-brand init` creates both `.cursor/skills/` and `.agents/skills/` with identical content, plus `.cursorrules` and `.github/copilot-instructions.md` with the same brand routing.
+**Per-project:** `xd-toolkit init` creates both `.cursor/skills/` and `.agents/skills/` with identical content, plus `.cursorrules` and `.github/copilot-instructions.md` with the same brand routing.
 
 **Key limitation vs. Claude Code:** Skill auto-triggering is less sophisticated in both editors. Skills mostly need explicit `/slash` invocation. Brand routing still works because the instruction files contain the same routing rules.
 
 ### Codex CLI / Gemini CLI
 
-Same pattern. `vml-brand init` creates `.codex/skills/` and `.gemini/skills/`. Each tool reads `AGENTS.md` for project context. MCPs configure via each tool's own mechanism — same server commands, different config file locations.
+Same pattern. `xd-toolkit init` creates `.codex/skills/` and `.gemini/skills/`. Each tool reads `AGENTS.md` for project context. MCPs configure via each tool's own mechanism — same server commands, different config file locations.
 
 ### Claude.ai (Web/Desktop — Not Claude Code)
 
@@ -855,8 +938,8 @@ If public is a firm no, a **GitHub repo under a team member's personal account**
 
 ```bash
 # Option A: npm install (preferred — versioned, updatable)
-npm install -g @vml-xd/brand-toolkit
-vml-brand init --client "ClientName"
+npm install -g @vml-xd/xd-toolkit
+xd-toolkit init --client "ClientName"
 
 # Option B: git clone (for contributors/customizers)
 git clone https://github.com/[team]/xd-toolkit.git
@@ -890,7 +973,7 @@ These are third-party tools we use as-is. We configure them, document how to set
 | Firecrawl MCP (optional) | Firecrawl | Optional upgrade for faster bulk scraping during client onboarding. Not required — Playwright handles the default workflow. Free tier covers ~2-3 clients; paid plans start at $16/month. |
 | specs CLI | Nathan Curtis / DirectedEdges | Install globally. Brand Factory orchestrates it; DS Pack uses it for ongoing analysis. |
 | Layout CLI | Layout.design | Install globally when stable. Brand Factory orchestrates it. |
-| Designer Skills Pack (63 skills, 27 commands, 8 plugins) | Owl-Listener/designer-skills (664 stars) | Install per-practitioner. Covers research, strategy, UI, interaction, prototyping, design ops, toolkit, design systems. |
+| UX Design Skills Pack (63 skills, 27 commands, 8 plugins) | Owl-Listener/designer-skills (664 stars) | Install per-practitioner. Covers research, strategy, UI, interaction, prototyping, design ops, toolkit, design systems. |
 
 ### Things We Create (Custom Development Required)
 
@@ -899,7 +982,7 @@ These are the components we build from scratch. This is where our development ef
 | # | Deliverable | What It Is | Effort |
 |---|------------|-----------|--------|
 | **C1** | **`.brand/` schema specification** | Documented spec for every file in the brand package: what fields, what format, required vs. optional, tiered completeness model (minimum → standard → comprehensive) | 3-5 days |
-| **C2** | **`xd-brand` CLI** | Node.js CLI with commands: `init` (scaffold project), `update` (refresh skills), `validate` (check completeness), `doctor` (MCP verification), `score` (completeness), `upgrade` (tier promotion). Supports `--mode pitch/standard/comprehensive` and `--json` flag for machine-readable output on all commands. Copies skills to all tool directories, generates instruction files from templates. | 5-8 days |
+| **C2** | **`xd-toolkit` CLI** | Two-level CLI: `setup` (global, once per practitioner — installs MCPs, skill packs, collects tokens, verifies health) and `init` (per-project — scaffolds .brand/, skills, instruction files, .brandrc.yaml). Also: `doctor` (global + project health checks), `update` (refresh skills without overwriting .brand/), `score` (brand package completeness). Supports `--mode pitch/standard/comprehensive`, `--brand-path` (shared brand packages across projects), `--figma-only` (brand context for Figma design work, no code scaffolding), and `--json` on all commands. | 5-8 days |
 | **C3** | **CLAUDE.md template** | The brand routing instructions — ~40-50 lines that tell agents when to load which brand files. Plus AGENTS.md, .cursorrules, copilot-instructions.md equivalents. | 1-2 days |
 | **C4** | **`/brand-extract` skill** | Orchestrates the extraction pipeline: specs CLI (Figma component anatomy) + Layout CLI (CSS tokens from URLs) + Figma MCP (variable inventory) + voice extraction via Playwright MCP (default) or Firecrawl (optional). Scrapes website, social profiles, and app store listings per `.brandrc.yaml` sources. Falls back to guided manual input when automated extraction fails. Supports `--public-only` flag for pitch scenarios. | 3-5 days |
 | **C5** | **`/brand-analyze` skill** | The core analysis skill. Reads extraction output + brand guide PDF (multimodal) + screenshots + copy samples. Synthesizes into `.brand/` directory files. Auto-generates `.impeccable.md` from overview. Infers voice from copy samples with confidence levels (HIGH/MEDIUM/LOW). Supports `--mode pitch` (minimum tier only) and `--mode comprehensive` (full analysis + existing codebase integration). Flags contradictions between sources. This is the most complex custom component. | 5-8 days |
@@ -907,7 +990,7 @@ These are the components we build from scratch. This is where our development ef
 | **C7** | **`/brand-audit` skill** | Evaluates agent output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces a brand adherence score. | 3-5 days |
 | **C8** | **`/brand-refresh` skill** | Re-runs analysis against updated client assets. Produces diff against existing brand package. Human reviews changes before committing. | 2-3 days |
 | **C9** | **Practitioner documentation** | Setup guide (MCP installation, CLI usage), daily workflow guide (how to use the toolkit), brand onboarding guide (how to run the Brand Factory), troubleshooting | 3-5 days |
-| **C10** | **MCP setup verification script** | A script that checks which MCPs are configured, which are missing, and prints the exact install commands for the practitioner's agent tool. Run via `vml-brand doctor`. | 1-2 days |
+| **C10** | **MCP setup verification script** | A script that checks which MCPs are configured, which are missing, and prints the exact install commands for the practitioner's agent tool. Run via `xd-toolkit doctor`. | 1-2 days |
 
 **Total custom development: ~30-45 days of effort.**
 
@@ -924,7 +1007,7 @@ These are the components we build from scratch. This is where our development ef
 | # | Task | Deliverable | Effort |
 |---|------|------------|--------|
 | 1 | Define `.brand/` schema | **C1** — Schema specification | 3-5 days |
-| 2 | Build `vml-brand init` CLI | **C2** — CLI scaffold (init command only first) | 3-5 days |
+| 2 | Build `xd-toolkit init` CLI | **C2** — CLI scaffold (init command only first) | 3-5 days |
 | 3 | Write instruction file templates | **C3** — CLAUDE.md, AGENTS.md, .cursorrules, copilot-instructions.md | 1-2 days |
 | 4 | Write MCP setup guide + doctor script | **C9** (partial) + **C10** | 2-3 days |
 | 5 | Test with one real client | Hand-author `.brand/` for existing client. Validate Impeccable + routing + MCPs produce on-brand output. | 3-5 days |
@@ -937,7 +1020,7 @@ These are the components we build from scratch. This is where our development ef
 | 7 | Build `/brand-analyze` | **C5** — the core analysis skill | 5-8 days |
 | 8 | Build `/brand-score` | **C6** | 2-3 days |
 | 9 | Build `/brand-audit` | **C7** | 3-5 days |
-| 10 | Build `vml-brand update` | **C2** (update command) | 2-3 days |
+| 10 | Build `xd-toolkit update` | **C2** (update command) | 2-3 days |
 | 11 | Test end-to-end on 2-3 clients | Full onboarding → production → validate | 5-8 days |
 
 ### Phase 3: Distribution & Extensions (Weeks 8-10)
@@ -948,7 +1031,7 @@ These are the components we build from scratch. This is where our development ef
 | 13 | Set up public GitHub repo | Repo structure, README, releases, npm package publishing | 1-2 days |
 | 14 | Write practitioner docs | **C9** — setup, workflow, onboarding, troubleshooting guides | 3-5 days |
 | 15 | Package DS Pack | Bundle Design System Ops (21 skills) + Figma community skills + installation guide as optional extension | 1-2 days |
-| 16 | Package Designer Skills Pack | Test integration, document the optional extension, verify no conflicts with Impeccable | 1-2 days |
+| 16 | Package UX Design Skills Pack | Test integration, document the optional extension, verify no conflicts with Impeccable | 1-2 days |
 | 17 | Claude.ai Project templates | Pre-configured Projects with brand knowledge for non-Code users | 1-2 days |
 
 ### Phase 4+ (Future)
@@ -978,21 +1061,21 @@ These are the components we build from scratch. This is where our development ef
 
 | Component | Update Mechanism | Cadence |
 |-----------|-----------------|---------|
-| **Impeccable skills** | `vml-brand update --core` re-downloads latest and re-deploys to all tool directories | Quarterly or on major release |
+| **Impeccable skills** | `xd-toolkit update --core` re-downloads latest and re-deploys to all tool directories | Quarterly or on major release |
 | **Design System Ops** | `git pull` from murphytrueman/design-system-ops or re-download plugin file | Track releases; update when new skills ship |
 | **UX/engineering skills** | Same as core — bundled with core update | Same |
-| **Brand Factory skills** | `/plugin marketplace update vml/brand-factory` or `npm update -g @vml/brand-toolkit` | As we ship improvements |
+| **Brand Factory skills** | `/plugin marketplace update vml/brand-factory` or `npm update -g @vml-xd/xd-toolkit` | As we ship improvements |
 | **MCPs (npm-based)** | Auto-update via `@latest` tag in npx commands | Automatic on each invocation |
 | **MCPs (cloud-hosted)** | Automatic (Vercel MCP, etc.) | No action needed |
 | **specs CLI** | `npm update -g @directededges/specs-cli` | Quarterly — test new version first |
 | **Layout CLI** | `npm update -g @uselayout/cli` | As-available (early access) |
 | **Brand packages** | Manual + skill-assisted: `/brand-refresh` with new assets | When client's brand evolves |
-| **CLAUDE.md / instruction files** | `vml-brand update` merges template changes, preserves customizations | With core updates |
+| **CLAUDE.md / instruction files** | `xd-toolkit update` merges template changes, preserves customizations | With core updates |
 
-### What `vml-brand update` Does
+### What `xd-toolkit update` Does
 
 ```bash
-vml-brand update
+xd-toolkit update
 
 1. Downloads latest Core Toolkit skills from registry
 2. Re-deploys to .claude/, .cursor/, .agents/, .gemini/, .codex/
@@ -1011,7 +1094,7 @@ vml-brand update
 | 2 | **How prescriptive is the `.brand/` schema?** | Tiered: minimum (overview + tokens + voice), standard (+ components + composition), comprehensive (+ specs + workflows). `/brand-score` reports which tier. |
 | 3 | **Should we publish the toolkit publicly?** | Yes — recommended. Skills are markdown files on top of public tools. The competitive advantage is the Brand Factory methodology and client-specific brand packages (never public), not the skill files. Public removes the org-seat bottleneck for 95 practitioners. |
 | 4 | **GitHub org repo or personal repo?** | Start with a team-owned personal GitHub repo (e.g., under your account or a shared "vml-xd" account). Move to org repo if/when seats become available. The toolkit works identically either way. |
-| 5 | **Storybook: required or optional?** | Optional per-project. Include MCP config in `vml-brand init` only if project has Storybook dependency. |
+| 5 | **Storybook: required or optional?** | Optional per-project. Include MCP config in `xd-toolkit init` only if project has Storybook dependency. |
 | 6 | **Default deployment platform?** | Netlify (free tier allows commercial use). Vercel for Next.js projects where performance matters. Support both — practitioner picks per project. |
 | 7 | **MCP server for brand intelligence?** | Not yet. File-based loading works until brand packages exceed useful context window size. Build MCP when we hit that limit. |
 | 8 | **Practitioners without Claude Code?** | Cursor/VS Code get full skill + MCP support. Claude.ai Projects with brand knowledge is the fallback for non-editor users. |

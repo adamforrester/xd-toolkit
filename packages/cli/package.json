@@ -1,10 +1,10 @@
 {
-  "name": "@vml-xd/brand-toolkit",
+  "name": "@vml-xd/xd-toolkit",
   "version": "0.1.0",
   "description": "CLI for scaffolding brand-consistent XD projects with AI agent support",
   "type": "module",
   "bin": {
-    "vml-brand": "./bin/vml-brand.js"
+    "xd-toolkit": "./bin/xd-toolkit.js"
   },
   "scripts": {
     "build": "echo 'TODO: add build step'",

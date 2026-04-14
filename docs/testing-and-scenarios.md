@@ -111,7 +111,7 @@ Each component of the toolkit is tested independently, in dependency order. You 
 **What you're testing:** Does the complete pipeline produce output that a designer would approve?
 
 **Method:**
-1. Start from zero: `xd-brand init --client "TestClient"`
+1. Start from zero: `xd-toolkit init --client "TestClient"`
 2. Run the Brand Factory on real assets
 3. Human reviews and enriches the brand package (time this — it's your onboarding cost metric)
 4. Build three representative deliverables:
@@ -143,7 +143,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
 
 **Toolkit workflow:**
 ```
-1. xd-brand init --client "ClientName" --mode standard
+1. xd-toolkit init --client "ClientName" --mode standard
 
 2. Gather assets:
    - Get brand guide PDF
@@ -201,7 +201,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
 
 **Toolkit workflow:**
 ```
-1. xd-brand init --client "ProspectName" --mode pitch
+1. xd-toolkit init --client "ProspectName" --mode pitch
 
    The --mode pitch flag tells the CLI:
    - Only generate minimum-tier files (overview, voice, tokens, .impeccable.md)
@@ -237,7 +237,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
    - Output won't be perfect but will feel directionally right
 
 6. If pitch is won → upgrade to Scenario A:
-   xd-brand upgrade --tier standard
+   xd-toolkit upgrade --tier standard
    - Preserves existing .brand/ files
    - Adds empty scaffolds for standard-tier files
    - Removes pitch-mode disclaimers
@@ -268,7 +268,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
 
 **Toolkit workflow:**
 ```
-1. xd-brand init --client "ClientName" --mode comprehensive
+1. xd-toolkit init --client "ClientName" --mode comprehensive
 
 2. /brand-extract
    - Full extraction: specs CLI, Layout CLI, Figma MCP, Playwright MCP
