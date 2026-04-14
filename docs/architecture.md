@@ -72,7 +72,7 @@ The `.brand/` directory — structured markdown and JSON files containing brand-
 
 ## Category 1: The MCP Stack
 
-Nine core MCP servers organized by pipeline phase, installed per-practitioner and available across every project. One optional MCP (Firecrawl) provides faster bulk scraping for frequent client onboarding.
+Eight core MCP servers organized by pipeline phase, installed per-practitioner and available across every project. One optional MCP (Firecrawl) provides faster bulk scraping for frequent client onboarding.
 
 ### Design Phase
 
@@ -144,8 +144,8 @@ npx mcp-add --type http --url "http://localhost:6006/mcp" --scope project
 ### Build & Test Phase
 
 #### Playwright MCP (Microsoft)
-- **What:** Browser automation — navigate, click, fill forms, take screenshots, run E2E tests conversationally. Agent verifies its own output in a real browser.
-- **Why essential:** The agent can say "navigate to localhost:3000, log in, check the dashboard loads, verify the notification toast appears" and actually do it. Closes the loop between generation and verification. No test scripts to write.
+- **What:** Browser automation — navigate, click, fill forms, take screenshots, run E2E tests conversationally. Agent verifies its own output in a real browser. Also handles accessibility auditing via axe-core injection — no separate a11y MCP needed.
+- **Why essential:** The agent can say "navigate to localhost:3000, log in, check the dashboard loads, verify the notification toast appears" and actually do it. Closes the loop between generation and verification. When CLAUDE.md rule 7 (WCAG 2.1 AA) triggers, the agent uses Playwright to inject axe-core and run a full audit. Testing confirmed Playwright + axe-core produces better results than a dedicated scanner (3 violation categories / 34 rules vs. 1 category / 25 rules).
 - **License:** Apache 2.0
 
 **Installation:**
@@ -159,27 +159,6 @@ claude mcp add playwright -s user -- npx -y @playwright/mcp@latest
     "playwright": {
       "command": "npx",
       "args": ["-y", "@playwright/mcp@latest"]
-    }
-  }
-}
-```
-
-#### Accessibility Scanner MCP
-- **What:** Axe-core powered WCAG 2.0/2.1/2.2 auditing at A/AA/AAA levels. Single page scans and site-wide crawling. Keyboard navigation auditing. Generates JSON reports with violation severity, affected elements, and remediation guidance. Visual annotations on violations.
-- **Why essential:** ADA Title II requires WCAG 2.1 AA compliance for government-serving entities by April 2026. Agencies serving government clients need automated a11y validation. Even for non-government work, accessibility is a quality bar. The agent can audit its own output before shipping.
-- **License:** MIT
-
-**Installation:**
-```bash
-# Claude Code
-claude mcp add a11y -s user -- npx -y mcp-accessibility-scanner
-
-# All tools (config file)
-{
-  "mcpServers": {
-    "accessibility": {
-      "command": "npx",
-      "args": ["-y", "mcp-accessibility-scanner"]
     }
   }
 }
@@ -283,7 +262,6 @@ claude mcp add firecrawl -s user \
 | Figma Console | `claude mcp add figma-console -s user -e FIGMA_ACCESS_TOKEN=... -- npx -y figma-console-mcp@latest` | Figma PAT | Design |
 | Storybook | `npx mcp-add --type http --url "http://localhost:6006/mcp" --scope project` | None | Design/Test |
 | Playwright | `claude mcp add playwright -s user -- npx -y @playwright/mcp@latest` | None | Test |
-| A11y Scanner | `claude mcp add a11y -s user -- npx -y mcp-accessibility-scanner` | None | Test |
 | GitHub | `claude mcp add github -s user -e GITHUB_PERSONAL_ACCESS_TOKEN=... -- npx -y @modelcontextprotocol/server-github` | GitHub PAT | Deploy |
 | Vercel | `claude mcp add vercel -s user --transport http https://mcp.vercel.com` | Vercel OAuth | Deploy |
 | Netlify | `claude mcp add netlify -s user -- npx -y @netlify/mcp` | Netlify OAuth | Deploy |
@@ -653,7 +631,7 @@ DESIGN INTENT (human describes what they want)
      ▼
 ┌─ TEST & VALIDATE PHASE ─────────────────────────────────────┐
 │  Playwright MCP → verify in real browser                     │
-│  A11y Scanner MCP → WCAG 2.1 AA audit (axe-core)           │
+│  Playwright MCP → WCAG 2.1 AA audit (axe-core injection)    │
 │  Storybook MCP → run component tests, self-fix              │
 │  Figma Console MCP → design-code parity check (scored diff)  │
 │  /critique → dual assessment (LLM + automated scanner)       │
@@ -690,7 +668,7 @@ Agent behavior:
 5. Calls Figma Official MCP → gets design context if Figma URL provided
 6. Generates code using design system components + correct tokens
 7. Calls Playwright MCP → opens localhost, verifies page renders correctly
-8. Calls A11y Scanner MCP → runs WCAG 2.1 AA audit
+8. Uses Playwright MCP → injects axe-core, runs WCAG 2.1 AA audit
 9. Fixes any violations found
 10. Writes Storybook stories for new components
 
@@ -723,7 +701,6 @@ claude mcp add figma-console -s user \
   -e ENABLE_MCP_APPS=true \
   -- npx -y figma-console-mcp@latest
 claude mcp add playwright -s user -- npx -y @playwright/mcp@latest
-claude mcp add a11y -s user -- npx -y mcp-accessibility-scanner
 claude mcp add github -s user \
   -e GITHUB_PERSONAL_ACCESS_TOKEN=ghp_TOKEN \
   -- npx -y @modelcontextprotocol/server-github
@@ -810,7 +787,6 @@ Both editors use the same MCP configuration format and the same skills architect
       "env": { "FIGMA_ACCESS_TOKEN": "figd_TOKEN", "ENABLE_MCP_APPS": "true" }
     },
     "playwright": { "command": "npx", "args": ["-y", "@playwright/mcp@latest"] },
-    "accessibility": { "command": "npx", "args": ["-y", "mcp-accessibility-scanner"] },
     "github": {
       "command": "npx",
       "args": ["-y", "@modelcontextprotocol/server-github"],
@@ -907,7 +883,6 @@ These are third-party tools we use as-is. We configure them, document how to set
 | Figma Console MCP | Southleft | Configure per-practitioner. Document setup. |
 | Storybook MCP | Storybook | Configure per-project where Storybook exists. Essential for DS Pack. |
 | Playwright MCP | Microsoft | Configure per-practitioner. Document setup. |
-| Accessibility Scanner MCP | Community | Configure per-practitioner. Document setup. |
 | GitHub MCP | Anthropic | Configure per-practitioner. Document setup. |
 | Vercel MCP | Vercel | Configure per-practitioner. Document setup. |
 | Netlify MCP | Netlify | Configure per-practitioner. Document setup. |

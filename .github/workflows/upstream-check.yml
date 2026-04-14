@@ -36,7 +36,7 @@ jobs:
             "southleft/figma-console-mcp|Figma Console MCP|mcp"
             "DirectedEdges/specs|specs CLI|cli-tool"
             "microsoft/playwright-mcp|Playwright MCP|mcp"
-            "JustasMonkev/mcp-accessibility-scanner|A11y Scanner MCP|mcp"
+            "dequelabs/axe-mcp-server-public|Deque axe MCP (watch for maturity)|mcp"
             "figma/community-resources|Figma Community Skills|skills"
             "Owl-Listener/designer-skills|Designer Skills Pack|skills"
           )

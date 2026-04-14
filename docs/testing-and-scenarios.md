@@ -62,8 +62,7 @@ Each component of the toolkit is tested independently, in dependency order. You 
 |-----|------------|---------|
 | Figma Official | "Get the design context from [Figma URL]" | Returns structured design data |
 | Figma Console | "Show me the design system health score for [Figma file]" | Returns scored dashboard |
-| Playwright | "Open localhost:3000 and verify the hero section renders" | Browser opens, navigates, reports result |
-| A11y Scanner | "Run an accessibility audit on localhost:3000" | Returns WCAG findings with severity |
+| Playwright | "Open localhost:3000 and verify the hero section renders" + "Run an accessibility audit" | Browser opens, navigates, reports result. For a11y: injects axe-core, returns WCAG findings with severity. |
 | GitHub | "Create a new repo called test-project and push this code" | Repo created, code pushed |
 | Netlify | "Deploy this project to Netlify" | Site deployed, returns URL |
 | Context7 | "What's the current API for Next.js app router layouts?" | Returns current docs, not stale training data |
@@ -72,7 +71,7 @@ Each component of the toolkit is tested independently, in dependency order. You 
 | Firecrawl (optional) | "Scrape the copy from [URL] and extract headlines, CTAs, and body text" | Returns structured copy samples (skip if not installed — Playwright handles this) |
 
 **What to watch for:**
-- Agent doesn't attempt to use an MCP when it should → the CLAUDE.md rules may need a hint (e.g., "Use the accessibility scanner MCP to verify rule 7")
+- Agent doesn't attempt to use an MCP when it should → the CLAUDE.md rules may need a hint (e.g., "Use Playwright to inject axe-core to verify rule 7")
 - MCP connection fails → auth configuration issue. Document the fix in troubleshooting.
 - Agent over-uses MCPs (e.g., screenshots on every action) → this is the Playwright proliferation problem. May need a skill hint about when to use vs. not.
 

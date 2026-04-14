@@ -7,7 +7,7 @@ An end-to-end suite of tools for Experience Design (XD) practitioners to produce
 See `docs/architecture.md` for the full architecture document covering:
 - Three packages (Core Toolkit, Brand Factory, Brand Packages)
 - Four component categories (MCP Servers, Skills, Instruction Files, Data Files)
-- The MCP stack (9 core + 1 optional across Design, Build/Test, Deploy, Context phases)
+- The MCP stack (8 core + 1 optional across Design, Build/Test, Deploy, Context phases)
 - The skills stack (Impeccable 18 skills + engineering + Brand Factory)
 - The `.brand/` directory structure and loading strategy
 - The E2E pipeline (Design -> Build -> Test -> Deploy)
