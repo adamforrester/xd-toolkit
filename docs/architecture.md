@@ -72,7 +72,7 @@ The `.brand/` directory — structured markdown and JSON files containing brand-
 
 ## Category 1: The MCP Stack
 
-Ten MCP servers organized by pipeline phase. Nine are installed per-practitioner and available across every project. One (Firecrawl) is scoped to the Brand Factory and only needed by practitioners running client onboarding.
+Nine core MCP servers organized by pipeline phase, installed per-practitioner and available across every project. One optional MCP (Firecrawl) provides faster bulk scraping for frequent client onboarding.
 
 ### Design Phase
 
@@ -259,31 +259,20 @@ claude mcp add context7 -s user -- npx -y @context7/mcp
 }
 ```
 
-### Brand Factory Phase
+### Optional: Brand Factory Enhancement
 
-#### Firecrawl MCP
-- **What:** Web scraping and content extraction. Converts web pages into structured markdown. Supports site crawling, single-page scraping, and content extraction with CSS selectors.
-- **Why essential for Brand Factory:** Enables voice extraction — scraping 30-50 copy samples from a client's live site (headlines, CTAs, body copy, error messages, navigation labels, microcopy) for `/brand-analyze` to infer voice and tone. Also used for general content ingestion during brand analysis.
-- **License:** Firecrawl terms (free tier: 500 credits/month)
-- **Scoped to:** Brand Factory skills only. Not required for day-to-day build work.
+#### Firecrawl MCP (optional)
+- **What:** Web scraping and content extraction. Converts web pages into structured markdown. Supports bulk site crawling, single-page scraping, and content extraction with CSS selectors.
+- **Why useful:** Faster bulk scraping for practitioners doing frequent client onboarding. Not required — Playwright MCP (already in core stack) handles the default voice extraction and content analysis workflow.
+- **License:** Firecrawl terms (free tier: 500 credits one-time, covers ~2-3 clients. Paid plans start at $16/month.)
+- **When to install:** Recommended for practitioners doing frequent client onboarding who want faster bulk scraping. Skip if you're doing occasional onboarding or working with a small number of clients.
 
 **Installation:**
 ```bash
-# Claude Code
+# Claude Code (optional — only if you want faster bulk scraping)
 claude mcp add firecrawl -s user \
   -e FIRECRAWL_API_KEY=fc_KEY \
   -- npx -y firecrawl-mcp
-
-# All tools (config file)
-{
-  "mcpServers": {
-    "firecrawl": {
-      "command": "npx",
-      "args": ["-y", "firecrawl-mcp"],
-      "env": { "FIRECRAWL_API_KEY": "fc_KEY" }
-    }
-  }
-}
 ```
 
 ### MCP Installation Summary
@@ -299,9 +288,14 @@ claude mcp add firecrawl -s user \
 | Vercel | `claude mcp add vercel -s user --transport http https://mcp.vercel.com` | Vercel OAuth | Deploy |
 | Netlify | `claude mcp add netlify -s user -- npx -y @netlify/mcp` | Netlify OAuth | Deploy |
 | Context7 | `claude mcp add context7 -s user -- npx -y @context7/mcp` | None | Context |
-| Firecrawl | `claude mcp add firecrawl -s user -e FIRECRAWL_API_KEY=... -- npx -y firecrawl-mcp` | Firecrawl API key | Brand Factory |
 
-**Total practitioner setup time:** ~30-45 minutes (one-time). Requires: Node.js 18+, Figma PAT, GitHub PAT, Vercel/Netlify accounts. Brand Factory practitioners also need: Firecrawl API key.
+**Optional:**
+
+| MCP | Install Command (Claude Code) | Auth Required | Phase |
+|-----|-------------------------------|---------------|-------|
+| Firecrawl | `claude mcp add firecrawl -s user -e FIRECRAWL_API_KEY=... -- npx -y firecrawl-mcp` | Firecrawl API key ($16+/mo for heavy use) | Brand Factory |
+
+**Total practitioner setup time:** ~30-45 minutes (one-time). Requires: Node.js 18+, Figma PAT, GitHub PAT, Vercel/Netlify accounts.
 
 ---
 
@@ -505,12 +499,19 @@ This extension will be developed in a future phase once the core toolkit, Brand 
 
 These are personal skills for the practitioners who run client onboarding. Not every team member needs them.
 
-**Prerequisites:** Firecrawl MCP (voice extraction), specs CLI, Layout CLI — installed per-practitioner alongside the standard MCP stack.
+**Prerequisites:** specs CLI, Layout CLI — installed per-practitioner alongside the standard MCP stack. Playwright MCP (already in core) handles voice extraction. Firecrawl MCP is an optional upgrade for faster bulk scraping.
+
+**Extraction method priority:**
+1. **Playwright MCP** (default, free, already in core stack) — navigates pages, extracts copy, handles social profiles
+2. **Firecrawl MCP** (optional upgrade, faster for bulk site crawling, requires API key + paid plan for heavy use)
+3. **Manual input** (fallback when automated extraction fails — screenshots, copy/paste, uploaded docs)
+
+The skill detects which tools are available and uses the best method. If both Playwright and Firecrawl are installed, prefers Firecrawl for bulk site crawling and Playwright for social media profiles and individual pages.
 
 | Skill | Trigger | What It Does |
 |-------|---------|--------------|
-| `/brand-extract` | User | Orchestrates extraction pipeline: specs CLI (Figma component anatomy) + Layout CLI (CSS tokens from URLs) + Figma MCP (variable inventory) + Firecrawl MCP (voice extraction — scrapes 30-50 copy samples from live site grouped by type: headlines, CTAs, body copy, error messages, navigation labels, microcopy, social posts). Supports `--public-only` flag for pitch scenarios (skips Figma/specs, runs only Layout CLI + Firecrawl against public URLs). Stores structured output for `/brand-analyze`. |
-| `/brand-analyze` | User | Core analysis: reads extraction output + brand guide PDF (multimodal) + screenshots. Synthesizes into `.brand/` directory. Auto-generates `.impeccable.md`. Scores completeness. **Voice inference:** reads copy samples from extraction, infers formality level, sentence structure patterns, vocabulary preferences, humor/seriousness spectrum, active vs. passive voice, user address mode (you/we/brand name), error/negative state handling. Outputs to `.brand/voice.md` with source samples cited for human validation. Every inference marked with confidence: HIGH (directly observed pattern) / MEDIUM (inferred from limited samples) / LOW (guessed from single instance). Supports `--mode pitch` (minimum tier + confidence markers only) and `--mode comprehensive` (full analysis + existing codebase integration). |
+| `/brand-extract` | User | Orchestrates extraction pipeline: specs CLI (Figma component anatomy) + Layout CLI (CSS tokens from URLs) + Figma MCP (variable inventory) + **voice extraction** (Playwright MCP default, Firecrawl optional). Voice extraction scrapes 30-50 copy samples from live site + social profiles + app store listings, grouped by type (headlines, CTAs, body copy, error messages, nav labels, microcopy) and channel. Falls back to guided manual input if automated extraction yields fewer than 10 usable samples. Always prompts practitioner for supplementary sources (brand docs, email examples, campaign materials) after extraction. Sources configured in `.brandrc.yaml`. Supports `--public-only` flag for pitch scenarios. |
+| `/brand-analyze` | User | Core analysis: reads extraction output + brand guide PDF (multimodal) + screenshots. Synthesizes into `.brand/` directory. Auto-generates `.impeccable.md`. Scores completeness. **Voice inference:** reads copy samples from extraction, infers formality level, sentence structure patterns, vocabulary preferences, humor/seriousness spectrum, active vs. passive voice, user address mode (you/we/brand name), error/negative state handling. Maps voice registers per channel (website/social/email/brand story), noting where voice is consistent vs. where it diverges. Outputs to `.brand/voice.md` with source samples cited for human validation. Every inference marked with confidence: HIGH (directly observed pattern) / MEDIUM (inferred from limited samples) / LOW (guessed from single instance). Supports `--mode pitch` (minimum tier + confidence markers only) and `--mode comprehensive` (full analysis + existing codebase integration). |
 | `/brand-audit` | User | Evaluates output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces brand adherence score. |
 | `/brand-score` | User | Completeness scoring across all brand package dimensions (modeled on Layout.design's 0-100 approach). |
 | `/brand-refresh` | User | Re-analyzes updated assets, produces diff against existing brand package. |
@@ -911,7 +912,7 @@ These are third-party tools we use as-is. We configure them, document how to set
 | Vercel MCP | Vercel | Configure per-practitioner. Document setup. |
 | Netlify MCP | Netlify | Configure per-practitioner. Document setup. |
 | Context7 MCP | Community | Configure per-practitioner. Document setup. |
-| Firecrawl MCP | Firecrawl | Configure per-practitioner (Brand Factory only). Used for voice extraction — scraping copy samples from live sites. |
+| Firecrawl MCP (optional) | Firecrawl | Optional upgrade for faster bulk scraping during client onboarding. Not required — Playwright handles the default workflow. Free tier covers ~2-3 clients; paid plans start at $16/month. |
 | specs CLI | Nathan Curtis / DirectedEdges | Install globally. Brand Factory orchestrates it; DS Pack uses it for ongoing analysis. |
 | Layout CLI | Layout.design | Install globally when stable. Brand Factory orchestrates it. |
 | Designer Skills Pack (63 skills, 27 commands, 8 plugins) | Owl-Listener/designer-skills (664 stars) | Install per-practitioner. Covers research, strategy, UI, interaction, prototyping, design ops, toolkit, design systems. |
@@ -925,7 +926,7 @@ These are the components we build from scratch. This is where our development ef
 | **C1** | **`.brand/` schema specification** | Documented spec for every file in the brand package: what fields, what format, required vs. optional, tiered completeness model (minimum → standard → comprehensive) | 3-5 days |
 | **C2** | **`xd-brand` CLI** | Node.js CLI with commands: `init` (scaffold project), `update` (refresh skills), `validate` (check completeness), `doctor` (MCP verification), `score` (completeness), `upgrade` (tier promotion). Supports `--mode pitch/standard/comprehensive` and `--json` flag for machine-readable output on all commands. Copies skills to all tool directories, generates instruction files from templates. | 5-8 days |
 | **C3** | **CLAUDE.md template** | The brand routing instructions — ~40-50 lines that tell agents when to load which brand files. Plus AGENTS.md, .cursorrules, copilot-instructions.md equivalents. | 1-2 days |
-| **C4** | **`/brand-extract` skill** | Orchestrates the extraction pipeline: specs CLI (Figma component anatomy) + Layout CLI (CSS tokens from URLs) + Figma MCP (variable inventory) + Firecrawl MCP (voice extraction — 30-50 copy samples from live site). Supports `--public-only` flag for pitch scenarios. Stores structured output for `/brand-analyze`. | 3-5 days |
+| **C4** | **`/brand-extract` skill** | Orchestrates the extraction pipeline: specs CLI (Figma component anatomy) + Layout CLI (CSS tokens from URLs) + Figma MCP (variable inventory) + voice extraction via Playwright MCP (default) or Firecrawl (optional). Scrapes website, social profiles, and app store listings per `.brandrc.yaml` sources. Falls back to guided manual input when automated extraction fails. Supports `--public-only` flag for pitch scenarios. | 3-5 days |
 | **C5** | **`/brand-analyze` skill** | The core analysis skill. Reads extraction output + brand guide PDF (multimodal) + screenshots + copy samples. Synthesizes into `.brand/` directory files. Auto-generates `.impeccable.md` from overview. Infers voice from copy samples with confidence levels (HIGH/MEDIUM/LOW). Supports `--mode pitch` (minimum tier only) and `--mode comprehensive` (full analysis + existing codebase integration). Flags contradictions between sources. This is the most complex custom component. | 5-8 days |
 | **C6** | **`/brand-score` skill** | Completeness scoring across all brand package dimensions. Modeled on Layout.design's 0-100 approach. Reports which tier the package is at. | 2-3 days |
 | **C7** | **`/brand-audit` skill** | Evaluates agent output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces a brand adherence score. | 3-5 days |

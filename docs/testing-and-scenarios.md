@@ -69,7 +69,7 @@ Each component of the toolkit is tested independently, in dependency order. You 
 | Context7 | "What's the current API for Next.js app router layouts?" | Returns current docs, not stale training data |
 | Storybook | (only if project has Storybook) "What components are available?" | Returns component list from Storybook |
 | Vercel | "Deploy this to Vercel" | Site deployed, returns URL |
-| Firecrawl | "Scrape the copy from [URL] and extract headlines, CTAs, and body text" | Returns structured copy samples |
+| Firecrawl (optional) | "Scrape the copy from [URL] and extract headlines, CTAs, and body text" | Returns structured copy samples (skip if not installed — Playwright handles this) |
 
 **What to watch for:**
 - Agent doesn't attempt to use an MCP when it should → the CLAUDE.md rules may need a hint (e.g., "Use the accessibility scanner MCP to verify rule 7")
@@ -153,7 +153,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
    - Schedule brand intake interview with client stakeholders
 
 3. /brand-extract
-   - Firecrawl MCP → scrape copy samples for voice extraction
+   - Playwright MCP → scrape copy samples for voice extraction
    - Layout CLI → tokens from live site (immediate)
    - specs CLI → component anatomy from Figma (when access granted)
    - Figma MCP → variables (when access granted)
@@ -213,7 +213,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
 
 2. /brand-extract --public-only
    - Layout CLI → tokens from public website (colors, typography, spacing, radii)
-   - Firecrawl MCP → scrape copy samples for voice extraction
+   - Playwright MCP → scrape copy samples for voice extraction
    - Screenshots of key pages for composition analysis
    - No Figma extraction, no specs CLI (no access)
 
@@ -272,7 +272,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
 1. xd-brand init --client "ClientName" --mode comprehensive
 
 2. /brand-extract
-   - Full extraction: specs CLI, Layout CLI, Figma MCP, Firecrawl MCP
+   - Full extraction: specs CLI, Layout CLI, Figma MCP, Playwright MCP
    - Also scan existing codebase for: existing AGENTS.md/CLAUDE.md, 
      token files, component documentation, Storybook stories
 
