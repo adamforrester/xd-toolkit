@@ -7,7 +7,6 @@
     "xd-toolkit": "./bin/xd-toolkit.js"
   },
   "scripts": {
-    "build": "echo 'TODO: add build step'",
     "test": "echo 'TODO: add tests'"
   },
   "keywords": [
@@ -23,6 +22,11 @@
   "engines": {
     "node": ">=18.0.0"
   },
-  "dependencies": {},
-  "devDependencies": {}
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^13.1.0",
+    "inquirer": "^12.6.0",
+    "ora": "^8.2.0",
+    "yaml": "^2.7.1"
+  }
 }

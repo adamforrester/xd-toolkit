@@ -1,0 +1,40 @@
+# {{client}}{{#project}} — {{project}}{{/project}}
+
+Read `.brand/overview.md` for this client's brand identity, personality, and visual language.
+
+## Context Loading (follow these rules — do not skip)
+
+Load the relevant `.brand/` file **before generating** when you encounter these tasks:
+
+- **Any visual implementation** → read the relevant file in `.brand/tokens/` (colors, typography, spacing, motion, surfaces)
+- **Working on a specific component** → check `.brand/components/{{name}}.md` if it exists
+- **Building a new page or layout** → read `.brand/composition/page-types.md` and check `anti-patterns.md`
+- **Writing user-facing copy** → read `.brand/voice.md`
+- **Translating a Figma design** → follow `.brand/workflows/figma-to-code.md`
+- **Generating code** → follow `.brand/workflows/code-standards.md`
+- **Running QA or final checks** → follow `.brand/workflows/qa-checklist.md`
+
+If a referenced file doesn't exist, proceed with your best judgment and flag the gap.
+
+## Rules (enforce always)
+
+1. Every color value must reference a design token. No hex, RGB, or HSL literals in source.
+2. Every spacing value must use the spacing scale. No magic numbers.
+3. Every border-radius and shadow must use a surface token. No arbitrary values.
+4. Use existing design system components. Do not rebuild what exists.
+5. Check `.brand/composition/anti-patterns.md` before proposing any layout.
+6. Maximum one primary CTA per visible viewport area.
+7. Run accessibility checks (WCAG 2.1 AA minimum) before considering any page complete.
+8. All interactive elements must be keyboard-navigable.
+
+## Deployment
+
+Push to personal GitHub repo (not the org repo). Deploy via {{deploy_platform}} — see `.brand/workflows/deploy.md`.
+
+## When to Stop and Ask
+
+- A Figma value doesn't map to any known design token
+- A component's behavior is ambiguous or underspecified in the design
+- A required semantic token doesn't exist in the token system
+- You need to make a breaking change to the token system or component API
+- The design conflicts with an anti-pattern rule
