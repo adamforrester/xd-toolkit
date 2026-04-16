@@ -71,15 +71,41 @@ const OPTIONAL_MCPS = {
 };
 
 /**
- * Install all core MCP servers.
+ * Get the set of already-connected MCP server names.
+ */
+async function getInstalledMCPs() {
+  const { ok, stdout } = await runAsync('claude mcp list');
+  if (!ok) return new Set();
+  const names = new Set();
+  for (const line of stdout.split('\n')) {
+    if (line.includes('Connected')) {
+      // Lines look like: "name: command... - ✓ Connected"
+      const match = line.match(/^([^:]+):/);
+      if (match) names.add(match[1].trim());
+    }
+  }
+  return names;
+}
+
+/**
+ * Install all core MCP servers, skipping any already connected.
  * @param {Object} tokens - { figma, github }
- * @returns {Array<{ name, label, ok, error? }>}
+ * @returns {Array<{ name, label, ok, skipped?, error? }>}
  */
 export async function installCoreMCPs(tokens) {
   const results = [];
+  const installed = await getInstalledMCPs();
 
   for (let i = 0; i < CORE_MCPS.length; i++) {
     const mcp = CORE_MCPS[i];
+
+    // Skip if already connected
+    if (installed.has(mcp.name)) {
+      console.log(chalk.dim(`  [${i + 1}/${CORE_MCPS.length}] ${mcp.label} — already installed, skipping`));
+      results.push({ name: mcp.name, label: mcp.label, ok: true, skipped: true });
+      continue;
+    }
+
     const spinner = ora(`[${i + 1}/${CORE_MCPS.length}] ${mcp.label} — ${mcp.description}`).start();
 
     const cmd = typeof mcp.cmd === 'function' ? mcp.cmd(tokens) : mcp.cmd;
@@ -104,6 +130,13 @@ export async function installCoreMCPs(tokens) {
 export async function installOptionalMCP(name, tokens) {
   const mcp = OPTIONAL_MCPS[name];
   if (!mcp) throw new Error(`Unknown optional MCP: ${name}`);
+
+  // Skip if already installed
+  const installed = await getInstalledMCPs();
+  if (installed.has(mcp.name)) {
+    console.log(chalk.dim(`  ${mcp.label} — already installed, skipping`));
+    return { name: mcp.name, label: mcp.label, ok: true, skipped: true };
+  }
 
   const spinner = ora(`${mcp.label} — ${mcp.description}`).start();
   const cmd = typeof mcp.cmd === 'function' ? mcp.cmd(tokens) : mcp.cmd;

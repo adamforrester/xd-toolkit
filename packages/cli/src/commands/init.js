@@ -177,7 +177,12 @@ export async function initCommand(opts) {
 
   // ── Scaffold the project ──
   const projectDir = process.cwd();
-  const tier = TIER_FOR_MODE[answers.mode];
+  let tier = TIER_FOR_MODE[answers.mode];
+
+  // Figma-only projects don't need workflow files — cap at standard tier
+  if (answers.figmaOnly && tier === 'comprehensive') {
+    tier = 'standard';
+  }
   results.tier = tier;
   results.mode = answers.mode;
   results.client = answers.client;
