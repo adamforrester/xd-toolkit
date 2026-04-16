@@ -1,9 +1,17 @@
-import { mkdirSync, cpSync, existsSync } from 'node:fs';
-import { join } from 'node:path';
+import { mkdirSync, cpSync, existsSync, readdirSync } from 'node:fs';
+import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import { homedir } from 'node:os';
 import chalk from 'chalk';
 import ora from 'ora';
 import { runAsync } from './exec.js';
+
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+
+/**
+ * Path to the bundled core skills shipped with the CLI package.
+ */
+export const BUNDLED_SKILLS_DIR = resolve(__dirname, '../../skills/core');
 
 /**
  * Tool-specific skill directories within a project.

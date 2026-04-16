@@ -18,6 +18,11 @@
     "figma",
     "xd"
   ],
+  "files": [
+    "bin/",
+    "src/",
+    "skills/"
+  ],
   "license": "MIT",
   "engines": {
     "node": ">=18.0.0"

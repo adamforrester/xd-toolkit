@@ -5,11 +5,10 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { stringify as yamlStringify } from 'yaml';
 import { renderTemplate } from '../utils/template-renderer.js';
-import { copySkillsToProject } from '../utils/skill-copier.js';
+import { copySkillsToProject, BUNDLED_SKILLS_DIR } from '../utils/skill-copier.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const TEMPLATES_DIR = resolve(__dirname, '../../src/templates');
-const SKILLS_DIR = resolve(__dirname, '../../skills');
 
 // .brand/ files to scaffold per tier
 const BRAND_FILES = {
@@ -89,9 +88,13 @@ export async function initCommand(opts) {
     answers.mode = opts.mode;
   }
 
+  // Detect non-interactive mode: if --client is passed as a flag, skip all prompts
+  // and use sensible defaults for anything not provided
+  const nonInteractive = !!opts.client;
+
   // Figma-only
   answers.figmaOnly = opts.figmaOnly || false;
-  if (!opts.figmaOnly) {
+  if (!opts.figmaOnly && !nonInteractive) {
     const { projectType } = await inquirer.prompt([
       {
         type: 'list',
@@ -108,40 +111,48 @@ export async function initCommand(opts) {
   }
 
   // Source URLs
-  const { websiteUrl } = await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'websiteUrl',
-      message: 'Live website URL (for brand extraction):',
-      default: '',
-    },
-  ]);
-  answers.websiteUrl = websiteUrl.trim();
-
-  if (answers.mode !== 'pitch') {
-    const { figmaUrl } = await inquirer.prompt([
+  if (nonInteractive) {
+    answers.websiteUrl = '';
+    answers.figmaUrl = '';
+    answers.socialProfiles = '';
+  } else {
+    const { websiteUrl } = await inquirer.prompt([
       {
         type: 'input',
-        name: 'figmaUrl',
-        message: `Figma file URL ${chalk.dim('(optional, press Enter to skip)')}:`,
+        name: 'websiteUrl',
+        message: 'Live website URL (for brand extraction):',
         default: '',
       },
     ]);
-    answers.figmaUrl = figmaUrl.trim();
+    answers.websiteUrl = websiteUrl.trim();
+
+    if (answers.mode !== 'pitch') {
+      const { figmaUrl } = await inquirer.prompt([
+        {
+          type: 'input',
+          name: 'figmaUrl',
+          message: `Figma file URL ${chalk.dim('(optional, press Enter to skip)')}:`,
+          default: '',
+        },
+      ]);
+      answers.figmaUrl = figmaUrl.trim();
+    }
+
+    const { socialProfiles } = await inquirer.prompt([
+      {
+        type: 'input',
+        name: 'socialProfiles',
+        message: `Social profiles ${chalk.dim('(comma-separated URLs, optional)')}:`,
+        default: '',
+      },
+    ]);
+    answers.socialProfiles = socialProfiles.trim();
   }
 
-  const { socialProfiles } = await inquirer.prompt([
-    {
-      type: 'input',
-      name: 'socialProfiles',
-      message: `Social profiles ${chalk.dim('(comma-separated URLs, optional)')}:`,
-      default: '',
-    },
-  ]);
-  answers.socialProfiles = socialProfiles.trim();
-
   // Brand path (shared brand packages)
-  if (!opts.brandPath) {
+  if (opts.brandPath) {
+    answers.brandPath = opts.brandPath;
+  } else if (!nonInteractive) {
     const { brandLocation } = await inquirer.prompt([
       {
         type: 'list',
@@ -169,8 +180,6 @@ export async function initCommand(opts) {
       ]);
       answers.brandPath = brandPath.trim();
     }
-  } else {
-    answers.brandPath = opts.brandPath;
   }
 
   console.log('');
@@ -203,22 +212,13 @@ export async function initCommand(opts) {
 
   // 2. Skills directories (unless figma-only)
   if (!answers.figmaOnly) {
-    if (existsSync(SKILLS_DIR)) {
-      const skillResults = copySkillsToProject(projectDir, SKILLS_DIR);
-      for (const r of skillResults) {
-        if (r.ok) {
-          console.log(chalk.green(`✓ ${r.dir}/`));
-          results.created.push(r.dir + '/');
-        } else {
-          console.log(chalk.yellow(`⚠ ${r.dir}/ — ${r.error}`));
-        }
-      }
-    } else {
-      // Skills not bundled yet — create empty directories
-      for (const dir of ['.claude/skills', '.cursor/skills', '.agents/skills', '.gemini/skills']) {
-        mkdirSync(join(projectDir, dir), { recursive: true });
-        console.log(chalk.green(`✓ ${dir}/ (empty — run xd-toolkit update to populate)`));
-        results.created.push(dir + '/');
+    const skillResults = copySkillsToProject(projectDir, BUNDLED_SKILLS_DIR);
+    for (const r of skillResults) {
+      if (r.ok) {
+        console.log(chalk.green(`✓ ${r.dir}/ (21 skills)`));
+        results.created.push(r.dir + '/');
+      } else {
+        console.log(chalk.yellow(`⚠ ${r.dir}/ — ${r.error}`));
       }
     }
   }
