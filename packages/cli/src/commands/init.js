@@ -5,7 +5,7 @@ import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { stringify as yamlStringify } from 'yaml';
 import { renderTemplate } from '../utils/template-renderer.js';
-import { copySkillsToProject, BUNDLED_SKILLS_DIR } from '../utils/skill-copier.js';
+import { copySkillsToProject, copyCommandsToProject, BUNDLED_SKILLS_DIR } from '../utils/skill-copier.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const TEMPLATES_DIR = resolve(__dirname, '../../src/templates');
@@ -221,6 +221,15 @@ export async function initCommand(opts) {
         console.log(chalk.yellow(`⚠ ${r.dir}/ — ${r.error}`));
       }
     }
+  }
+
+  // 2b. Slash commands (always copied — they work for both code and Figma-only)
+  const cmdResult = copyCommandsToProject(projectDir);
+  if (cmdResult.ok) {
+    console.log(chalk.green(`✓ .claude/commands/ (${cmdResult.count} slash commands)`));
+    results.created.push('.claude/commands/');
+  } else {
+    console.log(chalk.yellow(`⚠ Slash commands not copied: ${cmdResult.error}`));
   }
 
   // 3. Instruction files

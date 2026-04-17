@@ -3,7 +3,7 @@ import inquirer from 'inquirer';
 import { tryRun } from '../utils/exec.js';
 import { validateFigmaToken, validateGitHubToken, validateFirecrawlKey } from '../utils/token-validator.js';
 import { installCoreMCPs, installOptionalMCP } from '../utils/mcp-installer.js';
-import { installUXDesignSkills } from '../utils/skill-copier.js';
+import { installUXDesignSkills, installCommandsGlobal } from '../utils/skill-copier.js';
 
 export async function setupCommand(opts) {
   const results = { mcps: [], skills: [], warnings: [] };
@@ -205,6 +205,20 @@ export async function setupCommand(opts) {
     results.skills.push({ name: 'brand-factory', ok: true });
   }
 
+  // ── Step 5b: Install slash commands globally ──
+  console.log('');
+  console.log(chalk.bold('  Installing slash commands'));
+  console.log('');
+
+  const cmdResult = installCommandsGlobal();
+  if (cmdResult.ok) {
+    console.log(chalk.green(`✓ ${cmdResult.count} slash commands installed to ~/.claude/commands/`));
+    console.log(chalk.dim('    /new-project — set up a new client project with brand extraction'));
+    console.log(chalk.dim('    /brand-check — check brand package completeness'));
+  } else {
+    console.log(chalk.yellow(`⚠ Slash commands not installed: ${cmdResult.error}`));
+  }
+
   console.log('');
 
   // ── Step 6: Verify ──
@@ -253,7 +267,8 @@ export async function setupCommand(opts) {
 
   console.log('');
   console.log(chalk.bold('  Next step:'));
-  console.log(`  Create a project: ${chalk.cyan('npx xd-toolkit init')}`);
+  console.log(`  Open Claude Code and type: ${chalk.cyan('/new-project [client name]')}`);
+  console.log(chalk.dim('  Or from the CLI: npx xd-toolkit init'));
   console.log('');
 
   if (opts.json) {

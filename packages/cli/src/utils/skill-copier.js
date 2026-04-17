@@ -82,3 +82,50 @@ export function installBrandFactorySkills(skillsSourceDir) {
 export function getUserSkillsDir() {
   return join(homedir(), '.claude', 'skills');
 }
+
+/**
+ * Path to the bundled slash commands shipped with the CLI package.
+ */
+export const BUNDLED_COMMANDS_DIR = resolve(__dirname, '../../commands');
+
+/**
+ * Copy slash commands to user-level ~/.claude/commands/ (globally available).
+ */
+export function installCommandsGlobal() {
+  const source = BUNDLED_COMMANDS_DIR;
+  const target = join(homedir(), '.claude', 'commands');
+
+  if (!existsSync(source)) {
+    return { ok: false, error: 'Commands source not found' };
+  }
+
+  mkdirSync(target, { recursive: true });
+  try {
+    cpSync(source, target, { recursive: true });
+    const count = readdirSync(source).filter(f => f.endsWith('.md')).length;
+    return { ok: true, count };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+}
+
+/**
+ * Copy slash commands to project-level .claude/commands/ (travels with repo).
+ */
+export function copyCommandsToProject(projectDir) {
+  const source = BUNDLED_COMMANDS_DIR;
+  const target = join(projectDir, '.claude', 'commands');
+
+  if (!existsSync(source)) {
+    return { ok: false, error: 'Commands source not found' };
+  }
+
+  mkdirSync(target, { recursive: true });
+  try {
+    cpSync(source, target, { recursive: true });
+    const count = readdirSync(source).filter(f => f.endsWith('.md')).length;
+    return { ok: true, count };
+  } catch (err) {
+    return { ok: false, error: err.message };
+  }
+}
