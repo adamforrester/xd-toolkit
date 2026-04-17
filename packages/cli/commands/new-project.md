@@ -72,6 +72,52 @@ For each file type:
 
 If they don't have anything: "No problem — I'll work with the website and any Figma files. The results will have lower confidence in some areas, which I'll flag."
 
+## Phase 3b: Essential Asset Check
+
+After collecting documents and before extraction, check for assets the agent will need during the build phase but cannot generate or substitute. Ask about each one conversationally:
+
+1. **Logo files** — "Do you have the brand logo? I need it as SVG or PNG. I can't generate or recreate logos — I need the real file."
+   - Accept multiple variants (full color, white/reversed, icon-only)
+   - If they don't have it: note the gap, the build phase will use a placeholder
+
+2. **Brand fonts** — Check any provided token files or brand guide for font family names. If custom/brand fonts are specified (anything that isn't a Google Font or system font), ask: "The brand uses [font name]. Do you have the font files (.woff2, .ttf, .otf)? Without them I'll have to fall back to a similar system font, which won't look right."
+   - If Google Fonts: no files needed, note the font names for build phase
+   - If custom fonts without files: flag as a gap that will affect build quality
+
+3. **Hero/product photography** — "Do you have any brand photography or product images? Without real images I can only use placeholders."
+   - Not required — placeholders are acceptable for prototypes
+   - But real images dramatically improve prototype fidelity
+
+4. **Icons** — "Does the brand use a custom icon set? If so, where are the icon files?"
+   - If they use a standard set (Lucide, Heroicons, Material, etc.): note the set name
+   - If custom: collect the files
+
+Store provided assets in an organized directory:
+
+```
+assets/
+├── logo/
+│   ├── [client]-logo.svg
+│   └── [client]-logo-white.svg
+├── fonts/
+│   ├── [FontName]-Regular.woff2
+│   └── [FontName]-Bold.woff2
+├── images/
+│   └── (hero photos, product shots)
+└── icons/
+    └── (icon set if provided)
+```
+
+Create the `assets/` directory and subdirectories as needed. Update `.brandrc.yaml` with asset paths under a new `assets` key:
+
+```yaml
+assets:
+  logo: assets/logo/
+  fonts: assets/fonts/
+  images: assets/images/
+  icons: assets/icons/
+```
+
 ## Phase 4: Brand Extraction
 
 Tell the practitioner: "I have everything I need. I'm going to analyze your brand assets now. This takes a few minutes."
