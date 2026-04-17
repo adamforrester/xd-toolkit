@@ -29,7 +29,8 @@ jobs:
 
           # Each entry: "repo|display_name|category"
           # Categories: skills (affects what we ship to projects),
-          #             mcp (agent tooling), cli-tool (extraction/analysis)
+          #             mcp (agent tooling), cli-tool (extraction/analysis),
+          #             plugin (per-practitioner plugins)
           REPOS=(
             "pbakaus/impeccable|Impeccable|skills"
             "murphytrueman/design-system-ops|Design System Ops|skills"
@@ -39,6 +40,7 @@ jobs:
             "dequelabs/axe-mcp-server-public|Deque axe MCP (watch for maturity)|mcp"
             "figma/community-resources|Figma Community Skills|skills"
             "Owl-Listener/designer-skills|UX Design Skills Pack|skills"
+            "obra/superpowers|Superpowers|plugin"
           )
 
           for entry in "${REPOS[@]}"; do
@@ -101,6 +103,8 @@ jobs:
             echo "**MCP update** — may add new tools, change tool behavior, or fix bugs. Check if setup docs or practitioner instructions need updating."
           elif [ "$category" = "cli-tool" ]; then
             echo "**CLI tool update** — may change output format, add new commands, or fix extraction bugs. Check if Brand Factory skills that orchestrate this tool need updating."
+          elif [ "$category" = "plugin" ]; then
+            echo "**Plugin update** — may add new capabilities or change behavior. Check if setup docs or practitioner instructions need updating."
           fi)
 
           ### Release notes

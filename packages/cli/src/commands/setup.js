@@ -51,7 +51,7 @@ export async function setupCommand(opts) {
       message: 'Select packages',
       choices: [
         {
-          name: `Core Toolkit ${chalk.dim('— Impeccable 18 skills, engineering quality, 7 MCP servers')}`,
+          name: `Core Toolkit ${chalk.dim('— 21 skills, Superpowers plugin, 7 MCP servers')}`,
           value: 'core',
           checked: true,
           disabled: 'always included',
@@ -205,7 +205,22 @@ export async function setupCommand(opts) {
     results.skills.push({ name: 'brand-factory', ok: true });
   }
 
-  // ── Step 5b: Install slash commands globally ──
+  // ── Step 5b: Install plugins ──
+  console.log('');
+  console.log(chalk.bold('  Installing plugins'));
+  console.log('');
+
+  const superpowersResult = tryRun('claude install github:obra/superpowers');
+  if (superpowersResult.ok) {
+    console.log(chalk.green('✓ Superpowers — structured development: brainstorming, TDD, debugging, code review'));
+    results.skills.push({ name: 'superpowers', ok: true });
+  } else {
+    console.log(chalk.yellow('⚠ Superpowers plugin failed to install'));
+    if (superpowersResult.stderr) console.log(chalk.dim(`    ${superpowersResult.stderr.split('\n')[0]}`));
+    results.skills.push({ name: 'superpowers', ok: false, error: superpowersResult.stderr });
+  }
+
+  // ── Step 5c: Install slash commands globally ──
   console.log('');
   console.log(chalk.bold('  Installing slash commands'));
   console.log('');

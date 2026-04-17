@@ -14,8 +14,8 @@ It's built for an agency context: multiple brands, multiple practitioners, varia
 ┌──────────────────────────────────────────────────────────────────┐
 │                                                                  │
 │  PACKAGE 1: Core Toolkit                                         │
-│  Universal design quality + workflow skills + MCP stack          │
-│  Installed per-practitioner (MCPs) + per-project (skills/files)  │
+│  21 skills + 1 plugin + 7 MCP servers + Storybook (per-project) │
+│  Installed per-practitioner (MCPs, plugin) + per-project (skills)│
 │  Brand-agnostic                                                  │
 │                                                                  │
 │  ┌────────────────────────────────────────────────────────────┐   │
@@ -336,6 +336,27 @@ For dedicated UX research, strategy, and design ops work, see the **UX Design Sk
 | Skill | Source | What It Does |
 |-------|--------|--------------|
 | `/figma-plugin-dev` | **Custom (previously built)** | Figma plugin development — two-context architecture (sandbox vs. UI iframe), message passing protocol, NEVER/ALWAYS rules preventing common LLM mistakes, code organization (plugin/ui/shared), TypeScript config, build setup with esbuild. Auto-triggers on any Figma plugin work. 501 lines. |
+
+#### Plugin: Superpowers (per-practitioner)
+
+| Plugin | Source | What It Does |
+|--------|--------|--------------|
+| Superpowers | obra/superpowers (294k installs) | Structured development practices: brainstorming before coding, test-driven development, systematic debugging, and code review via subagents. Improves the quality of every coded prototype by teaching Claude disciplined development workflows. |
+
+**Installation:**
+```bash
+claude install github:obra/superpowers
+```
+
+Installed per-practitioner during `xd-toolkit setup`. Available across all projects.
+
+#### Recommended: Design Cowork Plugin (for Cowork users)
+
+The Anthropic-verified **Design** plugin for Claude Cowork (211k installs) covers design critique, UX writing, accessibility audits, research synthesis, and dev handoff. It works in the Cowork environment while our skills work in Claude Code and Cursor.
+
+This is NOT installed by `xd-toolkit setup` — it's a recommendation for practitioners who have Cowork access:
+
+> **If you use Claude Cowork:** Settings → Plugins → Search "Design" → Install (by Anthropic)
 
 ### Extension: UX Design Skills Pack (Optional)
 
@@ -731,15 +752,17 @@ npx xd-toolkit setup
 **What it does:**
 1. Checks Node.js version (18+ required)
 2. Prompts for which packages to install:
-   - **Core Toolkit** (always included) — Impeccable 18 skills, engineering quality 2 skills, figma-plugin-dev 1 skill, 7 MCP servers
+   - **Core Toolkit** (always included) — 21 skills (Impeccable 18 + Vercel 2 + figma-plugin-dev 1), Superpowers plugin, 7 MCP servers
    - **UX Design Skills Pack** (optional) — 63 skills, 27 commands for research, strategy, interaction design, design ops
    - **Design System Pack** (optional) — 21 skills for DS governance, auditing, documentation
    - **Brand Factory** (optional) — skills for generating .brand/ packages from client assets. For practitioners who run client onboarding.
 3. Collects tokens (Figma PAT, GitHub PAT) with links to where to get them
 4. Installs MCP servers (7 core + optional Firecrawl for Brand Factory)
-5. Installs selected skill packs
-6. Verifies everything with a health check
-7. Reports what's installed and ready
+5. Installs Superpowers plugin (structured development practices)
+6. Installs selected skill packs
+7. Installs slash commands globally (/new-project, /brand-check)
+8. Verifies everything with a health check
+9. Reports what's installed and ready
 
 See `docs/setup-guide.md` for the full step-by-step practitioner guide.
 
@@ -767,6 +790,7 @@ npx xd-toolkit init
 **Creates:**
 - `.brand/` directory (empty scaffold, depth varies by mode)
 - `.claude/skills/` with Core Toolkit skills
+- `.claude/commands/` with slash commands (/new-project, /brand-check)
 - `.cursor/skills/` with same (for Cursor users)
 - `.agents/skills/` with same (for VS Code Copilot / Codex users)
 - `.gemini/skills/` with same (for Gemini CLI users)
@@ -961,6 +985,8 @@ These are third-party tools we use as-is. We configure them, document how to set
 |-----------|--------|-------------------|
 | Impeccable (18 skills) | pbakaus/impeccable | Install into every project. Impeccable reads `.impeccable.md` for brand context — we generate that file. No fork needed. |
 | Vercel engineering skills (2) | vercel-labs/agent-skills | Install into every project alongside Impeccable. |
+| Superpowers plugin | obra/superpowers (294k installs) | Install per-practitioner during setup. Structured development: brainstorming, TDD, debugging, code review via subagents. |
+| Design Cowork plugin | Anthropic (211k installs) | **Recommended** for Cowork users (not installed by setup). Design critique, UX writing, a11y audits, research synthesis, dev handoff. |
 | **Design System Ops (21 skills + 3 agents)** | murphytrueman/design-system-ops | **Optional DS Pack extension.** Covers token audit (with DTCG/Style Dictionary), component audit, DS health scoring, governance, documentation, design-to-code parity, migration workflows. Saves us 8-12 days of custom development. |
 | Figma Official MCP | Figma | Configure per-practitioner. Document setup. |
 | Figma Console MCP | Southleft | Configure per-practitioner. Document setup. |
@@ -1083,6 +1109,18 @@ xd-toolkit update
 4. Merges CLAUDE.md template updates (flags conflicts for manual resolution)
 5. Reports what changed (diff summary)
 ```
+
+---
+
+## Claude Design (Under Investigation)
+
+Claude Design launched April 2026 as a new Anthropic product for visual design work. It includes built-in design system onboarding and handoff to Claude Code. Key capability: during onboarding, Claude Design builds a design system for your team by reading your codebase and design files, then every project uses your colors, typography, and components automatically.
+
+We are investigating whether Claude Design can consume `.brand/` files or custom design systems. If it can, it becomes another environment alongside Claude Code and Cursor that benefits from the brand package system. If it uses a proprietary format, we may need a bridge to export `.brand/` data into Claude Design's format.
+
+The design-to-Claude-Code handoff is particularly relevant — designs package into a bundle that Claude Code receives, which could integrate with our existing build pipeline.
+
+**Status:** Under investigation. Not yet integrated into the toolkit.
 
 ---
 

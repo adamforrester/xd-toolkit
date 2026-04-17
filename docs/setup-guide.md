@@ -152,6 +152,31 @@ This is per-project, not global — you'll do this step for each Storybook proje
 
 ---
 
+## Install the Superpowers Plugin
+
+**What it does:** Teaches Claude structured development practices — brainstorming before coding, test-driven development, systematic debugging, and code review via subagents. Improves the quality of every coded prototype.
+
+```bash
+claude install github:obra/superpowers
+```
+
+You should see confirmation that the plugin was installed.
+
+---
+
+## Recommended: Cowork Plugins
+
+If you use **Claude Cowork** (the desktop collaboration app), also install the Design plugin:
+
+1. Open Claude Cowork
+2. Go to **Settings → Plugins**
+3. Search for **"Design"** (by Anthropic, 211k installs)
+4. Click **Install**
+
+This adds design critique, UX writing, accessibility audits, research synthesis, and dev handoff capabilities inside Cowork. It complements the skills we install for Claude Code.
+
+---
+
 ## Verify Everything
 
 After installing all MCPs, run:

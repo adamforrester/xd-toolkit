@@ -8,7 +8,7 @@ See `docs/architecture.md` for the full architecture document covering:
 - Three packages (Core Toolkit, Brand Factory, Brand Packages)
 - Four component categories (MCP Servers, Skills, Instruction Files, Data Files)
 - The MCP stack (8 core + 1 optional across Design, Build/Test, Deploy, Context phases)
-- The skills stack (Impeccable 18 skills + engineering + Brand Factory)
+- The skills stack (21 skills + Superpowers plugin + Brand Factory)
 - The `.brand/` directory structure and loading strategy
 - The E2E pipeline (Design -> Build -> Test -> Deploy)
 - Build plan (C1-C10 deliverables)
@@ -24,7 +24,7 @@ packages/
     src/commands/   #   setup.js, init.js, doctor.js, update.js, score.js
     src/utils/      #   mcp-installer, skill-copier, template-renderer, token-validator
     src/templates/  #   Bundled .tmpl files for CLAUDE.md, AGENTS.md, etc.
-    skills/core/    #   Bundled 21 skills (Impeccable 18 + Vercel 2 + figma-plugin-dev 1)
+    skills/core/    #   Bundled 21 skills (Impeccable 18 + Vercel 2 + figma-plugin-dev 1) + Superpowers plugin
   core/             # Package 1: Core Toolkit skills + instruction file templates
     templates/      #   Source templates (CLAUDE.md.tmpl, AGENTS.md.tmpl, etc.)
   brand-factory/    # Package 2: Brand Factory skills (C4-C8, not yet built)
