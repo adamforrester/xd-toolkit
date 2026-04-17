@@ -73,6 +73,19 @@ Accessibility and technical rules for color application.
 | `Contrast rules` | required | Minimum contrast ratios for text, large text, UI components (WCAG AA/AAA targets) |
 | `Restrictions` | required | Hard constraints: max colors per component, color-semantic conflicts to avoid (e.g., "don't use brand red for errors") |
 
+### Usage by Medium (optional)
+
+How colors are applied differently across channels and media. Brands often use color differently in digital vs. print vs. social — this is intentional, not a conflict.
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `Website / Web App` | optional | How colors are actually used on the live site — typically white backgrounds with brand colors as accents, not leads |
+| `Print / Campaign` | optional | How the brand guide prescribes color usage for print — often more color-forward (e.g., "lead with Sand") |
+| `Social Media` | optional | Social profile color usage — typically bolder, more color-forward to stop the scroll |
+| `CRM / Email` | optional | Simplified palette, higher contrast requirements for email clients |
+
+**Key insight:** When the brand guide says "lead with [color]" but the website uses white backgrounds, document this as intentional medium-specific usage. The brand guide describes print/campaign intent; the website reflects digital best practices. Both are correct in context.
+
 ### Dark Mode (optional)
 
 How the color system adapts for dark contexts.
@@ -144,4 +157,21 @@ Red is the brand. It's warm, energetic, and unmistakable. The palette supports r
 - `color-primary` on white: 4.6:1 — passes AA for large text only. Use `color-primary-dark` for small text on white.
 - Never use brand red for error states — use `color-error` (distinct hue avoids confusion)
 - Maximum 3 colors per component (excluding neutrals)
+
+## Usage by Medium
+
+### Website / Web App
+- Page backgrounds: White primary, neutral-50 secondary
+- Brand red: CTAs, badges, accent strips — never full-bleed section backgrounds
+- Hero sections: white or neutral background with red accents
+
+### Print / Campaign
+- Red leads most campaign materials
+- White space balanced differently than digital (denser)
+- CMYK values may differ slightly from hex — use hex for digital
+
+### Social Media
+- Bolder color usage — red backgrounds acceptable for posts
+- Higher saturation to stand out in feed
+- Simplified palette (primary red + white + one neutral)
 ```

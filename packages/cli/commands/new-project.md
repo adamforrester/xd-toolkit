@@ -32,6 +32,38 @@ Ask these questions one at a time. Don't dump them all at once.
 6. **Social profiles** — "Do they have social media accounts I should look at for voice and tone? (X/Twitter, Instagram, LinkedIn, Facebook)"
    - Accept URLs or skip
 
+7. **Component library** — "Does this client have a component library in code?"
+   - Yes — npm package → ask for the package name (e.g., `@trugreen/tgds`)
+   - Yes — GitHub repo → ask for the repo URL
+   - Yes — in this project already → monorepo or local, note the path
+   - No — components only exist in Figma → extraction will generate build specs
+   - No — no component library at all → components built from scratch
+
+   If a code library exists:
+   - Install it as a project dependency during scaffold
+   - Note in `.brandrc.yaml` under `design_system`:
+     ```yaml
+     design_system:
+       package: "@trugreen/tgds"
+       repo: "https://github.com/trugreen/tgds"
+       storybook: "https://trugreen-tgds.chromatic.com"
+     ```
+   - During extraction (Phase 4), scan the library: read exports, props/APIs, variants, stories
+   - Generate `.brand/components/*.md` as USAGE GUIDANCE for existing components, not specs for building new ones
+   - Each component file references the import path: `Import: \`import { Button } from '@trugreen/tgds'\``
+   - Add CLAUDE.md rule: "Import components from [package]. Do not rebuild components that exist in the library."
+
+   If components exist only in Figma (no code):
+   - Extract component specs via Figma MCPs during Phase 4
+   - `.brand/components/*.md` becomes build specs, not usage guidance
+   - Agent builds components following the specs
+
+   Key principle: `.brand/components/*.md` is always a guidance layer, never the component itself. When a library exists in code, the agent uses the library. When it doesn't, the agent builds following the guidance.
+
+8. **Storybook** — If they mentioned a component library or coded prototype: "Does the project have a Storybook?"
+   - If yes: note the Storybook URL for MCP setup
+   - If no: skip
+
 ## Phase 2: Scaffold
 
 Use the xd-toolkit CLI to scaffold the project:
@@ -148,7 +180,13 @@ Using the schema specs in schema/brand/ as the format guide, generate each file:
 
 - overview.md — from brand guide + website analysis
 - voice.md — from copy samples + voice docs + social analysis. Include register map per channel. Include do/don't reference.
-- tokens/colors.md — from token files > Figma variables > website extraction (priority order). Include USAGE RULES not just values.
+- tokens/colors.md — from token files > Figma variables > website extraction (priority order). Include USAGE RULES not just values. Include a "Usage by medium" section that documents how colors are used differently across channels:
+  - **Website / Web App**: Infer from the website crawl — note actual background colors (usually white), where brand colors appear as accents vs. backgrounds
+  - **Print / Campaign**: Infer from the brand guide — may say "lead with [color]" for print layouts
+  - **Social media**: Infer from social profiles — typically bolder, more color-forward
+  - **CRM / Email**: Simplified palette if email examples are available
+
+  When the brand guide says "lead with [color]" but the live website uses white backgrounds, this is NOT a conflict — it's intentional medium-specific usage. Document the distinction, don't flag it.
 - tokens/typography.md — same priority order
 - tokens/spacing.md — same priority order
 - tokens/surfaces.md — border radius, shadows, elevation
@@ -276,6 +314,37 @@ Files I'd recommend you review:
 - conflicts.md — [if any unresolved conflicts exist: 'N items need client input']
 
 Want to review any specific file, or should we continue to building?"
+
+### Visual Atmosphere Summary
+
+After presenting findings, generate a one-paragraph "Visual atmosphere" summary — 2-3 sentences capturing how the brand's digital presence FEELS, not what the tokens are. Present it for validation:
+
+"Based on everything I analyzed, here's the visual atmosphere summary:
+
+[generated summary — e.g., 'TruGreen's digital presence feels clean, grounded, and trustworthy. Generous white space creates breathing room, while deep forest greens anchor the eye and signal expertise. Photography-forward layouts let the work speak, with warm sand tones softening what could otherwise feel corporate.']
+
+Does this capture it? Edit anything that doesn't feel right."
+
+Save the validated summary at the top of `.brand/overview.md` as the opening paragraph after the positioning statement. This becomes the north star for every micro-decision the agent makes — when the agent is choosing between two valid options, the atmosphere summary breaks the tie.
+
+### Conditional MCP Installation
+
+During the review phase, check if any project-scoped MCPs are needed but not yet installed:
+
+**Storybook MCP** — If the practitioner indicated they have a Storybook (Phase 1, question 8):
+- Check if Storybook MCP is configured for this project
+- If not: "Storybook MCP isn't set up for this project yet. I'll configure it now."
+  ```bash
+  npx storybook add @storybook/addon-mcp
+  npx mcp-add --type http --url "[storybook-url]/mcp" --scope project
+  ```
+- Verify connection: "Connected to Storybook. I can see [X] components."
+
+**Firecrawl MCP** — If extraction hit heavy crawling needs (many pages, rate-limited) and Firecrawl isn't installed:
+- "The website has a lot of pages and I'm hitting rate limits with the browser. Want me to set up Firecrawl for faster crawling? It needs an API key."
+- Don't silently fall back — offer the upgrade
+
+General principle: core MCPs install during `xd-toolkit setup`. Project-scoped and optional MCPs install conversationally when the workflow requires them.
 
 ## Error Handling
 

@@ -34,6 +34,7 @@ const BRAND_FILES = {
     'workflows/code-standards.md',
     'workflows/deploy.md',
     'workflows/qa-checklist.md',
+    'workflows/build-sequence.md',
     'specs/.gitkeep',
   ],
 };
