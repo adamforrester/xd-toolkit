@@ -122,6 +122,94 @@ Cite the source for each finding: "From brand guide p.12" or "Observed on homepa
 
 Extract from overview.md: personality traits, audience, visual direction, design principles, use cases (infer from website if not explicit).
 
+## Phase 4b: Conflict Resolution
+
+After extraction, compare findings across all sources. When multiple sources disagree on the same design element, resolve using the process below.
+
+### Source Authority Hierarchy
+
+When sources disagree, prefer the higher-authority source (highest first):
+
+1. **Figma variables/tokens** — the live design system, actively maintained
+2. **Figma component library** — what's built and used in production designs
+3. **Design token JSON files** — exported from the system, may lag behind Figma
+4. **Brand guide PDF** — often outdated in agency contexts, reflects intent more than current state
+5. **Live website** — may have legacy implementations or tech-debt compromises
+6. **Social media** — reflects marketing voice, not the design system
+
+### Digital Adaptations (NOT Conflicts)
+
+Before flagging a difference as a conflict, check whether it represents an intentional context-specific adaptation. Common intentional splits:
+
+- **Display vs. body fonts** — Brand guides often specify a brand font for all uses. Design systems correctly substitute a screen-optimized font (Inter, Roboto, SF Pro, etc.) for body/UI text. If the brand guide says "Brand Font" and the Figma DS uses a different font specifically for body/UI text, this is NOT a conflict. Document it as a digital adaptation in tokens/typography.md:
+
+  > Display: [Brand Font] (per brand guidelines)
+  > Body/UI: [Digital Font] (digital optimization — brand font used in print and display contexts, [Digital Font] used for body text on screens for readability)
+
+- **Print vs. digital colors** — Pantone/CMYK values in the brand guide vs. hex/RGB in the design system. These are format translations, not conflicts.
+
+- **Print vs. digital spacing** — Different density needs between print and screen. The design system's spacing scale governs digital work.
+
+The general rule: a difference is a conflict only when the **same usage context** has different values across sources (e.g., Figma says Inter for body AND the brand guide says DM Sans specifically for digital body text). Different contexts having different values is expected.
+
+### Conflict Classification
+
+**Critical conflicts** — ALWAYS stop and ask the practitioner. Never silently resolve these:
+- Primary/secondary brand colors (different hex values for "primary blue")
+- Primary fonts (conflicting typeface families for the same usage context)
+- CTA styles (different button treatments across sources)
+- Logo usage rules (contradictory guidance)
+
+**Minor conflicts** — Apply the hierarchy silently, note in CHANGELOG.md, mention in the review summary:
+- Shadow values (e.g., slightly different elevation shadows)
+- Specific spacing values (e.g., 16px vs. 20px card padding)
+- Border-radius differences (e.g., 4px vs. 6px)
+- Secondary/tertiary color variations
+
+### Resolution Process
+
+For each critical conflict detected, present it conversationally:
+
+"I found a conflict on **[element]**:
+- **Figma variables:** [value] 
+- **Brand guide (p.XX):** [value]
+- **Website:** [value]
+
+My recommendation: use **[value]** from **[source]** because [reason based on hierarchy].
+
+What would you like to do?
+1. Accept my recommendation
+2. Override with a different value
+3. Flag this for client resolution"
+
+### Recording Resolutions
+
+**Resolved conflicts** — Append to `.brand/CHANGELOG.md`:
+```
+## [date] — Initial brand extraction
+
+### Conflicts resolved
+- **[element]**: Used [value] from [source]. [Rationale]. 
+  Other sources: [source] said [value], [source] said [value].
+  Resolution: [accepted recommendation / practitioner override / etc.]
+```
+
+**Unresolved conflicts** (flagged for client) — Write to `.brand/conflicts.md`:
+```
+# Unresolved Brand Conflicts
+
+These items need client input before the brand package is complete.
+
+## [element]
+- **Source A ([name]):** [value]
+- **Source B ([name]):** [value]  
+- **Context:** [why this matters, what's affected]
+- **Recommendation:** [suggested resolution]
+- **Status:** Awaiting client input
+```
+
+After all conflicts are resolved or flagged, proceed to Phase 5.
+
 ## Phase 5: Review
 
 Present a summary of what was generated:
@@ -133,10 +221,13 @@ Present a summary of what was generated:
 **Typography:** [font families]
 **Voice:** [2-sentence summary]
 **Confidence:** [X files HIGH, Y files MEDIUM, Z files LOW]
+**Conflicts:** [N resolved, M flagged for client] (if any)
+**Digital adaptations:** [list any intentional splits documented, e.g., 'body font uses Inter instead of brand font for screen readability']
 
 Files I'd recommend you review:
 - voice.md — [reason, e.g., 'only had website copy, no official voice guide']
 - tokens/motion.md — [reason, e.g., 'no motion specs found, generated defaults']
+- conflicts.md — [if any unresolved conflicts exist: 'N items need client input']
 
 Want to review any specific file, or should we continue to building?"
 

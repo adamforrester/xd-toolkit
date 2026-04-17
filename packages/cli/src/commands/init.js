@@ -27,6 +27,7 @@ const BRAND_FILES = {
     'composition/patterns.md',
     'composition/anti-patterns.md',
     'CHANGELOG.md',
+    'conflicts.md',
   ],
   comprehensive: [
     'workflows/figma-to-code.md',
