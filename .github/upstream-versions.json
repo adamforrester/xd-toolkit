@@ -1,7 +1,8 @@
 {
-  "DirectedEdges/specs": "specs-cli@0.9.0",
+  "DirectedEdges/specs": "specs-cli@0.11.0",
   "JustasMonkev/mcp-accessibility-scanner": "2.0.9",
   "microsoft/playwright-mcp": "v0.0.70",
   "murphytrueman/design-system-ops": "v1.1.0",
+  "obra/superpowers": "v5.0.7",
   "southleft/figma-console-mcp": "v1.22.1"
 }
