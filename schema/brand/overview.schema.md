@@ -60,6 +60,19 @@ Where the brand sits relative to competitors. Helps agents avoid designs that lo
 |-------|----------|-------------|
 | `Differentiation` | optional | What visually or tonally distinguishes this brand from competitors |
 | `Avoid resemblance to` | optional | Specific brands or styles to avoid looking like |
+| `Aesthetic anti-patterns` | optional | Styles and aesthetics this brand explicitly rejects. Not just competitor avoidance — broader aesthetic directions that conflict with the brand personality (e.g., "NOT corporate minimalist, NOT startup playful, NOT enterprise gray, NOT glassmorphic, NOT neobrutalist"). Inferred from brand personality and visual direction: if the brand is "confident, professional, playful" then it's NOT "austere, minimal, serious." |
+
+### Brand Self-Test (optional)
+
+A short checklist (5-10 yes/no questions) that agents run against any output to verify it "feels like" the brand. These questions are brand-specific, not generic — they're generated from the brand personality, visual direction, signature elements, and anti-patterns.
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `Questions` | optional | 5-10 yes/no questions. Each question tests one specific brand attribute. Mix of visual (typography, color, layout), tonal (copy, voice), and holistic (overall feel) questions. The first question should always be: "Could this screen belong to a competitor? (should be NO)". The last should be an overall feel check tied to the visual atmosphere. |
+
+**When to run:** Before presenting any visual work. The `/critique` skill and `/brand-check` command should reference this self-test when evaluating output.
+
+**How to generate:** Infer from brand personality traits, visual direction, design principles, signature elements, and anti-patterns. Each question should be falsifiable — a wrong answer means something specific needs to change.
 
 ---
 
@@ -96,4 +109,17 @@ Wendy's doesn't take itself too seriously, but it takes its food seriously. The 
 ## Competitive Context
 **Differentiation:** Personality-driven where competitors (McDonald's, Burger King) lean on scale or flame-grilling. Wendy's wins on wit.
 **Avoid resemblance to:** McDonald's yellow/red warmth (Wendy's red is cooler), Burger King's flame aesthetic, Chick-fil-A's earnestness
+**Aesthetic anti-patterns:** NOT corporate minimalist (too sterile), NOT fast-casual upscale (too serious), NOT retro diner (too nostalgic), NOT flat/generic (too forgettable). Wendy's is modern and energetic — never stuffy, never trying to be something it isn't.
+
+## Brand self-test (run before presenting work)
+1. Could this screen belong to a competitor? (should be NO)
+2. Is the food photography front and center — not buried below the fold?
+3. Does the copy have personality — would you smile reading it?
+4. Is the red warm (Wendy's red), not aggressive or cool?
+5. Does the layout feel confident — strong hierarchy, no clutter?
+6. Could this headline work as a tweet? (tone check)
+7. Is the Wendy cameo present (header, footer, or watermark)?
+8. Are interactive elements obvious — no mystery meat navigation?
+9. Does this feel mobile-native, not desktop-shrunk?
+10. Would a 22-year-old scrolling on their phone stop and engage? (energy check)
 ```

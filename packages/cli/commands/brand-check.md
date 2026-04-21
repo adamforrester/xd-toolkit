@@ -32,7 +32,15 @@ What needs attention:
 
 Want me to work on filling any of these gaps?"
 
+If a brand self-test exists in overview.md, include it in the report:
+
+"Brand self-test: [X/Y questions have clear answers based on the current brand package]"
+
+If the self-test is missing, suggest generating one: "Your brand package doesn't have a self-test yet. Want me to generate one from the brand personality and visual direction?"
+
 If gaps are found, offer specific actions:
 - Missing voice.md: "I can analyze the website copy and social profiles to generate this"
 - Empty token files: "Do you have a Figma file I can pull variables from?"
 - Low confidence files: "I can improve these if you share [specific asset type]"
+- Missing self-test: "I can generate a brand self-test from your overview.md"
+- Missing aesthetic anti-patterns: "I can infer what this brand is NOT from the personality traits"

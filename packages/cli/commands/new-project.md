@@ -327,6 +327,39 @@ Does this capture it? Edit anything that doesn't feel right."
 
 Save the validated summary at the top of `.brand/overview.md` as the opening paragraph after the positioning statement. This becomes the north star for every micro-decision the agent makes — when the agent is choosing between two valid options, the atmosphere summary breaks the tie.
 
+### Brand Self-Test
+
+After the atmosphere summary, generate a brand self-test: 5-10 yes/no questions that test whether output "feels like" the brand. These must be brand-specific, not generic. Generate them from:
+- Brand personality traits → questions about tone and energy
+- Visual direction → questions about color usage, typography weight, layout density
+- Signature elements → questions about distinctive brand markers
+- Anti-patterns → questions that catch competitor resemblance or wrong aesthetic
+
+Present the self-test to the practitioner:
+
+"I also generated a quick self-test — questions I'll run against everything I build to make sure it stays on-brand:
+
+1. Could this screen belong to a competitor? (should be NO)
+2. [brand-specific question about visual treatment]
+3. [brand-specific question about typography]
+4. [brand-specific question about copy/voice]
+...
+10. [overall feel check tied to the atmosphere summary]
+
+Any questions to add, remove, or reword?"
+
+Save the validated self-test as a `## Brand self-test` section at the bottom of `.brand/overview.md`. The `/critique` skill and `/brand-check` command reference this when evaluating output.
+
+### Aesthetic Anti-Patterns
+
+Also generate explicit aesthetic anti-patterns inferred from the brand personality and visual direction. If the brand is "confident, professional, playful" then it's NOT "austere, minimal, serious." Add these to the `## Competitive Context` section of overview.md:
+
+```markdown
+**Aesthetic anti-patterns:** NOT [style] ([why it conflicts]), NOT [style] ([why]), ...
+```
+
+These help the agent avoid drifting toward generic aesthetics. Present them to the practitioner for validation alongside the self-test.
+
 ### Conditional MCP Installation
 
 During the review phase, check if any project-scoped MCPs are needed but not yet installed:
