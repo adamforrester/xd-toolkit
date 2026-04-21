@@ -84,7 +84,31 @@ If the CLI isn't available at all, scaffold manually:
 - Create .brandrc.yaml with the collected URLs
 - Copy skills to .claude/skills/ if available
 
-Report what was created.
+Report what was created (list the directories and files).
+
+### Off-ramp
+
+After reporting the scaffold, ask:
+
+"Project scaffolded. Want to continue with brand extraction now?
+
+- **Yes** — I have assets ready (or a website to analyze)
+- **Not now** — I'll do extraction later
+- **Skip** — I'll fill in .brand/ files manually"
+
+**If "Not now":** The project is fully usable — skills, CLAUDE.md, .brand/ scaffold are all in place. Print:
+
+"No problem. When you're ready, open Claude Code in this directory and say: 'Run brand extraction for [client name]'. Everything is set up and waiting."
+
+End the command here. Do not proceed to Phase 3.
+
+**If "Skip":** Print:
+
+"The .brand/ files are scaffolded with placeholders. Each file references its schema spec — check the `schema/brand/` directory in the toolkit repo for the full field guide and examples for every file."
+
+End the command here. Do not proceed to Phase 3.
+
+**If "Yes":** Continue to Phase 3.
 
 ## Phase 3: Asset Collection
 
