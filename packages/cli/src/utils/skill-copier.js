@@ -64,11 +64,24 @@ async function addPluginMarketplace(repo) {
   return null;
 }
 
+// The Owl-Listener/designer-skills marketplace contains 8 separate plugins.
+const UX_DESIGN_PLUGINS = [
+  'design-research',
+  'design-systems',
+  'ux-strategy',
+  'ui-design',
+  'interaction-design',
+  'prototyping-testing',
+  'design-ops',
+  'designer-toolkit',
+];
+
 /**
  * Install the UX Design Skills Pack via the Claude Code plugin marketplace.
+ * Installs all 8 plugins from Owl-Listener/designer-skills.
  */
 export async function installUXDesignSkills() {
-  const spinner = ora('Installing UX Design Skills Pack (63 skills, 8 plugins)...').start();
+  const spinner = ora(`Installing UX Design Skills Pack (${UX_DESIGN_PLUGINS.length} plugins)...`).start();
 
   const marketplaceName = await addPluginMarketplace('Owl-Listener/designer-skills');
   if (!marketplaceName) {
@@ -76,17 +89,32 @@ export async function installUXDesignSkills() {
     return false;
   }
 
-  const install = await runAsync(`claude plugin install designer-skills@${marketplaceName}`);
-  if (install.ok) {
-    spinner.succeed('UX Design Skills Pack installed');
+  const failures = [];
+  let installed = 0;
+  for (const plugin of UX_DESIGN_PLUGINS) {
+    spinner.text = `Installing ${plugin} (${installed + failures.length + 1}/${UX_DESIGN_PLUGINS.length})...`;
+    const result = await runAsync(`claude plugin install ${plugin}@${marketplaceName}`);
+    if (result.ok) {
+      installed++;
+    } else {
+      failures.push({ plugin, error: result.stderr || result.stdout });
+    }
+  }
+
+  if (failures.length === 0) {
+    spinner.succeed(`UX Design Skills Pack installed (${installed} plugins)`);
     return true;
   }
 
-  spinner.fail('UX Design Skills Pack failed to install');
-  const errLine = (install.stderr || install.stdout || '').split('\n').find(l => l.trim());
-  if (errLine) console.log(chalk.dim(`    ${errLine}`));
-  console.log(chalk.dim(`    To install manually: claude plugin install <plugin-name>@${marketplaceName}`));
-  return false;
+  if (installed > 0) {
+    spinner.warn(`UX Design Skills Pack: ${installed}/${UX_DESIGN_PLUGINS.length} plugins installed, ${failures.length} failed`);
+  } else {
+    spinner.fail('UX Design Skills Pack failed: no plugins installed');
+  }
+  for (const f of failures) {
+    console.log(chalk.dim(`    ${f.plugin}: ${(f.error || '').split('\n')[0]}`));
+  }
+  return failures.length === 0;
 }
 
 export { addPluginMarketplace };
