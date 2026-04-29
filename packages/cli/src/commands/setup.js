@@ -104,7 +104,7 @@ export async function setupCommand(opts) {
       message: 'Select packages',
       choices: [
         {
-          name: `Core Toolkit ${chalk.dim('— 21 skills, Superpowers plugin, 7 MCP servers')}`,
+          name: `Core Toolkit ${chalk.dim('— 22 skills, Superpowers plugin, 7 MCP servers')}`,
           value: 'core',
           checked: true,
           disabled: 'always included',

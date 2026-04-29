@@ -8,7 +8,7 @@ See `docs/architecture.md` for the full architecture document covering:
 - Three packages (Core Toolkit, Brand Skills, Brand Packages)
 - Four component categories (MCP Servers, Skills, Instruction Files, Data Files)
 - The MCP stack (8 core + 1 optional across Design, Build/Test, Deploy, Context phases)
-- The skills stack (21 skills + Superpowers plugin + Brand Skills)
+- The skills stack (22 skills + Superpowers plugin + Brand Skills)
 - The `.brand/` directory structure and loading strategy
 - The E2E pipeline (Design -> Build -> Test -> Deploy)
 - Build plan (C1-C10 deliverables)
@@ -24,7 +24,7 @@ packages/
     src/commands/   #   setup.js, init.js, doctor.js, update.js, score.js
     src/utils/      #   mcp-installer, skill-copier, template-renderer, token-validator
     src/templates/  #   Bundled .tmpl files for CLAUDE.md, AGENTS.md, etc.
-    skills/core/    #   Bundled 21 skills (Impeccable 18 + Vercel 2 + figma-plugin-dev 1) + Superpowers plugin
+    skills/core/    #   Bundled 22 skills (Impeccable 18 + Vercel 2 + figma-plugin-dev 1 + vml-thrive-feedback 1) + Superpowers plugin
   core/             # Package 1: Core Toolkit skills + instruction file templates
     templates/      #   Source templates (CLAUDE.md.tmpl, AGENTS.md.tmpl, etc.)
   brand-skills/    # Package 2: Brand Skills skills (C4-C8, not yet built)
@@ -49,7 +49,7 @@ docs/
 | # | Deliverable | Status | Notes |
 |---|------------|--------|-------|
 | C1 | `.brand/` schema specification | **Done** | 16 schema files in `schema/brand/` |
-| C2 | `xd-toolkit` CLI | **Done** | setup, init, doctor, update, score commands working. 21 skills bundled. |
+| C2 | `xd-toolkit` CLI | **Done** | setup, init, doctor, update, score commands working. 22 skills bundled. |
 | C3 | Instruction file templates | **Done** | CLAUDE.md, AGENTS.md, .cursorrules, copilot-instructions.md, .impeccable.md |
 | C4 | `/brand-extract` skill | Not started | Spec complete in architecture doc (voice extraction via Playwright) |
 | C5 | `/brand-analyze` skill | Not started | Spec complete (channel-aware voice inference with confidence levels) |
