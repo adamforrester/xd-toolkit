@@ -4,8 +4,42 @@
 
 **Tier:** Minimum
 **Loaded:** Visual implementation tasks (CLAUDE.md routing rule)
+**Format:** YAML frontmatter (machine-readable rounded + elevation tokens, design.md-compatible) + markdown prose (philosophy, usage rules, shadow system).
 
 **Note:** This file is an addition to the original architecture (which covered colors, typography, spacing, and motion). Surfaces warrant their own token file because border-radius and elevation are strong brand signals — a brand with sharp corners and no shadows feels fundamentally different from one with rounded corners and layered elevation.
+
+In design.md terms, this file populates the `## Shapes` (radius) and `## Elevation & Depth` (shadows) sections.
+
+---
+
+## Frontmatter (required)
+
+A YAML block at the top of the file, between `---` delimiters.
+
+- `rounded`: a map from scale identifier to a Dimension (per design.md spec). Recommended identifiers: `none`, `sm`, `md`, `lg`, `xl`, `full`.
+- `elevation` (XD Toolkit extension — not in design.md spec but read by our tools): a map from elevation level to a CSS box-shadow string.
+
+```yaml
+---
+rounded:
+  none: 0
+  sm: 4px
+  md: 8px
+  lg: 16px
+  xl: 24px
+  full: 9999px
+elevation:
+  flat: none
+  sm: "0 1px 2px rgba(0,0,0,0.04)"
+  md: "0 4px 8px rgba(0,0,0,0.06)"
+  lg: "0 12px 24px rgba(0,0,0,0.08)"
+---
+```
+
+**Rules:**
+- `rounded` values must be Dimensions (`px`, `em`, `rem`) or the integer `0`.
+- `elevation` values are CSS box-shadow strings. Use `none` for the flat level.
+- If the brand is strictly flat, define only `elevation.flat: none` and explain in prose.
 
 ---
 
@@ -58,6 +92,21 @@ The depth system.
 ## Example
 
 ```markdown
+---
+rounded:
+  none: 0
+  sm: 4px
+  md: 8px
+  lg: 16px
+  xl: 24px
+  full: 9999px
+elevation:
+  flat: none
+  sm: "0 1px 2px rgba(0,0,0,0.04)"
+  md: "0 4px 8px rgba(0,0,0,0.06)"
+  lg: "0 12px 24px rgba(0,0,0,0.08)"
+---
+
 # Surfaces
 
 ## Philosophy

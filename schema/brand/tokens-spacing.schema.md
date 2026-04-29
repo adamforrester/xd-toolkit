@@ -4,6 +4,34 @@
 
 **Tier:** Minimum
 **Loaded:** Visual implementation tasks (CLAUDE.md routing rule)
+**Format:** YAML frontmatter (machine-readable spacing tokens, design.md-compatible) + markdown prose (density philosophy, application rules).
+
+---
+
+## Frontmatter (required)
+
+A YAML block at the top of the file, between `---` delimiters. The `spacing` key is a map from scale identifier to a Dimension (e.g., `16px`) or a unitless number (e.g., column counts).
+
+```yaml
+---
+spacing:
+  base: 16px
+  xs: 4px
+  sm: 8px
+  md: 16px
+  lg: 32px
+  xl: 64px
+  2xl: 96px
+  gutter: 24px
+  margin: 32px
+---
+```
+
+**Recommended scale identifiers:** `base`, `xs`, `sm`, `md`, `lg`, `xl`, `2xl`. Layout-specific values (`gutter`, `margin`, `column`, etc.) may be added.
+
+**Rules:**
+- Dimension values use `px`, `em`, or `rem` units. No `%` or `vh`/`vw` here — those belong in layout prose.
+- Unitless numbers are valid for column counts, ratios (e.g., `columns: 12`).
 
 ---
 
@@ -51,6 +79,19 @@ Common spacing mistakes to avoid.
 ## Example
 
 ```markdown
+---
+spacing:
+  base: 16px
+  xs: 4px
+  sm: 8px
+  md: 16px
+  lg: 32px
+  xl: 64px
+  2xl: 96px
+  gutter: 24px
+  margin: 32px
+---
+
 # Spacing
 
 ## Philosophy

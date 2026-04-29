@@ -4,6 +4,54 @@
 
 **Tier:** Minimum
 **Loaded:** Visual implementation tasks (CLAUDE.md routing rule)
+**Format:** YAML frontmatter (machine-readable type tokens, design.md-compatible) + markdown prose (rationale, font sources, usage rules).
+
+The frontmatter values are normative. The prose explains *how* to apply them. Tools that consume `design.md` read the frontmatter; agents working in this project read both.
+
+---
+
+## Frontmatter (required)
+
+A YAML block at the top of the file, between `---` delimiters. The `typography` key is a map from token name to a structured Typography object.
+
+```yaml
+---
+typography:
+  headline-display:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 48px
+    fontWeight: 800
+    lineHeight: 1.1
+    letterSpacing: -0.03em
+  headline-lg:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 36px
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: -0.02em
+  body-md:
+    fontFamily: Inter
+    fontSize: 16px
+    fontWeight: 400
+    lineHeight: 1.6
+  label-md:
+    fontFamily: Inter
+    fontSize: 14px
+    fontWeight: 500
+    lineHeight: 1.5
+---
+```
+
+**Typography object fields** (per design.md spec):
+- `fontFamily` (string, required)
+- `fontSize` (Dimension: `<number>px`, `<number>em`, or `<number>rem`, required)
+- `fontWeight` (number — 100–900, required)
+- `lineHeight` (Dimension or unitless number — `1.6` means 1.6× fontSize, recommended)
+- `letterSpacing` (Dimension, optional)
+- `fontFeature` (string, optional — sets `font-feature-settings`)
+- `fontVariation` (string, optional — sets `font-variation-settings`)
+
+**Recommended token names:** `headline-display`, `headline-lg`, `headline-md`, `body-lg`, `body-md`, `body-sm`, `label-lg`, `label-md`, `label-sm`. Custom names are allowed.
 
 ---
 
@@ -65,6 +113,54 @@ Constraints for type application.
 ## Example
 
 ```markdown
+---
+typography:
+  headline-display:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 48px
+    fontWeight: 800
+    lineHeight: 1.1
+    letterSpacing: -0.03em
+  headline-lg:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 36px
+    fontWeight: 700
+    lineHeight: 1.2
+    letterSpacing: -0.02em
+  headline-md:
+    fontFamily: Plus Jakarta Sans
+    fontSize: 30px
+    fontWeight: 700
+    lineHeight: 1.25
+    letterSpacing: -0.02em
+  body-lg:
+    fontFamily: Inter
+    fontSize: 18px
+    fontWeight: 400
+    lineHeight: 1.55
+  body-md:
+    fontFamily: Inter
+    fontSize: 16px
+    fontWeight: 400
+    lineHeight: 1.6
+  body-sm:
+    fontFamily: Inter
+    fontSize: 14px
+    fontWeight: 400
+    lineHeight: 1.5
+  label-md:
+    fontFamily: Inter
+    fontSize: 14px
+    fontWeight: 500
+    lineHeight: 1.5
+  label-sm:
+    fontFamily: Inter
+    fontSize: 12px
+    fontWeight: 500
+    lineHeight: 1.5
+    letterSpacing: 0.02em
+---
+
 # Typography
 
 ## Philosophy

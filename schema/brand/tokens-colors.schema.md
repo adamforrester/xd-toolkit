@@ -4,6 +4,39 @@
 
 **Tier:** Minimum
 **Loaded:** Visual implementation tasks (CLAUDE.md routing rule)
+**Format:** YAML frontmatter (machine-readable token values, design.md-compatible) + markdown prose (human-readable rationale and usage rules).
+
+The frontmatter values are normative. The prose explains *how* to apply them. Tools that consume `design.md` (per [google-labs-code/design.md](https://github.com/google-labs-code/design.md)) read the frontmatter directly; agents working in this project read both.
+
+---
+
+## Frontmatter (required)
+
+A YAML block at the top of the file, between `---` delimiters. The `colors` key is a flat map from token name to hex value (sRGB). Token names should follow a consistent convention; the recommended set is `primary`, `secondary`, `tertiary`, `neutral`, `surface`, `on-surface`, `error`, plus scale variants like `primary-50`, `primary-60`, etc.
+
+```yaml
+---
+colors:
+  primary: "#E2231A"
+  primary-dark: "#C1190F"
+  primary-light: "#FF6B61"
+  neutral-900: "#1A1A1A"
+  neutral-700: "#4A4A4A"
+  neutral-400: "#999999"
+  neutral-200: "#E5E5E5"
+  neutral-50: "#F8F8F8"
+  white: "#FFFFFF"
+  success: "#2E7D32"
+  warning: "#F9A825"
+  error: "#D32F2F"
+  info: "#1565C0"
+---
+```
+
+**Rules:**
+- Color values must be hex strings prefixed with `#` (sRGB). No `rgb()`, `hsl()`, or named CSS colors.
+- Every color named in the markdown prose must appear as a token in the frontmatter (or be a documented reference to one).
+- If `dark mode` tokens exist, namespace them: `dark.primary: "#..."` or use a separate `## Dark Mode` block (see Dark Mode section below).
 
 ---
 
@@ -100,6 +133,23 @@ How the color system adapts for dark contexts.
 ## Example
 
 ```markdown
+---
+colors:
+  primary: "#E2231A"
+  primary-dark: "#C1190F"
+  primary-light: "#FF6B61"
+  neutral-900: "#1A1A1A"
+  neutral-700: "#4A4A4A"
+  neutral-400: "#999999"
+  neutral-200: "#E5E5E5"
+  neutral-50: "#F8F8F8"
+  white: "#FFFFFF"
+  success: "#2E7D32"
+  warning: "#F9A825"
+  error: "#D32F2F"
+  info: "#1565C0"
+---
+
 # Color System
 
 ## Philosophy

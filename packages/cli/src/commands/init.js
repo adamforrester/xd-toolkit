@@ -385,7 +385,12 @@ function scaffoldBrandDirectory(brandDir, tier, isPitch) {
 
     const name = filePath.replace(/\.md$/, '').split('/').pop();
     const title = name.charAt(0).toUpperCase() + name.slice(1).replace(/-/g, ' ');
-    let content = `# ${title}\n\n<!-- Fill this file following the schema at schema/brand/${filePath.replace(/\//g, '-').replace('.md', '')}.schema.md -->\n`;
+    const schemaRef = `schema/brand/${filePath.replace(/\//g, '-').replace('.md', '')}.schema.md`;
+
+    const frontmatter = TOKEN_FRONTMATTER[filePath] || '';
+    let content =
+      frontmatter +
+      `# ${title}\n\n<!-- Fill this file following the schema at ${schemaRef} -->\n`;
 
     if (isPitch) {
       content = PITCH_DISCLAIMER + content;
@@ -394,6 +399,59 @@ function scaffoldBrandDirectory(brandDir, tier, isPitch) {
     writeFileSync(fullPath, content, 'utf-8');
   }
 }
+
+// Starter YAML frontmatter for token files (design.md-compatible).
+// Empty maps so the schema is visible; /brand-extract will populate them.
+const TOKEN_FRONTMATTER = {
+  'tokens/colors.md':
+`---
+colors:
+  # primary: "#000000"
+  # secondary: "#000000"
+  # neutral: "#FFFFFF"
+  # error: "#D32F2F"
+---
+
+`,
+  'tokens/typography.md':
+`---
+typography:
+  # body-md:
+  #   fontFamily: Inter
+  #   fontSize: 16px
+  #   fontWeight: 400
+  #   lineHeight: 1.6
+---
+
+`,
+  'tokens/spacing.md':
+`---
+spacing:
+  # base: 16px
+  # xs: 4px
+  # sm: 8px
+  # md: 16px
+  # lg: 32px
+  # xl: 64px
+---
+
+`,
+  'tokens/surfaces.md':
+`---
+rounded:
+  # none: 0
+  # sm: 4px
+  # md: 8px
+  # lg: 16px
+  # full: 9999px
+elevation:
+  # flat: none
+  # sm: "0 1px 2px rgba(0,0,0,0.04)"
+  # md: "0 4px 8px rgba(0,0,0,0.06)"
+---
+
+`,
+};
 
 /**
  * Build the .brandrc.yaml content from answers.
