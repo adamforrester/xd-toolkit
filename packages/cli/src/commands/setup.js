@@ -104,7 +104,7 @@ export async function setupCommand(opts) {
       message: 'Select packages',
       choices: [
         {
-          name: `Core Toolkit ${chalk.dim('— 22 skills, Superpowers plugin, 7 MCP servers')}`,
+          name: `Core Toolkit ${chalk.dim('— 23 skills, Superpowers plugin, 7 MCP servers')}`,
           value: 'core',
           checked: true,
           disabled: 'always included',
@@ -253,7 +253,8 @@ export async function setupCommand(opts) {
   const cmdResult = installCommandsGlobal();
   if (cmdResult.ok) {
     console.log(chalk.green(`✓ ${cmdResult.count} slash commands installed to ~/.claude/commands/`));
-    console.log(chalk.dim('    /new-project — set up a new client project with brand extraction'));
+    console.log(chalk.dim('    /new-project — set up a new client project'));
+    console.log(chalk.dim('    /brand-extract — extract tokens from Figma + website'));
     console.log(chalk.dim('    /brand-check — check brand package completeness'));
   } else {
     console.log(chalk.yellow(`⚠ Slash commands not installed: ${cmdResult.error}`));

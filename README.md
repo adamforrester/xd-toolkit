@@ -11,7 +11,7 @@ An end-to-end toolkit for **Experience Design practitioners** who want AI agents
 - **21 core skills** — Impeccable (×18) + Vercel (×2) + figma-plugin-dev (×1)
 - **Superpowers plugin** — structured development practices (brainstorming, TDD, debugging, code review)
 - **7 MCP servers** — Figma Official, Figma Console, Playwright, GitHub, Netlify, Vercel, Context7
-- **2 slash commands** — `/new-project` (conversational client onboarding), `/brand-check` (completeness report)
+- **3 slash commands** — `/new-project` (conversational client onboarding), `/brand-check` (completeness report), `/brand-extract` (token extraction from Figma + web)
 - **`.brand/` directory schema** — 16 schema files defining a tiered brand package (minimum / standard / comprehensive)
 - **Optional add-ons:**
   - UX Design Skills Pack (63 skills)
