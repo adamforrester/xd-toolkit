@@ -32,14 +32,3 @@ export function validateGitHubToken(token) {
   }
   return { valid: false, message: 'GitHub tokens usually start with ghp_ or github_pat_ — double-check your token' };
 }
-
-export function validateFirecrawlKey(key) {
-  if (!key || key.trim().length === 0) {
-    return { valid: false, message: 'Key is empty' };
-  }
-  const k = key.trim();
-  if (k.startsWith('fc-') || k.startsWith('fc_')) {
-    return { valid: true };
-  }
-  return { valid: true, message: 'Key format looks unusual (no fc- prefix) but may still work' };
-}

@@ -64,6 +64,45 @@ export async function installUXDesignSkills() {
 }
 
 /**
+ * Install the Design System Pack by cloning the repo and copying skills
+ * into the user-level Claude skills directory.
+ */
+export async function installDesignSystemPack() {
+  const spinner = ora('Installing Design System Pack (21 skills)...').start();
+  const tmpDir = join(homedir(), '.claude', '.tmp-ds-pack');
+  const target = getUserSkillsDir();
+
+  // Clean any prior temp dir
+  await runAsync(`rm -rf "${tmpDir}"`);
+
+  const clone = await runAsync(`git clone --depth 1 https://github.com/murphytrueman/design-system-ops.git "${tmpDir}"`);
+  if (!clone.ok) {
+    spinner.fail('Design System Pack failed to clone');
+    if (clone.stderr) console.log(chalk.dim(`    ${clone.stderr.split('\n')[0]}`));
+    return false;
+  }
+
+  try {
+    mkdirSync(target, { recursive: true });
+    const skillsSource = join(tmpDir, 'skills');
+    if (!existsSync(skillsSource)) {
+      spinner.fail('Design System Pack: skills directory not found in repo');
+      await runAsync(`rm -rf "${tmpDir}"`);
+      return false;
+    }
+    cpSync(skillsSource, target, { recursive: true });
+    await runAsync(`rm -rf "${tmpDir}"`);
+    spinner.succeed('Design System Pack installed');
+    return true;
+  } catch (err) {
+    spinner.fail('Design System Pack failed to install');
+    console.log(chalk.dim(`    ${err.message}`));
+    await runAsync(`rm -rf "${tmpDir}"`);
+    return false;
+  }
+}
+
+/**
  * Copy Brand Factory skills to user-level skills directory.
  */
 export function installBrandFactorySkills(skillsSourceDir) {

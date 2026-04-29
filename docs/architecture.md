@@ -72,7 +72,7 @@ The `.brand/` directory — structured markdown and JSON files containing brand-
 
 ## Category 1: The MCP Stack
 
-Eight core MCP servers organized by pipeline phase, installed per-practitioner and available across every project. One optional MCP (Firecrawl) provides faster bulk scraping for frequent client onboarding.
+Seven core MCP servers organized by pipeline phase, installed per-practitioner and available across every project. Two project-scoped MCPs (Storybook, optionally Firecrawl) install when their workflow is needed — Storybook auto-installs with the Design System Pack; Firecrawl is manual-only and only worth setting up with a paid plan.
 
 ### Design Phase
 
@@ -238,17 +238,15 @@ claude mcp add context7 -s user -- npx -y @context7/mcp
 }
 ```
 
-### Optional: Brand Factory Enhancement
+### Optional: Manual Add-Ons
 
-#### Firecrawl MCP (optional)
-- **What:** Web scraping and content extraction. Converts web pages into structured markdown. Supports bulk site crawling, single-page scraping, and content extraction with CSS selectors.
-- **Why useful:** Faster bulk scraping for practitioners doing frequent client onboarding. Not required — Playwright MCP (already in core stack) handles the default voice extraction and content analysis workflow.
-- **License:** Firecrawl terms (free tier: 500 credits one-time, covers ~2-3 clients. Paid plans start at $16/month.)
-- **When to install:** Recommended for practitioners doing frequent client onboarding who want faster bulk scraping. Skip if you're doing occasional onboarding or working with a small number of clients.
+#### Firecrawl MCP (manual install only)
+- **What:** Web scraping and content extraction.
+- **Status:** Not auto-installed by `xd-toolkit setup`. The free tier doesn't offer enough headroom to justify the prompt; Playwright (in core stack) handles the default extraction workflow.
+- **When to install manually:** Only if you have a Firecrawl paid plan and onboard many clients per month.
 
-**Installation:**
+**Installation (manual):**
 ```bash
-# Claude Code (optional — only if you want faster bulk scraping)
 claude mcp add firecrawl -s user \
   -e FIRECRAWL_API_KEY=fc_KEY \
   -- npx -y firecrawl-mcp
@@ -271,7 +269,8 @@ claude mcp add firecrawl -s user \
 
 | MCP | Install Command (Claude Code) | Auth Required | Phase |
 |-----|-------------------------------|---------------|-------|
-| Firecrawl | `claude mcp add firecrawl -s user -e FIRECRAWL_API_KEY=... -- npx -y firecrawl-mcp` | Firecrawl API key ($16+/mo for heavy use) | Brand Factory |
+| Storybook | `claude mcp add storybook -s user --transport http http://localhost:6006/mcp` | None | Design System Pack |
+| Firecrawl (manual only) | `claude mcp add firecrawl -s user -e FIRECRAWL_API_KEY=... -- npx -y firecrawl-mcp` | Firecrawl paid plan | Brand Factory |
 
 **Total practitioner setup time:** ~30-45 minutes (one-time). Requires: Node.js 18+, Figma PAT, GitHub PAT, Vercel/Netlify accounts.
 
@@ -757,7 +756,7 @@ npx xd-toolkit setup
    - **Design System Pack** (optional) — 21 skills for DS governance, auditing, documentation
    - **Brand Factory** (optional) — skills for generating .brand/ packages from client assets. For practitioners who run client onboarding.
 3. Collects tokens (Figma PAT, GitHub PAT) with links to where to get them
-4. Installs MCP servers (7 core + optional Firecrawl for Brand Factory)
+4. Installs MCP servers (7 core + Storybook MCP if Design System Pack is selected)
 5. Installs Superpowers plugin (structured development practices)
 6. Installs selected skill packs
 7. Installs slash commands globally (/new-project, /brand-check)
@@ -996,7 +995,8 @@ These are third-party tools we use as-is. We configure them, document how to set
 | Vercel MCP | Vercel | Configure per-practitioner. Document setup. |
 | Netlify MCP | Netlify | Configure per-practitioner. Document setup. |
 | Context7 MCP | Community | Configure per-practitioner. Document setup. |
-| Firecrawl MCP (optional) | Firecrawl | Optional upgrade for faster bulk scraping during client onboarding. Not required — Playwright handles the default workflow. Free tier covers ~2-3 clients; paid plans start at $16/month. |
+| Firecrawl MCP (manual only) | Firecrawl | No longer auto-installed. Practitioners with a Firecrawl paid plan can add it manually for faster bulk scraping; otherwise Playwright handles the default workflow. |
+| Storybook MCP | Storybook | Auto-installed when the Design System Pack is selected. User-scope HTTP transport pointing at `http://localhost:6006/mcp` — only connects when Storybook is running locally. |
 | specs CLI | Nathan Curtis / DirectedEdges | Install globally. Brand Factory orchestrates it; DS Pack uses it for ongoing analysis. |
 | Layout CLI | Layout.design | Install globally when stable. Brand Factory orchestrates it. |
 | UX Design Skills Pack (63 skills, 27 commands, 8 plugins) | Owl-Listener/designer-skills (664 stars) | Install per-practitioner. Covers research, strategy, UI, interaction, prototyping, design ops, toolkit, design systems. |

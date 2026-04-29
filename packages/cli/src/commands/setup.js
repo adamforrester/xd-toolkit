@@ -1,9 +1,9 @@
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { tryRun } from '../utils/exec.js';
-import { validateFigmaToken, validateGitHubToken, validateFirecrawlKey } from '../utils/token-validator.js';
+import { validateFigmaToken, validateGitHubToken } from '../utils/token-validator.js';
 import { installCoreMCPs, installOptionalMCP } from '../utils/mcp-installer.js';
-import { installUXDesignSkills, installCommandsGlobal } from '../utils/skill-copier.js';
+import { installUXDesignSkills, installDesignSystemPack, installCommandsGlobal } from '../utils/skill-copier.js';
 
 export async function setupCommand(opts) {
   const results = { mcps: [], skills: [], warnings: [] };
@@ -126,41 +126,6 @@ export async function setupCommand(opts) {
 
   const tokens = { figma: figmaToken.trim(), github: githubToken.trim() };
 
-  // Firecrawl key (only if Brand Factory selected)
-  if (selectedPackages.includes('brand-factory')) {
-    console.log('');
-    console.log(`  ${chalk.cyan('Firecrawl API Key')} ${chalk.dim('(optional)')}`);
-    console.log(chalk.dim('  Faster bulk scraping for brand onboarding. Free tier: 500 credits.'));
-    console.log(chalk.dim('  Skip this if you want to use Playwright (free, already included) instead.'));
-    console.log(chalk.dim('  Get a key: https://www.firecrawl.dev/signin'));
-    console.log('');
-
-    const { wantFirecrawl } = await inquirer.prompt([
-      {
-        type: 'confirm',
-        name: 'wantFirecrawl',
-        message: 'Install Firecrawl MCP?',
-        default: false,
-      },
-    ]);
-
-    if (wantFirecrawl) {
-      const { firecrawlKey } = await inquirer.prompt([
-        {
-          type: 'password',
-          name: 'firecrawlKey',
-          message: 'Firecrawl API key:',
-          mask: '*',
-          validate: (input) => {
-            const { valid, message } = validateFirecrawlKey(input);
-            return valid || message;
-          },
-        },
-      ]);
-      tokens.firecrawl = firecrawlKey.trim();
-    }
-  }
-
   console.log('');
 
   // ── Step 4: Install MCP servers ──
@@ -171,11 +136,12 @@ export async function setupCommand(opts) {
   const mcpResults = await installCoreMCPs(tokens);
   results.mcps.push(...mcpResults);
 
-  // Optional Firecrawl
-  if (tokens.firecrawl) {
+  // Storybook MCP — bundled with Design System Pack (only active when Storybook runs locally)
+  if (selectedPackages.includes('ds-pack')) {
     console.log('');
-    const firecrawlResult = await installOptionalMCP('firecrawl', tokens);
-    results.mcps.push(firecrawlResult);
+    const storybookResult = await installOptionalMCP('storybook', tokens);
+    results.mcps.push(storybookResult);
+    console.log(chalk.dim('    Storybook MCP only connects when a Storybook instance is running on http://localhost:6006'));
   }
 
   console.log('');
@@ -194,10 +160,8 @@ export async function setupCommand(opts) {
   }
 
   if (selectedPackages.includes('ds-pack')) {
-    console.log(chalk.yellow('⚠ Design System Pack: install manually from murphytrueman/design-system-ops'));
-    console.log(chalk.dim('    git clone https://github.com/murphytrueman/design-system-ops.git'));
-    console.log(chalk.dim('    cp -r design-system-ops/skills/* ~/.claude/skills/'));
-    results.skills.push({ name: 'ds-pack', ok: false, error: 'manual install required' });
+    const ok = await installDesignSystemPack();
+    results.skills.push({ name: 'ds-pack', ok });
   }
 
   if (selectedPackages.includes('brand-factory')) {

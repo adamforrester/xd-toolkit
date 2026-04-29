@@ -60,13 +60,12 @@ const CORE_MCPS = [
 ];
 
 const OPTIONAL_MCPS = {
-  firecrawl: {
-    name: 'firecrawl',
-    label: 'Firecrawl',
-    description: 'Faster bulk scraping for brand onboarding (optional, requires API key)',
-    cmd: (tokens) =>
-      `claude mcp add firecrawl -s user -e FIRECRAWL_API_KEY=${tokens.firecrawl} -- npx -y firecrawl-mcp`,
-    needsToken: 'firecrawl',
+  storybook: {
+    name: 'storybook',
+    label: 'Storybook',
+    description: 'Discover and test components in a running Storybook (localhost:6006)',
+    cmd: 'claude mcp add storybook -s user --transport http http://localhost:6006/mcp',
+    needsToken: false,
   },
 };
 

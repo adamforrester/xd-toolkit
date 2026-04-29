@@ -63,7 +63,7 @@ docs/
 
 - **Layer 1 (Brand Routing):** 5/5 passed — see `docs/test-results.md`
 - **Layer 2 (Impeccable Integration):** Partial pass — build output on-brand, briefs brand-light
-- **Layer 3 (MCP Stack):** 6/6 passed — Playwright replaces A11y Scanner, Firecrawl optional
+- **Layer 3 (MCP Stack):** 6/6 passed — Playwright replaces A11y Scanner
 - **Layer 4 (Brand Factory):** Blocked on C4-C8
 - **Layer 5 (E2E):** Blocked on Layer 4
 
@@ -86,4 +86,4 @@ Custom deliverables (C1-C10) are built in three phases:
 - CLI supports `--brand-path` for shared brand packages across multiple projects
 - CLI supports `--figma-only` for design-only workflows without code scaffolding
 - Playwright MCP handles both browser verification AND accessibility auditing (axe-core injection)
-- Firecrawl MCP is optional — Playwright is the default extraction method
+- Playwright is the default extraction method (Firecrawl is no longer auto-installed; users can add it manually if they have a paid plan)

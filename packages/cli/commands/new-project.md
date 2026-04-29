@@ -397,10 +397,6 @@ During the review phase, check if any project-scoped MCPs are needed but not yet
   ```
 - Verify connection: "Connected to Storybook. I can see [X] components."
 
-**Firecrawl MCP** — If extraction hit heavy crawling needs (many pages, rate-limited) and Firecrawl isn't installed:
-- "The website has a lot of pages and I'm hitting rate limits with the browser. Want me to set up Firecrawl for faster crawling? It needs an API key."
-- Don't silently fall back — offer the upgrade
-
 General principle: core MCPs install during `xd-toolkit setup`. Project-scoped and optional MCPs install conversationally when the workflow requires them.
 
 ## Error Handling
