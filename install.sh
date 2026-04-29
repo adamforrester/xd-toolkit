@@ -90,6 +90,14 @@ bold "  Installing xd-toolkit..."
 npm install -g "$REPO"
 green "✓ xd-toolkit installed"
 
+# Ensure the npm prefix's bin dir is on PATH for the rest of this script,
+# even if we didn't have to reconfigure the prefix above.
+NPM_BIN="$(npm config get prefix)/bin"
+case ":$PATH:" in
+  *":$NPM_BIN:"*) ;;
+  *) export PATH="$NPM_BIN:$PATH" ;;
+esac
+
 # ── Run setup ──
 echo ""
 bold "  Running xd-toolkit setup..."
