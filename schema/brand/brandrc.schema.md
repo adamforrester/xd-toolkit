@@ -40,7 +40,7 @@ References to source materials for the extraction pipeline. Drives what `/brand-
 | `sources.social.tiktok` | optional | string | TikTok profile URL |
 | `sources.app_store.ios` | optional | string | iOS App Store listing URL |
 | `sources.app_store.android` | optional | string | Google Play Store listing URL |
-| `sources.figma` | optional | string[] | Figma file IDs for extraction via specs CLI + Figma MCP |
+| `sources.figma` | optional | string[] | Figma file IDs for extraction via Figma Console MCP (variables) and Figma MCP (design context) |
 | `sources.figma_variable_collections` | optional | string[] | Specific variable collection names to extract |
 | `sources.live_urls` | optional | string[] | Live product URLs for token extraction via Layout CLI |
 | `sources.brand_guide` | optional | string | Path to brand guide PDF (relative to project root) |
@@ -52,7 +52,6 @@ References to source materials for the extraction pipeline. Drives what `/brand-
 |-------|----------|------|-------------|
 | `tools.agent` | optional | enum | Primary agent tool: `claude-code`, `cursor`, `vscode-copilot`, `codex`, `gemini` |
 | `tools.storybook` | optional | boolean | Whether this project uses Storybook |
-| `tools.specs_cli_pro` | optional | boolean | Whether to use specs CLI PRO features |
 
 ### Extensions (optional)
 
@@ -103,7 +102,6 @@ sources:
 tools:
   agent: claude-code
   storybook: true
-  specs_cli_pro: false
 
 extensions:
   - ds-pack

@@ -497,7 +497,7 @@ This extension will be developed in a future phase once the core toolkit, Brand 
 
 These are personal skills for the practitioners who run client onboarding. Not every team member needs them.
 
-**Prerequisites:** specs CLI, Layout CLI — installed per-practitioner alongside the standard MCP stack. Playwright MCP (already in core) handles voice extraction. Firecrawl MCP is an optional upgrade for faster bulk scraping.
+**Prerequisites:** Layout CLI (optional, for CSS token extraction from URLs) — installed per-practitioner alongside the standard MCP stack. Figma Console MCP (already in core) handles Figma variable extraction; Playwright MCP (already in core) handles voice extraction and visual analysis. Firecrawl MCP is an optional upgrade for faster bulk scraping. The specs CLI is a DS Pack tool, not a Brand Skills dependency.
 
 **Extraction method priority:**
 1. **Playwright MCP** (default, free, already in core stack) — navigates pages, extracts copy, handles social profiles
@@ -508,7 +508,7 @@ The skill detects which tools are available and uses the best method. If both Pl
 
 | Skill | Trigger | What It Does |
 |-------|---------|--------------|
-| `/brand-extract` | User | Orchestrates extraction pipeline: specs CLI (Figma component anatomy) + Layout CLI (CSS tokens from URLs) + Figma MCP (variable inventory) + **voice extraction** (Playwright MCP default, Firecrawl optional). Voice extraction scrapes 30-50 copy samples from live site + social profiles + app store listings, grouped by type (headlines, CTAs, body copy, error messages, nav labels, microcopy) and channel. Falls back to guided manual input if automated extraction yields fewer than 10 usable samples. Always prompts practitioner for supplementary sources (brand docs, email examples, campaign materials) after extraction. Sources configured in `.brandrc.yaml`. Supports `--public-only` flag for pitch scenarios. |
+| `/brand-extract` | User | Orchestrates extraction pipeline: Figma Console MCP (variable inventory → token files) + Layout CLI (CSS tokens from URLs, optional) + multimodal vision (brand-guide PDFs, screenshots) + **voice extraction** (Playwright MCP default, Firecrawl optional). Voice extraction scrapes 30-50 copy samples from live site + social profiles + app store listings, grouped by type (headlines, CTAs, body copy, error messages, nav labels, microcopy) and channel. Falls back to guided manual input if automated extraction yields fewer than 10 usable samples. Always prompts practitioner for supplementary sources (brand docs, email examples, campaign materials) after extraction. Sources configured in `.brandrc.yaml`. Supports `--public-only` flag for pitch scenarios. Does **not** orchestrate specs CLI — that's a DS Pack tool for component anatomy, which sits at a different layer than brand tokens. |
 | `/brand-analyze` | User | Core analysis: reads extraction output + brand guide PDF (multimodal) + screenshots. Synthesizes into `.brand/` directory. Auto-generates `.impeccable.md`. Scores completeness. **Voice inference:** reads copy samples from extraction, infers formality level, sentence structure patterns, vocabulary preferences, humor/seriousness spectrum, active vs. passive voice, user address mode (you/we/brand name), error/negative state handling. Maps voice registers per channel (website/social/email/brand story), noting where voice is consistent vs. where it diverges. Outputs to `.brand/voice.md` with source samples cited for human validation. Every inference marked with confidence: HIGH (directly observed pattern) / MEDIUM (inferred from limited samples) / LOW (guessed from single instance). Supports `--mode pitch` (minimum tier + confidence markers only) and `--mode comprehensive` (full analysis + existing codebase integration). |
 | `/brand-audit` | User | Evaluates output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces brand adherence score. |
 | `/brand-score` | User | Completeness scoring across all brand package dimensions (modeled on Layout.design's 0-100 approach). |
@@ -598,7 +598,7 @@ The structured output of the Brand Skills. Lives in each client's project repo. 
 │   ├── deploy.md            # Deployment instructions (Netlify/Vercel)
 │   └── qa-checklist.md      # Brand-specific QA steps
 │
-├── specs/                   # Output from specs CLI (Nathan Curtis)
+├── specs/                   # Output from specs CLI (DS Pack tooling, when present)
 │   ├── button.spec.json     # Deterministic component anatomy
 │   └── [component].spec.json
 │
@@ -997,7 +997,7 @@ These are third-party tools we use as-is. We configure them, document how to set
 | Context7 MCP | Community | Configure per-practitioner. Document setup. |
 | Firecrawl MCP (manual only) | Firecrawl | No longer auto-installed. Practitioners with a Firecrawl paid plan can add it manually for faster bulk scraping; otherwise Playwright handles the default workflow. |
 | Storybook MCP | Storybook | Auto-installed when the Design System Pack is selected. User-scope HTTP transport pointing at `http://localhost:6006/mcp` — only connects when Storybook is running locally. |
-| specs CLI | Nathan Curtis / DirectedEdges | Install globally. Brand Skills orchestrates it; DS Pack uses it for ongoing analysis. |
+| specs CLI | Nathan Curtis / DirectedEdges | DS Pack tool for component anatomy and ongoing DS analysis. Install globally for projects with an existing design system. Not used by Brand Skills. |
 | Layout CLI | Layout.design | Install globally when stable. Brand Skills orchestrates it. |
 | UX Design Skills Pack (63 skills, 27 commands, 8 plugins) | Owl-Listener/designer-skills (664 stars) | Install per-practitioner. Covers research, strategy, UI, interaction, prototyping, design ops, toolkit, design systems. |
 
@@ -1010,7 +1010,7 @@ These are the components we build from scratch. This is where our development ef
 | **C1** | **`.brand/` schema specification** | Documented spec for every file in the brand package: what fields, what format, required vs. optional, tiered completeness model (minimum → standard → comprehensive) | 3-5 days |
 | **C2** | **`xd-toolkit` CLI** | Two-level CLI: `setup` (global, once per practitioner — installs MCPs, skill packs, collects tokens, verifies health) and `init` (per-project — scaffolds .brand/, skills, instruction files, .brandrc.yaml). Also: `doctor` (global + project health checks), `update` (refresh skills without overwriting .brand/), `score` (brand package completeness). Supports `--mode pitch/standard/comprehensive`, `--brand-path` (shared brand packages across projects), `--figma-only` (brand context for Figma design work, no code scaffolding), and `--json` on all commands. | 5-8 days |
 | **C3** | **CLAUDE.md template** | The brand routing instructions — ~40-50 lines that tell agents when to load which brand files. Plus AGENTS.md, .cursorrules, copilot-instructions.md equivalents. | 1-2 days |
-| **C4** | **`/brand-extract` skill** | Orchestrates the extraction pipeline: specs CLI (Figma component anatomy) + Layout CLI (CSS tokens from URLs) + Figma MCP (variable inventory) + voice extraction via Playwright MCP (default) or Firecrawl (optional). Scrapes website, social profiles, and app store listings per `.brandrc.yaml` sources. Falls back to guided manual input when automated extraction fails. Supports `--public-only` flag for pitch scenarios. | 3-5 days |
+| **C4** | **`/brand-extract` skill** | Orchestrates the extraction pipeline: Figma Console MCP (variable inventory) + Layout CLI (CSS tokens from URLs, optional) + multimodal vision (brand-guide PDFs, screenshots) + voice extraction via Playwright MCP (default) or Firecrawl (optional). Scrapes website, social profiles, and app store listings per `.brandrc.yaml` sources. Falls back to guided manual input when automated extraction fails. Supports `--public-only` flag for pitch scenarios. Component anatomy (specs CLI) is intentionally out of scope — that's a DS Pack concern. | 3-5 days |
 | **C5** | **`/brand-analyze` skill** | The core analysis skill. Reads extraction output + brand guide PDF (multimodal) + screenshots + copy samples. Synthesizes into `.brand/` directory files. Auto-generates `.impeccable.md` from overview. Infers voice from copy samples with confidence levels (HIGH/MEDIUM/LOW). Supports `--mode pitch` (minimum tier only) and `--mode comprehensive` (full analysis + existing codebase integration). Flags contradictions between sources. This is the most complex custom component. | 5-8 days |
 | **C6** | **`/brand-score` skill** | Completeness scoring across all brand package dimensions. Modeled on Layout.design's 0-100 approach. Reports which tier the package is at. | 2-3 days |
 | **C7** | **`/brand-audit` skill** | Evaluates agent output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces a brand adherence score. | 3-5 days |
@@ -1128,7 +1128,7 @@ The design-to-Claude-Code handoff is particularly relevant — designs package i
 
 | # | Question | Recommendation |
 |---|----------|----------------|
-| 1 | **specs CLI: free vs. PRO?** | Start free. PRO adds token resolution + subcomponent references. Evaluate after first 2-3 client onboardings. Contact Nathan Curtis for agency pricing. |
+| 1 | **specs CLI: free vs. PRO? (DS Pack)** | Start free. PRO adds token resolution + subcomponent references. Evaluate when DS Pack workflows hit free-tier limits — not a Brand Skills decision. Contact Nathan Curtis / DirectedEdges for agency pricing. |
 | 2 | **How prescriptive is the `.brand/` schema?** | Tiered: minimum (overview + tokens + voice), standard (+ components + composition), comprehensive (+ specs + workflows). `/brand-score` reports which tier. |
 | 3 | **Should we publish the toolkit publicly?** | Yes — recommended. Skills are markdown files on top of public tools. The competitive advantage is the Brand Skills methodology and client-specific brand packages (never public), not the skill files. Public removes the org-seat bottleneck for 95 practitioners. |
 | 4 | **GitHub org repo or personal repo?** | Start with a team-owned personal GitHub repo (e.g., under your account or a shared "vml-xd" account). Move to org repo if/when seats become available. The toolkit works identically either way. |
