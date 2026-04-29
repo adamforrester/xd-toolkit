@@ -25,25 +25,29 @@ An end-to-end toolkit for **Experience Design practitioners** who want AI agents
 ### Prerequisites
 
 - Node.js 18+
+- git ([install](https://git-scm.com/downloads)) — required even for the npm install method, since npm uses git under the hood to fetch from GitHub
 - [Claude Code](https://docs.anthropic.com/en/docs/claude-code) (`npm install -g @anthropic-ai/claude-code`)
-- git
 - A Figma personal access token ([how to get one](https://help.figma.com/hc/en-us/articles/8085703771159))
 - A GitHub personal access token (classic, scopes: `repo`, `read:org`)
 
-### Option A — clone and run
+### Install (recommended)
+
+```bash
+npm install -g github:adamforrester/xd-toolkit
+xd-toolkit setup
+```
+
+That's it — one command to install, one to run setup. `xd-toolkit` is now on your PATH globally.
+
+### For contributors (clone the repo)
+
+If you want to modify the toolkit or pull updates with `git pull`:
 
 ```bash
 git clone https://github.com/adamforrester/xd-toolkit.git
 cd xd-toolkit
 npm install
 npx xd-toolkit setup
-```
-
-### Option B — install from GitHub
-
-```bash
-npm install -g github:adamforrester/xd-toolkit
-xd-toolkit setup
 ```
 
 `setup` prompts you for optional packages, your Figma PAT, and your GitHub PAT, then installs MCP servers, the Superpowers plugin, selected skill packs, and global slash commands. Run `xd-toolkit doctor` afterwards to verify everything is connected.

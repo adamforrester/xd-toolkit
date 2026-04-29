@@ -15,6 +15,7 @@ An end-to-end suite for Experience Design practitioners who want AI agents to pr
 ## Prerequisites
 
 - Node.js 18+
+- git (npm uses git internally to fetch from GitHub) — install from https://git-scm.com/downloads
 - Claude Code installed (`npm install -g @anthropic-ai/claude-code`)
 - A Figma personal access token — figma.com → avatar → Settings → Personal access tokens
 - A GitHub personal access token (classic) — github.com → Settings → Developer settings → Tokens (classic). Scopes: `repo`, `read:org`
@@ -24,7 +25,16 @@ Total setup time: ~10 minutes.
 ## Setup (one-time)
 
 ```bash
-git clone https://github.com/[your-fork]/xd-toolkit.git
+npm install -g github:adamforrester/xd-toolkit
+xd-toolkit setup
+```
+
+That's it — one command to install, one to run setup. `xd-toolkit` is now on your PATH globally.
+
+If you'd rather clone the repo (for example, to pull updates with `git pull`):
+
+```bash
+git clone https://github.com/adamforrester/xd-toolkit.git
 cd xd-toolkit
 npm install
 npx xd-toolkit setup
