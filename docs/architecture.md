@@ -1,4 +1,4 @@
-# XD Vibe Coding Toolkit: Architecture & Workflow
+# XD Toolkit: Architecture & Workflow
 
 ## What This Is
 
@@ -319,7 +319,7 @@ Impeccable already covers UX execution comprehensively:
 - **Evaluation**: `/critique` runs Nielsen heuristics (scored 0-4), cognitive load checklist (8 items), emotional journey (peak-end rule)
 - **Planning**: `/shape` runs a structured discovery interview covering purpose, audience, content/data ranges, design goals, constraints, and anti-goals — produces a design brief
 
-No additional UX skills are needed in the core toolkit for vibe coding workflows.
+No additional UX skills are needed in the core toolkit for day-to-day workflows.
 
 For dedicated UX research, strategy, and design ops work, see the **UX Design Skills Pack** extension below.
 
@@ -361,7 +361,7 @@ This is NOT installed by `xd-toolkit setup` — it's a recommendation for practi
 
 A comprehensive collection of 63 skills, 27 commands, and 8 plugins covering the full UX/UI design practice — research, strategy, UI design, interaction design, prototyping, design ops, and more. Powered by **Owl-Listener/designer-skills** (664 GitHub stars, MIT license).
 
-Not needed for day-to-day vibe coding but valuable for the UX team's broader practice: dedicated research, strategy work, design ops, and structured handoffs.
+Not needed for day-to-day toolkit work but valuable for the UX team's broader practice: dedicated research, strategy work, design ops, and structured handoffs.
 
 Installed **per-practitioner**, not per-project.
 
@@ -481,7 +481,7 @@ cp -r design-system-ops/commands/* ~/.claude/commands/
 
 ### Extension: XD Manager Pack (Future — Phase 4+)
 
-For XD managers handling team operations — employee reviews, scoping, resource planning. Not part of the vibe coding pipeline but valuable for XD practice leadership.
+For XD managers handling team operations — employee reviews, scoping, resource planning. Not part of the core toolkit pipeline but valuable for XD practice leadership.
 
 **Planned skills (work in progress in separate threads):**
 

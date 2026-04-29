@@ -9,7 +9,7 @@ import { scoreCommand } from '../src/commands/score.js';
 
 program
   .name('xd-toolkit')
-  .description('XD Vibe Coding Toolkit — brand-consistent AI-assisted development')
+  .description('XD Toolkit — brand-consistent AI-assisted development')
   .version('0.1.0');
 
 program

@@ -1,4 +1,4 @@
-# XD Vibe Coding Toolkit
+# XD Toolkit
 
 An end-to-end suite of tools for Experience Design (XD) practitioners to produce production-quality, brand-consistent digital products using AI agents.
 
