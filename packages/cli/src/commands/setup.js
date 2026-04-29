@@ -39,12 +39,39 @@ export async function setupCommand(opts) {
   }
   console.log(chalk.green(`✓ Claude Code ${claudeResult.stdout}`));
 
-  // ── Check git (required for Design System Pack install) ──
+  // ── Check git (required for Design System Pack install + npm github: installs) ──
   const gitResult = tryRun('git --version');
   if (!gitResult.ok) {
     console.log(chalk.yellow('⚠ git is not installed.'));
-    console.log(chalk.dim('  Install: https://git-scm.com/downloads'));
-    console.log(chalk.dim('  You can continue without git, but the Design System Pack option will fail to install.'));
+    console.log('');
+
+    if (process.platform === 'darwin') {
+      const { installGit } = await inquirer.prompt([
+        {
+          type: 'confirm',
+          name: 'installGit',
+          message: 'Install git via Xcode Command Line Tools? (a system dialog will open)',
+          default: true,
+        },
+      ]);
+
+      if (installGit) {
+        console.log(chalk.dim('  Triggering xcode-select --install...'));
+        tryRun('xcode-select --install');
+        console.log('');
+        console.log(chalk.bold('  A macOS install dialog should have appeared.'));
+        console.log('  Click "Install", agree to the license, and wait for it to finish (a few minutes).');
+        console.log(`  Then re-run: ${chalk.cyan('xd-toolkit setup')}`);
+        console.log('');
+        process.exit(0);
+      } else {
+        console.log(chalk.dim('  You can continue, but the Design System Pack option will fail to install.'));
+      }
+    } else {
+      console.log(chalk.dim(`  Detected platform: ${process.platform}. Auto-install is only supported on macOS.`));
+      console.log(chalk.dim('  Install manually: https://git-scm.com/downloads, then re-run setup.'));
+      console.log(chalk.dim('  You can continue without git, but the Design System Pack option will fail to install.'));
+    }
   } else {
     console.log(chalk.green(`✓ ${gitResult.stdout}`));
   }
