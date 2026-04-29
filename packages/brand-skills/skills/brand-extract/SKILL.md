@@ -19,17 +19,18 @@ Do **not** invoke this skill automatically on every message. Extraction is expen
 
 ## Inputs
 
-Read in this order. Every input is optional individually, but at least one source must be present.
+Read in this order. Every input is optional individually, but at least one source must be present. **Assume the practitioner has a website** — if `sources.website` isn't set, prompt for it before doing anything else. Figma is conditional (often missing for new or prospective clients).
 
 1. **`.brandrc.yaml`** — primary configuration:
-   - `sources.website` + `sources.website_pages` → Playwright targets
-   - `sources.figma` (file IDs) → Figma Console MCP targets
+   - `sources.website` + `sources.website_pages` → Playwright targets *(assumed; prompt if missing)*
+   - `sources.figma` (file IDs) → Figma Console MCP targets *(optional; absent for new/prospect clients)*
    - `sources.figma_variable_collections` → narrows variable extraction
    - `sources.live_urls` → Layout CLI targets (optional, for CSS-derived tokens when Figma access is unavailable)
    - `sources.social.*` → Playwright targets for voice samples
    - `sources.app_store.*` → Playwright targets for voice samples (descriptions, what's-new copy)
    - `sources.brand_guide` → path to PDF for multimodal analysis
    - `sources.screenshots` → paths to reference imagery for multimodal analysis
+   - `sources.design_system_repo` → string. Local path (e.g., `./packages/design-system`) or remote git URL (e.g., `https://github.com/client/design-system`). Used in Stage 6 (comprehensive tier) to extract real component implementations.
 2. **Project tier** from `.brandrc.yaml` `tier` field (`minimum` / `standard` / `comprehensive`) — controls which `.brand/` files are populated.
 3. **Mode** from `.brandrc.yaml` `mode` field (`standard` / `pitch` / `comprehensive`) — `pitch` mode is public-sources-only; flag every output file with the pitch disclaimer.
 4. **Practitioner-provided assets** uploaded into the project root or referenced in conversation (PDFs, images, additional URLs).
@@ -59,11 +60,11 @@ Run stages in order. Each stage is independently testable; if a stage fails, log
 
 **Fallback:** If Figma access fails (no token, file private, MCP disconnected), skip to Stage 2 and rely on Layout CLI / Playwright for token inference. Mark token files with `<!-- Source: inferred from web (no Figma access) -->`.
 
-### Stage 2: Web token extraction (fallback / supplement)
+### Stage 2: Web token extraction (always run)
 
 **Tool:** Playwright MCP — navigate to `sources.website`, capture computed CSS, screenshot at desktop + mobile.
 
-**Goal:** Fill gaps Stage 1 didn't cover. If Figma was the source of truth, Stage 2 supplements (e.g., capture actual web type sizes vs. Figma values for reconciliation). If Figma was unavailable, Stage 2 is the primary token source.
+**Always runs** when `sources.website` is set. Treat as supplementary when Stage 1 succeeded; treat as primary when Stage 1 was skipped or failed. Surfaces real web behavior either way — useful even with a healthy Figma source because Stage 5 (conflict detection) compares them.
 
 **Method:**
 - Inject `getComputedStyle` queries on representative elements (h1, h2, p, body, button.primary, etc.).
@@ -132,15 +133,61 @@ Run stages in order. Each stage is independently testable; if a stage fails, log
 
 If no conflicts, write a one-line file: "No conflicts detected as of {date}."
 
-### Stage 6: Generate `design.md`
+### Stage 6: Design-system repo scan (comprehensive tier only)
+
+**Tool:** Native `Read` over a local path or shallow `git clone` of a remote repo, then file-pattern analysis.
+
+**Trigger:** `sources.design_system_repo` is set AND tier is `comprehensive`.
+
+**Method:**
+- For local paths: read directly. For remote URLs: shallow-clone (`git clone --depth 1`) to a temp directory; clean up after.
+- Scan for and inventory:
+  - `tokens/` directory or `tokens.json` / `tokens.yaml` / `*.tokens.json` files → cross-check against Stage 1+2 tokens (potential conflict source).
+  - Component source files (typical patterns: `src/components/*/`, `packages/*/src/`, `lib/components/*/`). Identify component names, prop signatures (TypeScript or PropTypes), and any associated stories (`*.stories.tsx`).
+  - `package.json` to detect component-library dependencies (e.g., `@radix-ui/*`, `react-aria`, internal `@client/ds`).
+  - `figma.config.*` (Figma Code Connect mappings) → links Figma component IDs to source files.
+  - Storybook config (`.storybook/main.ts`) → confirms Storybook MCP can be used.
+
+**Output:** For each component discovered, write a `.brand/components/<name>.md` with:
+- Component purpose (inferred from name + props + JSDoc/TSDoc if present)
+- Prop API summary
+- Source file path (so agents can find it)
+- Storybook URL pattern if Storybook is configured
+- Any Code Connect mapping
+
+**Important:** This stage **describes** what exists; it does not audit quality, completeness, or DS conformance. That's a DS Pack concern. The output is "what components live in this repo" — agents working on visual implementation use it to know what to reuse instead of re-inventing.
+
+**Fallback:** If the path is invalid, clone fails, or no recognizable component patterns are found, skip the stage and log "design system repo scan: no components detected" to the summary. Don't error.
+
+### Stage 7: Generate `design.md`
 
 **Tool:** `generateDesignMd()` utility (Phase B, already shipped).
 
-Re-run the generator after Stages 1–5 complete to produce the spec-compliant `design.md` at project root.
+Re-run the generator after Stages 1–6 complete to produce the spec-compliant `design.md` at project root.
 
-### Stage 7: Update `.impeccable.md`
+### Stage 8: Update `.impeccable.md`
 
 Regenerate `.impeccable.md` from the new `overview.md` so the Impeccable skill picks up brand context immediately.
+
+## Overwrite policy
+
+`/brand-extract` writes into `.brand/` files that may already exist. Behavior depends on whether the file is still a placeholder.
+
+**Detection:** placeholder files contain the marker `<!-- Fill this file following the schema at schema/brand/...schema.md -->` written by `xd-toolkit init`. While that marker is present, treat the file as untouched scaffolding.
+
+| File state | Behavior |
+|---|---|
+| Placeholder marker present | Overwrite without prompting — that's the marker's purpose |
+| File is empty (zero bytes) | Overwrite without prompting |
+| Marker absent, file populated | Prompt: **overwrite** (blow away current contents), **merge** (preserve prose, refresh structured parts), or **skip** (leave file alone, only regenerate `design.md` from current contents) |
+
+**What "merge" means per file type:**
+- **Token files** (`.brand/tokens/*.md`): replace YAML frontmatter with new values; keep existing prose. Tokens are structured; prose is editorial.
+- **`overview.md`**: keep existing prose; replace only the brand self-test block (it has a clear `## Brand self-test` heading delimiter).
+- **`voice.md`**: append new samples under a "Latest extraction ({date})" subsection; don't touch existing prose.
+- **`conflicts.md`**: append new conflicts; mark previously-resolved entries as "still applies" or "resolved (verify)" based on whether the conflict re-surfaced.
+
+When in doubt, default to **skip** — destructive operations should require explicit confirmation. The practitioner can always re-run with `--overwrite` for a clean rebuild.
 
 ## Outputs by tier
 
@@ -157,7 +204,7 @@ Regenerate `.impeccable.md` from the new `overview.md` so the Impeccable skill p
 | `.brand/conflicts.md` | — | ✓ | ✓ |
 | `.brand/composition/page-types.md` | — | — | ✓ |
 | `.brand/composition/patterns.md` | — | — | ✓ |
-| `.brand/components/` | — | — | ✓ (specs derived from Figma component anatomy via DS Pack if available; otherwise empty) |
+| `.brand/components/` | — | — | ✓ (populated by Stage 6 from `sources.design_system_repo`; if no repo provided, left empty for DS Pack to fill later) |
 | `design.md` (root) | ✓ | ✓ | ✓ |
 | `.impeccable.md` (root) | ✓ | ✓ | ✓ |
 
@@ -169,6 +216,7 @@ Regenerate `.impeccable.md` from the new `overview.md` so the Impeccable skill p
 | Playwright MCP | 2, 3 | Yes (without it, only multimodal analysis can run) |
 | Layout CLI | 2 | No (optional; supplements Playwright if installed) |
 | Multimodal vision (`Read` on PDFs/images) | 4 | No (skipped if no PDFs/screenshots provided) |
+| `git` + `Read` (design system repo scan) | 6 | No (only runs when `sources.design_system_repo` is set and tier is comprehensive) |
 | Firecrawl MCP | 3 | No (Playwright is default) |
 
 specs CLI is intentionally out of scope — that's a DS Pack concern.
@@ -216,18 +264,12 @@ When `mode: pitch`:
 
 For the team building this skill, ship in order — each phase is testable end-to-end with the previous phases:
 
-1. **Phase 2** (~2 days) — Stage 1 (Figma → tokens) only. Practitioner can `/brand-extract` and get filled token files. Other files remain placeholders.
+1. **Phase 2** (~2 days) — Stage 1 (Figma → tokens) + Stage 2 (always-run web token extraction). Practitioner can `/brand-extract` and get filled token files. Other `.brand/` files remain placeholders.
 2. **Phase 3** (~1 day) — Stage 3 (voice scraping). Adds `voice.md`.
 3. **Phase 4** (~1 day) — Stage 4 (multimodal). Adds `overview.md`.
-4. **Phase 5** (~half day) — Stage 5 (conflict detection) + Stage 6/7 wiring. Full pipeline.
+4. **Phase 5** (~half day) — Stage 5 (conflict detection) + Overwrite policy enforcement + Stage 7/8 wiring. Full base pipeline.
+5. **Phase 6** (~1 day) — Stage 6 (design system repo scan). Comprehensive tier only. Last because it depends on the rest of the pipeline being solid.
+
+Total: ~5.5 days, gated by phase. Each phase ships a usable increment.
 
 The `brand-coherence-factory` skill (early version, third-party) can be referenced for prompt patterns during Phases 4 and 3, but its single-file output isn't a target — `.brand/` is the structured destination.
-
-## Open questions
-
-1. Should Stage 2 web extraction always run, or only as fallback when Figma is missing? (Current spec: always run, treat as supplement.)
-2. How aggressive should Stage 4 be about overwriting an existing populated `overview.md` vs. merging? (Default: warn before overwrite, ask practitioner.)
-3. Should pitch-mode extraction skip Figma entirely (since pitch typically means no client access), or attempt and fall back? (Current spec: attempt and fall back.)
-4. For comprehensive tier `components/` — should we attempt anything from the Figma file structure, or leave it for DS Pack to fill via specs CLI? (Current spec: leave for DS Pack.)
-
-Resolve these before Phase 2 begins.
