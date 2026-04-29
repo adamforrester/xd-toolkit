@@ -1,3 +1,6 @@
+import { readFileSync } from 'node:fs';
+import { resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 import chalk from 'chalk';
 import inquirer from 'inquirer';
 import { tryRun } from '../utils/exec.js';
@@ -5,12 +8,25 @@ import { validateFigmaToken, validateGitHubToken } from '../utils/token-validato
 import { installCoreMCPs, installOptionalMCP } from '../utils/mcp-installer.js';
 import { installUXDesignSkills, installDesignSystemPack, installCommandsGlobal } from '../utils/skill-copier.js';
 
+const __dirname = fileURLToPath(new URL('.', import.meta.url));
+
+function getVersion() {
+  try {
+    const pkgPath = resolve(__dirname, '../../../../package.json');
+    return JSON.parse(readFileSync(pkgPath, 'utf-8')).version || 'unknown';
+  } catch {
+    return 'unknown';
+  }
+}
+
 export async function setupCommand(opts) {
   const results = { mcps: [], skills: [], warnings: [] };
+  const version = getVersion();
 
   console.log('');
-  console.log(chalk.bold('  XD Toolkit — Practitioner Setup'));
+  console.log(chalk.bold(`  XD Toolkit — Practitioner Setup ${chalk.dim(`v${version}`)}`));
   console.log(chalk.dim('  One-time setup for MCP servers, skill packs, and tokens'));
+  console.log(chalk.dim('  Latest releases: https://github.com/adamforrester/xd-toolkit/releases'));
   console.log('');
 
   // ── Step 1: Check Node.js ──
