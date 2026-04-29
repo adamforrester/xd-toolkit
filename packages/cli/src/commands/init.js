@@ -6,6 +6,7 @@ import inquirer from 'inquirer';
 import { stringify as yamlStringify } from 'yaml';
 import { renderTemplate } from '../utils/template-renderer.js';
 import { copySkillsToProject, copyCommandsToProject, BUNDLED_SKILLS_DIR } from '../utils/skill-copier.js';
+import { generateDesignMd } from '../utils/design-md-generator.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const TEMPLATES_DIR = resolve(__dirname, '../../src/templates');
@@ -324,6 +325,15 @@ export async function initCommand(opts) {
   );
   console.log(chalk.green('✓ .impeccable.md'));
   results.created.push('.impeccable.md');
+
+  // 4b. design.md (spec-compliant, generated from .brand/)
+  const brandDirForGen = answers.brandPath
+    ? resolve(projectDir, answers.brandPath)
+    : join(projectDir, '.brand');
+  const designMd = generateDesignMd(brandDirForGen, answers.client);
+  writeFileSync(join(projectDir, 'design.md'), designMd, 'utf-8');
+  console.log(chalk.green('✓ design.md (design.md spec)'));
+  results.created.push('design.md');
 
   // 5. .brandrc.yaml
   const brandrc = buildBrandrc(answers);

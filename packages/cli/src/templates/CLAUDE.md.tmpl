@@ -2,6 +2,8 @@
 
 Read `.brand/overview.md` for this client's brand identity, personality, and visual language.
 
+A spec-compliant `design.md` (per [google-labs-code/design.md](https://github.com/google-labs-code/design.md)) is generated at the project root from `.brand/`. Other tools and agents that support the design.md spec can read it directly. `.brand/` remains the source of truth — edit those files, then re-run `/brand-extract` (or regenerate manually) to refresh `design.md`.
+
 ## Context Loading (follow these rules — do not skip)
 
 Load the relevant `.brand/` file **before generating** when you encounter these tasks:
