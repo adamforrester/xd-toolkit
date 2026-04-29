@@ -49,28 +49,47 @@ export function copySkillsToProject(projectDir, skillsSourceDir) {
 }
 
 /**
+ * Add a Claude Code plugin marketplace and parse its declared name from stdout.
+ * Returns the marketplace name (e.g. "superpowers-dev") or null if add failed.
+ */
+async function addPluginMarketplace(repo) {
+  const result = await runAsync(`claude plugin marketplace add ${repo}`);
+  const combined = `${result.stdout}\n${result.stderr}`;
+  // "Successfully added marketplace: <name>" or "Marketplace <name> already exists"
+  const m =
+    combined.match(/Successfully added marketplace:\s*([\w.-]+)/i) ||
+    combined.match(/[Mm]arketplace\s+["']?([\w.-]+)["']?\s+already/);
+  if (m) return m[1];
+  if (!result.ok) return null;
+  return null;
+}
+
+/**
  * Install the UX Design Skills Pack via the Claude Code plugin marketplace.
  */
 export async function installUXDesignSkills() {
   const spinner = ora('Installing UX Design Skills Pack (63 skills, 8 plugins)...').start();
 
-  const addMarketplace = await runAsync('claude plugin marketplace add Owl-Listener/designer-skills');
-  if (!addMarketplace.ok && !/already/i.test(addMarketplace.stderr || '')) {
-    spinner.fail('UX Design Skills Pack failed: marketplace add');
-    if (addMarketplace.stderr) console.log(chalk.dim(`    ${addMarketplace.stderr.split('\n')[0]}`));
+  const marketplaceName = await addPluginMarketplace('Owl-Listener/designer-skills');
+  if (!marketplaceName) {
+    spinner.fail('UX Design Skills Pack failed: could not add marketplace');
     return false;
   }
 
-  const install = await runAsync('claude plugin install designer-skills@Owl-Listener-designer-skills');
+  const install = await runAsync(`claude plugin install designer-skills@${marketplaceName}`);
   if (install.ok) {
     spinner.succeed('UX Design Skills Pack installed');
     return true;
   }
 
   spinner.fail('UX Design Skills Pack failed to install');
-  if (install.stderr) console.log(chalk.dim(`    ${install.stderr.split('\n')[0]}`));
+  const errLine = (install.stderr || install.stdout || '').split('\n').find(l => l.trim());
+  if (errLine) console.log(chalk.dim(`    ${errLine}`));
+  console.log(chalk.dim(`    To install manually: claude plugin install <plugin-name>@${marketplaceName}`));
   return false;
 }
+
+export { addPluginMarketplace };
 
 /**
  * Install the Design System Pack by cloning the repo and copying skills

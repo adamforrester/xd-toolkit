@@ -6,7 +6,7 @@ import inquirer from 'inquirer';
 import { tryRun } from '../utils/exec.js';
 import { validateFigmaToken, validateGitHubToken } from '../utils/token-validator.js';
 import { installCoreMCPs, installOptionalMCP } from '../utils/mcp-installer.js';
-import { installUXDesignSkills, installDesignSystemPack, installCommandsGlobal } from '../utils/skill-copier.js';
+import { installUXDesignSkills, installDesignSystemPack, installCommandsGlobal, addPluginMarketplace } from '../utils/skill-copier.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 
@@ -227,19 +227,20 @@ export async function setupCommand(opts) {
   console.log(chalk.bold('  Installing plugins'));
   console.log('');
 
-  const addMarketplace = tryRun('claude plugin marketplace add obra/superpowers');
-  if (!addMarketplace.ok && !/already/i.test(addMarketplace.stderr || '')) {
-    console.log(chalk.yellow('⚠ Superpowers plugin: marketplace add failed'));
-    if (addMarketplace.stderr) console.log(chalk.dim(`    ${addMarketplace.stderr.split('\n')[0]}`));
-    results.skills.push({ name: 'superpowers', ok: false, error: addMarketplace.stderr });
+  const marketplaceName = await addPluginMarketplace('obra/superpowers');
+  if (!marketplaceName) {
+    console.log(chalk.yellow('⚠ Superpowers plugin: could not add marketplace'));
+    results.skills.push({ name: 'superpowers', ok: false, error: 'marketplace add failed' });
   } else {
-    const install = tryRun('claude plugin install superpowers@obra-superpowers');
+    const install = tryRun(`claude plugin install superpowers@${marketplaceName}`);
     if (install.ok) {
       console.log(chalk.green('✓ Superpowers — structured development: brainstorming, TDD, debugging, code review'));
       results.skills.push({ name: 'superpowers', ok: true });
     } else {
       console.log(chalk.yellow('⚠ Superpowers plugin failed to install'));
-      if (install.stderr) console.log(chalk.dim(`    ${install.stderr.split('\n')[0]}`));
+      const errLine = (install.stderr || install.stdout || '').split('\n').find(l => l.trim());
+      if (errLine) console.log(chalk.dim(`    ${errLine}`));
+      console.log(chalk.dim(`    To retry manually: claude plugin install superpowers@${marketplaceName}`));
       results.skills.push({ name: 'superpowers', ok: false, error: install.stderr });
     }
   }

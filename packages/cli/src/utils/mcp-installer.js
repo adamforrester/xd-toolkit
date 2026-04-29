@@ -77,12 +77,10 @@ async function getInstalledMCPs() {
   if (!ok) return new Set();
   const names = new Set();
   for (const line of stdout.split('\n')) {
-    // Any entry line includes a status marker (Connected / Disconnected / Failed).
-    // Lines look like: "name: command... - ✓ Connected" or "name: ... - ✗ Disconnected"
-    if (/Connected|Disconnected|Failed/.test(line)) {
-      const match = line.match(/^([^:]+):/);
-      if (match) names.add(match[1].trim());
-    }
+    // Match any entry line: "name: command_or_url - <status>"
+    // Status can be: Connected, Disconnected, Failed to connect, Needs authentication, etc.
+    const match = line.match(/^([^:]+?):\s.+\s-\s/);
+    if (match) names.add(match[1].trim());
   }
   return names;
 }
