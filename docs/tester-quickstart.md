@@ -25,14 +25,23 @@ Total setup time: ~10 minutes.
 ## Setup (one-time)
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/adamforrester/xd-toolkit/main/install.sh | bash
+```
+
+One command. The script handles the common macOS npm permission issue automatically, installs the toolkit globally, and walks you through `xd-toolkit setup` (token prompts, MCP installs, etc.).
+
+To read the script first:
+```bash
+curl -fsSL https://raw.githubusercontent.com/adamforrester/xd-toolkit/main/install.sh | less
+```
+
+If you'd rather install manually (and trust your npm permissions):
+```bash
 npm install -g github:adamforrester/xd-toolkit
 xd-toolkit setup
 ```
 
-That's it — one command to install, one to run setup. `xd-toolkit` is now on your PATH globally.
-
 If you'd rather clone the repo (for example, to pull updates with `git pull`):
-
 ```bash
 git clone https://github.com/adamforrester/xd-toolkit.git
 cd xd-toolkit

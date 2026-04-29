@@ -33,11 +33,25 @@ An end-to-end toolkit for **Experience Design practitioners** who want AI agents
 ### Install (recommended)
 
 ```bash
+curl -fsSL https://raw.githubusercontent.com/adamforrester/xd-toolkit/main/install.sh | bash
+```
+
+One command. The installer checks your environment, fixes the common macOS npm permission issue automatically, installs the toolkit globally, and runs `xd-toolkit setup`.
+
+If you'd like to read the script before running it:
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/adamforrester/xd-toolkit/main/install.sh | less
+```
+
+### Manual install (if you'd rather not pipe to bash)
+
+```bash
 npm install -g github:adamforrester/xd-toolkit
 xd-toolkit setup
 ```
 
-That's it — one command to install, one to run setup. `xd-toolkit` is now on your PATH globally.
+If you hit `EACCES` permission errors on macOS, run the installer above instead — or fix npm's prefix once with `npm config set prefix ~/.npm-global` and add `~/.npm-global/bin` to your PATH.
 
 ### For contributors (clone the repo)
 
