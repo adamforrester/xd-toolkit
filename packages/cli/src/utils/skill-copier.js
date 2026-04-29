@@ -49,18 +49,27 @@ export function copySkillsToProject(projectDir, skillsSourceDir) {
 }
 
 /**
- * Install the UX Design Skills Pack via claude install.
+ * Install the UX Design Skills Pack via the Claude Code plugin marketplace.
  */
 export async function installUXDesignSkills() {
   const spinner = ora('Installing UX Design Skills Pack (63 skills, 8 plugins)...').start();
-  const { ok, stderr } = await runAsync('claude install github:Owl-Listener/designer-skills');
-  if (ok) {
-    spinner.succeed('UX Design Skills Pack installed');
-  } else {
-    spinner.fail('UX Design Skills Pack failed to install');
-    if (stderr) console.log(chalk.dim(`    ${stderr.split('\n')[0]}`));
+
+  const addMarketplace = await runAsync('claude plugin marketplace add Owl-Listener/designer-skills');
+  if (!addMarketplace.ok && !/already/i.test(addMarketplace.stderr || '')) {
+    spinner.fail('UX Design Skills Pack failed: marketplace add');
+    if (addMarketplace.stderr) console.log(chalk.dim(`    ${addMarketplace.stderr.split('\n')[0]}`));
+    return false;
   }
-  return ok;
+
+  const install = await runAsync('claude plugin install designer-skills@Owl-Listener-designer-skills');
+  if (install.ok) {
+    spinner.succeed('UX Design Skills Pack installed');
+    return true;
+  }
+
+  spinner.fail('UX Design Skills Pack failed to install');
+  if (install.stderr) console.log(chalk.dim(`    ${install.stderr.split('\n')[0]}`));
+  return false;
 }
 
 /**

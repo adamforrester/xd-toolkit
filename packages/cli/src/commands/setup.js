@@ -211,14 +211,21 @@ export async function setupCommand(opts) {
   console.log(chalk.bold('  Installing plugins'));
   console.log('');
 
-  const superpowersResult = tryRun('claude install github:obra/superpowers');
-  if (superpowersResult.ok) {
-    console.log(chalk.green('✓ Superpowers — structured development: brainstorming, TDD, debugging, code review'));
-    results.skills.push({ name: 'superpowers', ok: true });
+  const addMarketplace = tryRun('claude plugin marketplace add obra/superpowers');
+  if (!addMarketplace.ok && !/already/i.test(addMarketplace.stderr || '')) {
+    console.log(chalk.yellow('⚠ Superpowers plugin: marketplace add failed'));
+    if (addMarketplace.stderr) console.log(chalk.dim(`    ${addMarketplace.stderr.split('\n')[0]}`));
+    results.skills.push({ name: 'superpowers', ok: false, error: addMarketplace.stderr });
   } else {
-    console.log(chalk.yellow('⚠ Superpowers plugin failed to install'));
-    if (superpowersResult.stderr) console.log(chalk.dim(`    ${superpowersResult.stderr.split('\n')[0]}`));
-    results.skills.push({ name: 'superpowers', ok: false, error: superpowersResult.stderr });
+    const install = tryRun('claude plugin install superpowers@obra-superpowers');
+    if (install.ok) {
+      console.log(chalk.green('✓ Superpowers — structured development: brainstorming, TDD, debugging, code review'));
+      results.skills.push({ name: 'superpowers', ok: true });
+    } else {
+      console.log(chalk.yellow('⚠ Superpowers plugin failed to install'));
+      if (install.stderr) console.log(chalk.dim(`    ${install.stderr.split('\n')[0]}`));
+      results.skills.push({ name: 'superpowers', ok: false, error: install.stderr });
+    }
   }
 
   // ── Step 5c: Install slash commands globally ──

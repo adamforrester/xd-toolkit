@@ -77,8 +77,9 @@ async function getInstalledMCPs() {
   if (!ok) return new Set();
   const names = new Set();
   for (const line of stdout.split('\n')) {
-    if (line.includes('Connected')) {
-      // Lines look like: "name: command... - ✓ Connected"
+    // Any entry line includes a status marker (Connected / Disconnected / Failed).
+    // Lines look like: "name: command... - ✓ Connected" or "name: ... - ✗ Disconnected"
+    if (/Connected|Disconnected|Failed/.test(line)) {
       const match = line.match(/^([^:]+):/);
       if (match) names.add(match[1].trim());
     }
