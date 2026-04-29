@@ -1,14 +1,30 @@
 {
   "name": "xd-toolkit",
   "version": "0.1.0",
-  "private": true,
   "description": "End-to-end toolkit for XD practitioners to produce brand-consistent digital products using AI agents",
-  "workspaces": [
-    "packages/cli"
+  "type": "module",
+  "bin": {
+    "xd-toolkit": "./packages/cli/bin/xd-toolkit.js"
+  },
+  "files": [
+    "packages/cli/bin/",
+    "packages/cli/src/",
+    "packages/cli/skills/",
+    "packages/cli/commands/"
   ],
   "scripts": {
     "build": "npm run build --workspace=packages/cli",
     "test": "npm test --workspace=packages/cli"
+  },
+  "workspaces": [
+    "packages/cli"
+  ],
+  "dependencies": {
+    "chalk": "^5.3.0",
+    "commander": "^13.1.0",
+    "inquirer": "^12.6.0",
+    "ora": "^8.2.0",
+    "yaml": "^2.7.1"
   },
   "license": "MIT",
   "engines": {
