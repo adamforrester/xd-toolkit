@@ -38,6 +38,16 @@ export async function setupCommand(opts) {
     process.exit(1);
   }
   console.log(chalk.green(`✓ Claude Code ${claudeResult.stdout}`));
+
+  // ── Check git (required for Design System Pack install) ──
+  const gitResult = tryRun('git --version');
+  if (!gitResult.ok) {
+    console.log(chalk.yellow('⚠ git is not installed.'));
+    console.log(chalk.dim('  Install: https://git-scm.com/downloads'));
+    console.log(chalk.dim('  You can continue without git, but the Design System Pack option will fail to install.'));
+  } else {
+    console.log(chalk.green(`✓ ${gitResult.stdout}`));
+  }
   console.log('');
 
   // ── Step 2: Package selection ──
@@ -244,6 +254,12 @@ export async function setupCommand(opts) {
     }
   }
 
+  console.log('');
+  console.log(chalk.bold('  Where things live'));
+  console.log(chalk.dim('  Skill packs:      ~/.claude/skills/'));
+  console.log(chalk.dim('  Slash commands:   ~/.claude/commands/'));
+  console.log(chalk.dim('  Plugins:          ~/.claude/plugins/'));
+  console.log(chalk.dim('  MCP servers:      run "claude mcp list" to view, "claude mcp remove <name>" to remove'));
   console.log('');
   console.log(chalk.bold('  Next step:'));
   console.log(`  Open Claude Code and type: ${chalk.cyan('/new-project [client name]')}`);

@@ -186,8 +186,45 @@ export async function initCommand(opts) {
 
   console.log('');
 
-  // ── Scaffold the project ──
+  // ── Detect existing files before scaffolding ──
   const projectDir = process.cwd();
+  const existingFiles = [
+    'CLAUDE.md',
+    'AGENTS.md',
+    '.cursorrules',
+    '.brandrc.yaml',
+    '.impeccable.md',
+    '.brand',
+  ].filter(f => existsSync(join(projectDir, f)));
+
+  if (existingFiles.length > 0 && !opts.force) {
+    console.log(chalk.yellow('  Existing files detected in this directory:'));
+    for (const f of existingFiles) {
+      console.log(chalk.yellow(`    - ${f}`));
+    }
+    console.log('');
+
+    if (nonInteractive) {
+      console.log(chalk.red('  Aborting: existing files would be overwritten.'));
+      console.log(chalk.dim('  Re-run with --force to overwrite, or run from an empty directory.'));
+      process.exit(1);
+    }
+
+    const { proceed } = await inquirer.prompt([
+      {
+        type: 'confirm',
+        name: 'proceed',
+        message: 'Overwrite these files?',
+        default: false,
+      },
+    ]);
+    if (!proceed) {
+      console.log(chalk.dim('  Aborted. No files were changed.'));
+      return;
+    }
+    console.log('');
+  }
+
   let tier = TIER_FOR_MODE[answers.mode];
 
   // Figma-only projects don't need workflow files — cap at standard tier

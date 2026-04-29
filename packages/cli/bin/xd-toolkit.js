@@ -25,6 +25,7 @@ program
   .option('--mode <mode>', 'Project mode: standard, pitch, or comprehensive', 'standard')
   .option('--brand-path <path>', 'Path to existing shared .brand/ directory')
   .option('--figma-only', 'Minimal scaffold for Figma design work only')
+  .option('--force', 'Overwrite existing CLAUDE.md, .brand/, etc. without prompting')
   .option('--json', 'Output results as JSON')
   .action(initCommand);
 
