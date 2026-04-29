@@ -102,7 +102,7 @@ jobs:
           elif [ "$category" = "mcp" ]; then
             echo "**MCP update** — may add new tools, change tool behavior, or fix bugs. Check if setup docs or practitioner instructions need updating."
           elif [ "$category" = "cli-tool" ]; then
-            echo "**CLI tool update** — may change output format, add new commands, or fix extraction bugs. Check if Brand Factory skills that orchestrate this tool need updating."
+            echo "**CLI tool update** — may change output format, add new commands, or fix extraction bugs. Check if brand workflow skills that orchestrate this tool need updating."
           elif [ "$category" = "plugin" ]; then
             echo "**Plugin update** — may add new capabilities or change behavior. Check if setup docs or practitioner instructions need updating."
           fi)

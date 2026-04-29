@@ -19,7 +19,7 @@ It's built for an agency context: multiple brands, multiple practitioners, varia
 │  Brand-agnostic                                                  │
 │                                                                  │
 │  ┌────────────────────────────────────────────────────────────┐   │
-│  │  PACKAGE 2: Brand Factory                                 │   │
+│  │  PACKAGE 2: Brand Skills                                 │   │
 │  │  Analysis + generation skills + extraction CLIs           │   │
 │  │  Used during client onboarding — produces Package 3       │   │
 │  └────────────────────────────────────────────────────────────┘   │
@@ -66,7 +66,7 @@ Skills teach agents **how** to do things. They're markdown files (`SKILL.md`) in
 
 ### Category 4: Data Files (Brand Intelligence)
 
-The `.brand/` directory — structured markdown and JSON files containing brand-specific intelligence. No executable behavior. Skills and instruction files reference these. They're the **product** of the Brand Factory.
+The `.brand/` directory — structured markdown and JSON files containing brand-specific intelligence. No executable behavior. Skills and instruction files reference these. They're the **product** of the Brand Skills.
 
 ---
 
@@ -270,7 +270,7 @@ claude mcp add firecrawl -s user \
 | MCP | Install Command (Claude Code) | Auth Required | Phase |
 |-----|-------------------------------|---------------|-------|
 | Storybook | `claude mcp add storybook -s user --transport http http://localhost:6006/mcp` | None | Design System Pack |
-| Firecrawl (manual only) | `claude mcp add firecrawl -s user -e FIRECRAWL_API_KEY=... -- npx -y firecrawl-mcp` | Firecrawl paid plan | Brand Factory |
+| Firecrawl (manual only) | `claude mcp add firecrawl -s user -e FIRECRAWL_API_KEY=... -- npx -y firecrawl-mcp` | Firecrawl paid plan | Brand Skills |
 
 **Total practitioner setup time:** ~30-45 minutes (one-time). Requires: Node.js 18+, Figma PAT, GitHub PAT, Vercel/Netlify accounts.
 
@@ -307,7 +307,7 @@ These travel with each client repo. Everyone who clones gets them.
 | `/optimize` | Harden | User | Performance optimization |
 | `/polish` | Harden | User | Final production-readiness pass |
 
-**Why unforked:** Impeccable already reads `.impeccable.md` from the project root for brand context. The Brand Factory (Package 2) auto-generates this file from `.brand/overview.md`. So Impeccable gets brand-specific context without any modification. We stay on upstream, get free updates, avoid maintaining a fork of 18 skills across 10+ tool directories.
+**Why unforked:** Impeccable already reads `.impeccable.md` from the project root for brand context. The Brand Skills (Package 2) auto-generates this file from `.brand/overview.md`. So Impeccable gets brand-specific context without any modification. We stay on upstream, get free updates, avoid maintaining a fork of 18 skills across 10+ tool directories.
 
 **Micro-animations coverage:** `/animate` provides a dedicated animation skill with a full `motion-design.md` reference covering easing curves, duration principles, purposeful vs. decorative motion, and the rule that motion should communicate meaning. `/delight` covers micro-interactions specifically. The brand package's `.brand/tokens/motion.md` adds client-specific animation principles (e.g., "Wendy's uses quick, playful transitions; the hotel chain uses slow, elegant fades"). Between these three layers, motion is well covered.
 
@@ -491,9 +491,9 @@ For XD managers handling team operations — employee reviews, scoping, resource
 | `/scope` | Project scoping — estimates effort, identifies risks, produces scope documents from requirements |
 | Additional manager skills TBD | Resource planning, capacity management, team health assessments |
 
-This extension will be developed in a future phase once the core toolkit, Brand Factory, and DS Pack are validated.
+This extension will be developed in a future phase once the core toolkit, Brand Skills, and DS Pack are validated.
 
-### Package 2: Brand Factory Skills (per-practitioner)
+### Package 2: Brand Skills Skills (per-practitioner)
 
 These are personal skills for the practitioners who run client onboarding. Not every team member needs them.
 
@@ -569,7 +569,7 @@ This is ~40 lines. Short, imperative, router-style. The ETH Zurich research foun
 
 ## Category 4: Brand Package (`.brand/` Directory)
 
-The structured output of the Brand Factory. Lives in each client's project repo. Contains no skills, no code — just brand intelligence that skills and instruction files reference.
+The structured output of the Brand Skills. Lives in each client's project repo. Contains no skills, no code — just brand intelligence that skills and instruction files reference.
 
 ```
 .brand/
@@ -754,7 +754,7 @@ npx xd-toolkit setup
    - **Core Toolkit** (always included) — 21 skills (Impeccable 18 + Vercel 2 + figma-plugin-dev 1), Superpowers plugin, 7 MCP servers
    - **UX Design Skills Pack** (optional) — 63 skills, 27 commands for research, strategy, interaction design, design ops
    - **Design System Pack** (optional) — 21 skills for DS governance, auditing, documentation
-   - **Brand Factory** (optional) — skills for generating .brand/ packages from client assets. For practitioners who run client onboarding.
+   - **Brand Skills** (optional) — skills for generating .brand/ packages from client assets. For practitioners who run client onboarding.
 3. Collects tokens (Figma PAT, GitHub PAT) with links to where to get them
 4. Installs MCP servers (7 core + Storybook MCP if Design System Pack is selected)
 5. Installs Superpowers plugin (structured development practices)
@@ -941,7 +941,7 @@ The toolkit needs to be accessible to ~95 XD practitioners. Given the constraint
 
 | Component | Where It Lives | Why |
 |-----------|---------------|-----|
-| **Core Toolkit + Brand Factory + UX Pack** (skills, templates, CLI) | **Public GitHub repo** (team-owned) | Skills are markdown files — the methodology isn't the secret. Impeccable, Figma community skills, specs CLI are all public. Our skills being public removes the org-seat bottleneck and allows `npm install` or `git clone` by anyone on the team. |
+| **Core Toolkit + Brand Skills + UX Pack** (skills, templates, CLI) | **Public GitHub repo** (team-owned) | Skills are markdown files — the methodology isn't the secret. Impeccable, Figma community skills, specs CLI are all public. Our skills being public removes the org-seat bottleneck and allows `npm install` or `git clone` by anyone on the team. |
 | **Brand Packages** (`.brand/` directories) | **Per-client project repos** (personal GitHub) | Client-specific brand intelligence. Never public. Lives alongside the code it governs. Practitioners use personal GitHub repos for deployment flexibility (free Netlify/Vercel hosting). |
 | **Documentation** (guides, setup walkthroughs, troubleshooting) | **Same public repo** (in a `/docs` directory) + **internal SharePoint/OneDrive** for slide decks and leadership materials | Technical docs live with the code. Presentation materials for leadership live where the org already collaborates. |
 | **MCP configurations** | **Documented in the repo** but installed per-practitioner | MCP configs contain auth tokens — they can't be committed. The repo provides template configs and setup scripts. |
@@ -951,7 +951,7 @@ The toolkit needs to be accessible to ~95 XD practitioners. Given the constraint
 Public may feel counterintuitive for an agency, but consider:
 
 - Every tool in our stack is already public (Impeccable: 17k stars; Figma Console MCP: 436 stars; specs CLI: open source). Our skills are a thin integration layer on top of public tools.
-- The competitive advantage isn't the skill files — it's the Brand Factory methodology, the practitioner expertise, and the client-specific brand packages (which are never public).
+- The competitive advantage isn't the skill files — it's the Brand Skills methodology, the practitioner expertise, and the client-specific brand packages (which are never public).
 - Public repos have no seat limits. All 95 practitioners can clone, install, and contribute without procurement.
 - If the team later decides to go private, moving a repo from public to private is trivial. The reverse is harder.
 
@@ -997,8 +997,8 @@ These are third-party tools we use as-is. We configure them, document how to set
 | Context7 MCP | Community | Configure per-practitioner. Document setup. |
 | Firecrawl MCP (manual only) | Firecrawl | No longer auto-installed. Practitioners with a Firecrawl paid plan can add it manually for faster bulk scraping; otherwise Playwright handles the default workflow. |
 | Storybook MCP | Storybook | Auto-installed when the Design System Pack is selected. User-scope HTTP transport pointing at `http://localhost:6006/mcp` — only connects when Storybook is running locally. |
-| specs CLI | Nathan Curtis / DirectedEdges | Install globally. Brand Factory orchestrates it; DS Pack uses it for ongoing analysis. |
-| Layout CLI | Layout.design | Install globally when stable. Brand Factory orchestrates it. |
+| specs CLI | Nathan Curtis / DirectedEdges | Install globally. Brand Skills orchestrates it; DS Pack uses it for ongoing analysis. |
+| Layout CLI | Layout.design | Install globally when stable. Brand Skills orchestrates it. |
 | UX Design Skills Pack (63 skills, 27 commands, 8 plugins) | Owl-Listener/designer-skills (664 stars) | Install per-practitioner. Covers research, strategy, UI, interaction, prototyping, design ops, toolkit, design systems. |
 
 ### Things We Create (Custom Development Required)
@@ -1015,7 +1015,7 @@ These are the components we build from scratch. This is where our development ef
 | **C6** | **`/brand-score` skill** | Completeness scoring across all brand package dimensions. Modeled on Layout.design's 0-100 approach. Reports which tier the package is at. | 2-3 days |
 | **C7** | **`/brand-audit` skill** | Evaluates agent output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces a brand adherence score. | 3-5 days |
 | **C8** | **`/brand-refresh` skill** | Re-runs analysis against updated client assets. Produces diff against existing brand package. Human reviews changes before committing. | 2-3 days |
-| **C9** | **Practitioner documentation** | Setup guide (MCP installation, CLI usage), daily workflow guide (how to use the toolkit), brand onboarding guide (how to run the Brand Factory), troubleshooting | 3-5 days |
+| **C9** | **Practitioner documentation** | Setup guide (MCP installation, CLI usage), daily workflow guide (how to use the toolkit), brand onboarding guide (how to run the Brand Skills), troubleshooting | 3-5 days |
 | **C10** | **MCP setup verification script** | A script that checks which MCPs are configured, which are missing, and prints the exact install commands for the practitioner's agent tool. Run via `xd-toolkit doctor`. | 1-2 days |
 
 **Total custom development: ~30-45 days of effort.**
@@ -1038,7 +1038,7 @@ These are the components we build from scratch. This is where our development ef
 | 4 | Write MCP setup guide + doctor script | **C9** (partial) + **C10** | 2-3 days |
 | 5 | Test with one real client | Hand-author `.brand/` for existing client. Validate Impeccable + routing + MCPs produce on-brand output. | 3-5 days |
 
-### Phase 2: Brand Factory (Weeks 4-7)
+### Phase 2: Brand Skills (Weeks 4-7)
 
 | # | Task | Deliverable | Effort |
 |---|------|------------|--------|
@@ -1071,7 +1071,7 @@ These are the components we build from scratch. This is where our development ef
 - `/ds-scope` — Design system consulting deliverable generator. Reads DS Pack audit outputs (triage, token-audit, component-audit, system-health, naming-audit, drift-detection) and produces: executive summary (system maturity, key risks, competitive position), gap analysis (what's missing, broken, outdated), remediation phases with effort estimates, and a scope document for the consulting engagement. Existing DS scoping work will be ported into this skill.
 
 **Infrastructure improvements:**
-- Multi-agent orchestration — Claude Code's native subagent capability enables parallel extraction, parallel analysis, and parallel audit within skills. Not a Phase 1 concern, but a future optimization for reducing Brand Factory wall-clock time.
+- Multi-agent orchestration — Claude Code's native subagent capability enables parallel extraction, parallel analysis, and parallel audit within skills. Not a Phase 1 concern, but a future optimization for reducing Brand Skills wall-clock time.
 - MCP server for brand intelligence (serve `.brand/` via MCP for very large brand systems)
 - Visual regression integration (Applitools/Percy)
 - Voice/tone automated scoring
@@ -1090,7 +1090,7 @@ These are the components we build from scratch. This is where our development ef
 | **Impeccable skills** | `xd-toolkit update --core` re-downloads latest and re-deploys to all tool directories | Quarterly or on major release |
 | **Design System Ops** | `git pull` from murphytrueman/design-system-ops or re-download plugin file | Track releases; update when new skills ship |
 | **UX/engineering skills** | Same as core — bundled with core update | Same |
-| **Brand Factory skills** | `/plugin marketplace update vml/brand-factory` or `npm update -g @vml-xd/xd-toolkit` | As we ship improvements |
+| **Brand Skills skills** | `/plugin marketplace update vml/brand-skills` or `npm update -g @vml-xd/xd-toolkit` | As we ship improvements |
 | **MCPs (npm-based)** | Auto-update via `@latest` tag in npx commands | Automatic on each invocation |
 | **MCPs (cloud-hosted)** | Automatic (Vercel MCP, etc.) | No action needed |
 | **specs CLI** | `npm update -g @directededges/specs-cli` | Quarterly — test new version first |
@@ -1130,7 +1130,7 @@ The design-to-Claude-Code handoff is particularly relevant — designs package i
 |---|----------|----------------|
 | 1 | **specs CLI: free vs. PRO?** | Start free. PRO adds token resolution + subcomponent references. Evaluate after first 2-3 client onboardings. Contact Nathan Curtis for agency pricing. |
 | 2 | **How prescriptive is the `.brand/` schema?** | Tiered: minimum (overview + tokens + voice), standard (+ components + composition), comprehensive (+ specs + workflows). `/brand-score` reports which tier. |
-| 3 | **Should we publish the toolkit publicly?** | Yes — recommended. Skills are markdown files on top of public tools. The competitive advantage is the Brand Factory methodology and client-specific brand packages (never public), not the skill files. Public removes the org-seat bottleneck for 95 practitioners. |
+| 3 | **Should we publish the toolkit publicly?** | Yes — recommended. Skills are markdown files on top of public tools. The competitive advantage is the Brand Skills methodology and client-specific brand packages (never public), not the skill files. Public removes the org-seat bottleneck for 95 practitioners. |
 | 4 | **GitHub org repo or personal repo?** | Start with a team-owned personal GitHub repo (e.g., under your account or a shared "vml-xd" account). Move to org repo if/when seats become available. The toolkit works identically either way. |
 | 5 | **Storybook: required or optional?** | Optional per-project. Include MCP config in `xd-toolkit init` only if project has Storybook dependency. |
 | 6 | **Default deployment platform?** | Netlify (free tier allows commercial use). Vercel for Next.js projects where performance matters. Support both — practitioner picks per project. |
@@ -1143,7 +1143,7 @@ The design-to-Claude-Code handoff is particularly relevant — designs package i
 
 See `docs/testing-and-scenarios.md` for the complete testing strategy and agency scenario definitions:
 
-- **Testing:** Five-layer validation strategy (routing → Impeccable integration → MCP stack → Brand Factory → E2E)
+- **Testing:** Five-layer validation strategy (routing → Impeccable integration → MCP stack → Brand Skills → E2E)
 - **Scenario A:** New client onboarding (standard mode)
 - **Scenario B:** Pitch / no direct access (pitch mode)
 - **Scenario C:** Existing client / established relationship (comprehensive mode)

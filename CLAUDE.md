@@ -5,10 +5,10 @@ An end-to-end suite of tools for Experience Design (XD) practitioners to produce
 ## Architecture
 
 See `docs/architecture.md` for the full architecture document covering:
-- Three packages (Core Toolkit, Brand Factory, Brand Packages)
+- Three packages (Core Toolkit, Brand Skills, Brand Packages)
 - Four component categories (MCP Servers, Skills, Instruction Files, Data Files)
 - The MCP stack (8 core + 1 optional across Design, Build/Test, Deploy, Context phases)
-- The skills stack (21 skills + Superpowers plugin + Brand Factory)
+- The skills stack (21 skills + Superpowers plugin + Brand Skills)
 - The `.brand/` directory structure and loading strategy
 - The E2E pipeline (Design -> Build -> Test -> Deploy)
 - Build plan (C1-C10 deliverables)
@@ -27,7 +27,7 @@ packages/
     skills/core/    #   Bundled 21 skills (Impeccable 18 + Vercel 2 + figma-plugin-dev 1) + Superpowers plugin
   core/             # Package 1: Core Toolkit skills + instruction file templates
     templates/      #   Source templates (CLAUDE.md.tmpl, AGENTS.md.tmpl, etc.)
-  brand-factory/    # Package 2: Brand Factory skills (C4-C8, not yet built)
+  brand-skills/    # Package 2: Brand Skills skills (C4-C8, not yet built)
 schema/
   brand/            # C1: .brand/ directory schema specification (16 schema files)
 extensions/
@@ -64,14 +64,14 @@ docs/
 - **Layer 1 (Brand Routing):** 5/5 passed — see `docs/test-results.md`
 - **Layer 2 (Impeccable Integration):** Partial pass — build output on-brand, briefs brand-light
 - **Layer 3 (MCP Stack):** 6/6 passed — Playwright replaces A11y Scanner
-- **Layer 4 (Brand Factory):** Blocked on C4-C8
+- **Layer 4 (Brand Skills):** Blocked on C4-C8
 - **Layer 5 (E2E):** Blocked on Layer 4
 
 ## Build Order
 
 Custom deliverables (C1-C10) are built in three phases:
 1. **Foundation** — C1 (.brand/ schema), C2 (CLI), C3 (instruction templates), C9/C10 (docs + doctor) — **DONE**
-2. **Brand Factory** — C4-C8 (extract, analyze, score, audit, refresh skills) — **NEXT**
+2. **Brand Skills** — C4-C8 (extract, analyze, score, audit, refresh skills) — **NEXT**
 3. **Distribution** — Public repo setup, practitioner docs, extension packaging
 
 ## Key Conventions

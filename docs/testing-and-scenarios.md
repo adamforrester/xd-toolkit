@@ -79,7 +79,7 @@ Each component of the toolkit is tested independently, in dependency order. You 
 
 ---
 
-### Layer 4: Brand Factory (Test when C4-C8 are built)
+### Layer 4: Brand Skills (Test when C4-C8 are built)
 
 **What you're testing:** Does the analysis pipeline produce a usable `.brand/` directory from real client assets?
 
@@ -112,7 +112,7 @@ Each component of the toolkit is tested independently, in dependency order. You 
 
 **Method:**
 1. Start from zero: `xd-toolkit init --client "TestClient"`
-2. Run the Brand Factory on real assets
+2. Run the Brand Skills on real assets
 3. Human reviews and enriches the brand package (time this — it's your onboarding cost metric)
 4. Build three representative deliverables:
    - A marketing landing page
@@ -175,7 +175,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
 7. Commit .brand/ to repo → team starts producing work
 ```
 
-**Key challenge:** The client's assets often contradict each other. The style guide says one thing, the live site does another, and the stakeholder says something different. The Brand Factory analysis will surface these conflicts — the human enrichment step is where they get resolved. The `/brand-analyze` skill should flag contradictions explicitly rather than silently picking one.
+**Key challenge:** The client's assets often contradict each other. The style guide says one thing, the live site does another, and the stakeholder says something different. The Brand Skills analysis will surface these conflicts — the human enrichment step is where they get resolved. The `/brand-analyze` skill should flag contradictions explicitly rather than silently picking one.
 
 **Testing this scenario:** Use a real new client onboarding. Time the entire process. Measure brand package quality. The target is 4-8 hours from "received assets" to "brand package committed," down from what would otherwise be weeks of manual documentation.
 

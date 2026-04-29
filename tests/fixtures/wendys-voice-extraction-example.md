@@ -1,6 +1,6 @@
 # Wendy's Voice Extraction — Reference Example
 
-> **Reference example** — generated via Playwright MCP voice extraction from wendys.com on 2026-04-14. This file demonstrates the expected output format and analysis depth for the Brand Factory voice extraction workflow. Use this as the quality bar for what `/brand-extract` + `/brand-analyze` should produce.
+> **Reference example** — generated via Playwright MCP voice extraction from wendys.com on 2026-04-14. This file demonstrates the expected output format and analysis depth for the voice extraction workflow. Use this as the quality bar for what `/brand-extract` + `/brand-analyze` should produce.
 
 ---
 

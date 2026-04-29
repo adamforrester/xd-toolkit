@@ -70,10 +70,10 @@ Test results from Layer 1-3 validation. Tested 2026-04-14.
 | Netlify | Deploy | Core |
 | Vercel | Deploy | Core |
 | Context7 | Context | Core |
-| Firecrawl | Brand Factory | Optional |
+| Firecrawl | Brand Skills | Optional |
 
 ---
 
-## Next: Layer 4 (Brand Factory) and Layer 5 (E2E)
+## Next: Layer 4 (Brand Skills) and Layer 5 (E2E)
 
 Layer 4 testing requires C4-C8 to be built. Layer 5 requires the full pipeline.

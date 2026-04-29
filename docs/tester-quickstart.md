@@ -1,6 +1,6 @@
 # XD Toolkit — Tester Quickstart
 
-Thanks for testing this. The toolkit is in early access — the foundation works end-to-end, but the Brand Factory skills (extraction, scoring, audit, refresh) are still in build. This guide gets you through what's ready today.
+Thanks for testing this. The toolkit is in early access — the foundation works end-to-end, but the Brand Skills skills (extraction, scoring, audit, refresh) are still in build. This guide gets you through what's ready today.
 
 ## What this is
 
@@ -10,7 +10,7 @@ An end-to-end suite for Experience Design practitioners who want AI agents to pr
 - The Superpowers plugin (structured development practices)
 - 7 MCP servers (Figma Official, Figma Console, Playwright, GitHub, Netlify, Vercel, Context7)
 - Two slash commands (`/new-project`, `/brand-check`)
-- Optional add-ons: UX Design Skills Pack (63 skills), Design System Pack (21 skills + Storybook MCP), Brand Factory
+- Optional add-ons: UX Design Skills Pack (63 skills), Design System Pack (21 skills + Storybook MCP), Brand Skills
 
 ## Prerequisites
 
@@ -50,7 +50,7 @@ npx xd-toolkit setup
 ```
 
 You'll be prompted to:
-1. Choose which optional packages to install (Core is forced on; UX Design Skills, Design System Pack, and Brand Factory are checkboxes)
+1. Choose which optional packages to install (Core is forced on; UX Design Skills, Design System Pack, and Brand Skills are checkboxes)
 2. Paste your Figma PAT
 3. Paste your GitHub PAT
 
@@ -106,7 +106,7 @@ npx xd-toolkit score
 
 ## Known limitations
 
-- **Brand Factory skills (C4–C8) are not built yet.** `/new-project`'s extraction phase relies on the model + Playwright doing it ad hoc. Dedicated `/brand-extract`, `/brand-analyze`, `/brand-audit`, `/brand-refresh` skills are coming.
+- **Brand Skills skills (C4–C8) are not built yet.** `/new-project`'s extraction phase relies on the model + Playwright doing it ad hoc. Dedicated `/brand-extract`, `/brand-analyze`, `/brand-audit`, `/brand-refresh` skills are coming.
 - **Layer 4 + Layer 5 end-to-end tests are blocked** on the above.
 - **No daily-workflow doc yet** — `docs/setup-guide.md` covers install, but ongoing use is documented via the slash commands themselves.
 - **Design System Pack** requires `git` on PATH (the installer clones from GitHub).

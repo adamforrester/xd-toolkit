@@ -1,10 +1,10 @@
 # Schema: .brandrc.yaml
 
-**Purpose:** Project-level configuration for the brand toolkit. Controls CLI behavior, declares which brand tier the project targets, and stores references to external assets (Figma files, URLs, etc.) used by the Brand Factory.
+**Purpose:** Project-level configuration for the toolkit. Controls CLI behavior, declares which brand tier the project targets, and stores references to external assets (Figma files, URLs, etc.) used by the brand workflow skills.
 
 **Location:** Project root (alongside `CLAUDE.md`)
 **Created by:** `xd-toolkit init`
-**Used by:** CLI commands (`validate`, `update`, `doctor`), Brand Factory skills (`/brand-extract`, `/brand-analyze`)
+**Used by:** CLI commands (`validate`, `update`, `doctor`), brand workflow skills (`/brand-extract`, `/brand-analyze`)
 
 ---
 
@@ -27,7 +27,7 @@
 
 ### Brand Sources (optional)
 
-References to source materials for the Brand Factory extraction pipeline. Drives what `/brand-extract` crawls without prompting the practitioner during extraction.
+References to source materials for the extraction pipeline. Drives what `/brand-extract` crawls without prompting the practitioner during extraction.
 
 | Field | Required | Type | Description |
 |-------|----------|------|-------------|

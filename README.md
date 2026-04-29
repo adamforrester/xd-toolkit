@@ -1,6 +1,6 @@
 # XD Toolkit
 
-> **Status:** Early access. Foundation works end-to-end; Brand Factory automation skills are still in build. See [Known limitations](#known-limitations).
+> **Status:** Early access. Foundation works end-to-end; Brand Skills automation skills are still in build. See [Known limitations](#known-limitations).
 
 An end-to-end toolkit for **Experience Design practitioners** who want AI agents to produce brand-consistent, production-quality digital products. It bundles the skills, MCP servers, slash commands, and brand-context plumbing that an AI agent needs to design, build, test, and deploy on-brand work.
 
@@ -16,7 +16,7 @@ An end-to-end toolkit for **Experience Design practitioners** who want AI agents
 - **Optional add-ons:**
   - UX Design Skills Pack (63 skills)
   - Design System Pack (21 skills + Storybook MCP)
-  - Brand Factory (skills for generating `.brand/` packages from client assets — in progress)
+  - Brand Skills (skills for generating `.brand/` packages from client assets — in progress)
 
 ---
 
@@ -113,7 +113,7 @@ npx xd-toolkit score
 packages/
   cli/              CLI source (setup, init, doctor, update, score)
   core/             Core Toolkit skill + instruction file templates
-  brand-factory/    Brand Factory skills (in progress)
+  brand-skills/    Brand Skills skills (in progress)
 schema/
   brand/            .brand/ directory schema (16 files)
 extensions/
@@ -127,7 +127,7 @@ tests/fixtures/     Reference brand packages
 
 ## Known limitations
 
-- **Brand Factory skills (C4–C8) are not yet built.** `/new-project`'s brand extraction phase relies on the model + Playwright doing it ad hoc. Dedicated `/brand-extract`, `/brand-analyze`, `/brand-audit`, and `/brand-refresh` skills are the next milestone.
+- **Brand Skills skills (C4–C8) are not yet built.** `/new-project`'s brand extraction phase relies on the model + Playwright doing it ad hoc. Dedicated `/brand-extract`, `/brand-analyze`, `/brand-audit`, and `/brand-refresh` skills are the next milestone.
 - **Layer 4 + Layer 5 end-to-end tests are blocked** on the above.
 - **Daily-workflow documentation** is partial — install is documented; ongoing use is documented via the slash commands themselves.
 - **Firecrawl MCP** is no longer auto-installed (free tier is too thin to be worth the prompt). Add it manually if you have a paid plan — see `docs/architecture.md`.

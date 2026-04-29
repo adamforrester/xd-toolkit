@@ -120,8 +120,8 @@ export async function setupCommand(opts) {
           checked: false,
         },
         {
-          name: `Brand Factory ${chalk.dim('— generate .brand/ packages from client assets')}`,
-          value: 'brand-factory',
+          name: `Brand Skills ${chalk.dim('— generate .brand/ packages from client assets')}`,
+          value: 'brand-skills',
           checked: false,
         },
       ],
@@ -217,9 +217,9 @@ export async function setupCommand(opts) {
     results.skills.push({ name: 'ds-pack', ok });
   }
 
-  if (selectedPackages.includes('brand-factory')) {
-    console.log(chalk.green('✓ Brand Factory skills bundled (available during brand analysis)'));
-    results.skills.push({ name: 'brand-factory', ok: true });
+  if (selectedPackages.includes('brand-skills')) {
+    console.log(chalk.green('✓ Brand Skills skills bundled (available during brand analysis)'));
+    results.skills.push({ name: 'brand-skills', ok: true });
   }
 
   // ── Step 5b: Install plugins ──

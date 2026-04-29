@@ -159,10 +159,10 @@ export async function installDesignSystemPack() {
 }
 
 /**
- * Copy Brand Factory skills to user-level skills directory.
+ * Copy brand workflow skills to user-level skills directory.
  */
-export function installBrandFactorySkills(skillsSourceDir) {
-  const target = join(homedir(), '.claude', 'skills', 'brand-factory');
+export function installBrandSkills(skillsSourceDir) {
+  const target = join(homedir(), '.claude', 'skills', 'brand-skills');
   mkdirSync(target, { recursive: true });
   if (existsSync(skillsSourceDir)) {
     cpSync(skillsSourceDir, target, { recursive: true });
