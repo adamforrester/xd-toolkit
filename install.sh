@@ -98,14 +98,15 @@ case ":$PATH:" in
   *) export PATH="$NPM_BIN:$PATH" ;;
 esac
 
-# ── Run setup ──
+# ── Done — point user at setup ──
+# We don't auto-run `xd-toolkit setup` because curl|bash doesn't provide a
+# real TTY, and inquirer's password prompts (Figma PAT, GitHub PAT) crash
+# without one. Running setup directly from the user's shell works fine.
 echo ""
-bold "  Running xd-toolkit setup..."
+bold "  Done. Now run:"
 echo ""
-xd-toolkit setup
-
+echo "    xd-toolkit setup"
 echo ""
-bold "  Done."
-dim "  If 'xd-toolkit' isn't found in a new terminal, run:"
-dim "    source ${SHELL_RC:-your shell rc file}"
+dim "  If 'xd-toolkit: command not found', open a new terminal or run:"
+dim "    source ${SHELL_RC:-~/.zshrc or ~/.bash_profile}"
 echo ""
