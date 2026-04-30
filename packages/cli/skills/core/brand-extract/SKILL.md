@@ -148,17 +148,21 @@ If `mode: pitch` in `.brandrc.yaml`, prepend the disclaimer:
 
 Use the `Write` tool to write the full content. Do not use `Edit` — token files are regenerated wholesale.
 
-## 5. Regenerate design.md
+## 5. Regenerate design.md (required — do not skip)
 
-After all four token files are written, regenerate `design.md` at the project root. Two options:
+After all four token files are written, regenerate `design.md` at the project root. **This is a required step, not optional.** `design.md` is a self-contained, spec-compliant artifact (per https://github.com/google-labs-code/design.md/blob/main/docs/spec.md) — it inlines the actual token values in the YAML frontmatter so external tools can read them. Without this step, `design.md` stays the empty skeleton from `init` and the extraction work is invisible to spec consumers.
 
-- **Preferred:** Tell the user to run `xd-toolkit init --force` if available, or call the `generateDesignMd` utility programmatically. Easier path: ask the user to confirm regeneration, then build `design.md` inline by reading each `.brand/` file and following the design.md spec at https://github.com/google-labs-code/design.md/blob/main/docs/spec.md.
-- **Manual fallback:** if you can't run the utility, write a one-line note to `design.md`:
-  ```
-  <!-- design.md needs regeneration — run `xd-toolkit init --force` or invoke the design-md-generator utility. -->
-  ```
+Use the dedicated CLI command — it's deterministic and avoids hand-building the file:
 
-For Phase 2, the inline build is acceptable. Regenerate the frontmatter from the four token files, leave body sections as-is.
+```bash
+xd-toolkit refresh-design
+```
+
+Run it via the `Bash` tool. The command reads `.brand/` and overwrites `design.md`. It exits 0 on success and prints the brand directory it used.
+
+If `xd-toolkit refresh-design` is unavailable (older toolkit version on the practitioner's machine), fall back to building `design.md` inline: read each `.brand/` file, merge the `colors` / `typography` / `spacing` / `rounded` / `elevation` frontmatter blocks into a single design.md frontmatter, then assemble the body sections (Overview, Colors, Typography, Layout, Elevation, Shapes, Components, Do's and Don'ts) per the spec.
+
+After regeneration, verify the file is no longer the placeholder by checking that the frontmatter contains at least one populated token map.
 
 ## 6. Final summary
 

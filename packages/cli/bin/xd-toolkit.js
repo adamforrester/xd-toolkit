@@ -6,6 +6,7 @@ import { initCommand } from '../src/commands/init.js';
 import { doctorCommand } from '../src/commands/doctor.js';
 import { updateCommand } from '../src/commands/update.js';
 import { scoreCommand } from '../src/commands/score.js';
+import { refreshDesignCommand } from '../src/commands/refresh-design.js';
 
 program
   .name('xd-toolkit')
@@ -46,5 +47,12 @@ program
   .description('Report brand package completeness')
   .option('--json', 'Output results as JSON')
   .action(scoreCommand);
+
+program
+  .command('refresh-design')
+  .description('Regenerate design.md at the project root from .brand/')
+  .option('--brand-path <path>', 'Override path to .brand/ directory')
+  .option('--json', 'Output results as JSON')
+  .action(refreshDesignCommand);
 
 program.parse();
