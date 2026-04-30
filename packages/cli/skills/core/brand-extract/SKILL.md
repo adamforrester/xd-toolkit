@@ -1,13 +1,13 @@
 ---
 name: brand-extract
-description: Extract a structured brand package from a client's Figma file and live website, populating .brand/tokens/*.md and regenerating design.md. Use when the user says "extract the brand", "/brand-extract", "build a brand package from these assets", "pull tokens from Figma", or after running /new-project for the first time. Currently implements Phase 2 (token extraction from Figma + web). Voice extraction, multimodal analysis, conflict detection, and design-system repo scanning are stages of the full pipeline that will land in subsequent phases.
+description: Extract a structured brand package from a client's Figma file, live website, and social profiles, populating .brand/tokens/*.md, .brand/voice.md, and regenerating design.md. Use when the user says "extract the brand", "/brand-extract", "build a brand package from these assets", "pull tokens from Figma", "analyze the voice", or after running /new-project for the first time. Currently implements Phase 3 (token extraction from Figma + web, plus voice extraction from website + social + app stores). Multimodal analysis, conflict detection, and design-system repo scanning are stages of the full pipeline that will land in subsequent phases.
 ---
 
-# /brand-extract — Phase 2 (token extraction)
+# /brand-extract — Phase 3 (tokens + voice)
 
-You are running the brand-extract skill to populate this project's `.brand/tokens/*.md` files from the client's Figma file (when available) and live website.
+You are running the brand-extract skill to populate this project's `.brand/tokens/*.md` files (from the client's Figma file when available + the live website) and `.brand/voice.md` (from the live website + social profiles + app store listings).
 
-**Phase 2 scope:** Stages 1 and 2 only — token extraction. Stages 3–8 (voice, overview, conflicts, repo scan, design.md/impeccable.md regen) are not yet implemented. Stop after Stage 2 and tell the user what's left for later phases.
+**Phase 3 scope:** Stages 1, 2, and 3. Stages 4–8 (overview, conflicts, repo scan, .impeccable.md regen) are not yet implemented. Stop after Stage 3 and tell the user what's left for later phases.
 
 The full design lives at `packages/brand-skills/skills/brand-extract/DESIGN.md` in the toolkit repo.
 
@@ -75,7 +75,108 @@ This stage always runs when `sources.website` is set. Treat as supplementary to 
 - If Stage 1 produced a token with the same role (e.g., "primary"), prefer the Figma value unless the web value materially differs (then it's a conflict — note for Stage 5 in a future phase, but don't write to `conflicts.md` yet; just include a note in the prose).
 - If Stage 1 had no equivalent, add the web-derived token with a name inferred from its role (e.g., `surface-page`, `text-primary`).
 
-## 4. Write token files
+## 4. Stage 3 — Voice extraction (always run when sources.website is set)
+
+This stage scrapes user-facing copy from the live site, social profiles, and app store listings to produce `.brand/voice.md`. Run after Stages 1+2.
+
+### 4a. Source list
+
+Build the URL list from `.brandrc.yaml`:
+- `sources.website` (homepage) and every entry in `sources.website_pages` (e.g., `/about`, `/products`, `/contact`, `/help`)
+- Each platform under `sources.social.*` (twitter / x, instagram, linkedin, facebook, tiktok)
+- Each entry under `sources.app_store.*` (ios, android)
+
+If `sources.website` is missing, you should already have prompted for it in Stage 0. If still absent, skip Stage 3 with a note in the summary.
+
+### 4b. Scrape copy samples (target: 30–50 total)
+
+For each URL, use Playwright MCP. Don't reuse the screenshots from Stage 2 — voice extraction needs the rendered text content, not visuals.
+
+For website / social pages:
+1. `mcp__playwright__browser_navigate` to the URL
+2. `mcp__playwright__browser_snapshot` to get the accessibility tree (preferred — gives semantic structure with role labels)
+3. If snapshot is sparse, fall back to `mcp__playwright__browser_evaluate` with a script that walks `document.querySelectorAll('h1, h2, h3, [role="heading"], button, a, .cta, [aria-label], [class*="error"], nav a, footer a, .toast, .notice')` and returns `{tag, role, textContent, ariaLabel, className}` for each.
+
+For app store listings: navigate, then capture the description block, "What's New" section, and short subtitle. Most app stores require minimal selector work.
+
+For each captured string, classify and store:
+- **Type** — exactly one of: `headline`, `cta`, `body`, `error`, `nav`, `microcopy`, `transactional`. Inference rules:
+  - `headline` — H1/H2/H3 elements with role="heading", or hero text >= 24px font (you saw the type scale in Stage 2 — use it)
+  - `cta` — `<button>`, `<a>` styled as button (class contains "btn"/"button"), `[role="button"]`, or anchor with imperative verb
+  - `body` — paragraph elements, list items >= 5 words
+  - `error` — anything in elements with class/data attribute containing "error", "alert", "warn", or aria-invalid
+  - `nav` — anchors inside `<nav>`, header, or footer
+  - `microcopy` — tooltips (`[role="tooltip"]`), placeholders, helper text under inputs, badges, captions
+  - `transactional` — toast/notice/confirmation patterns, anything in `[role="status"]` or `[aria-live]`
+- **Channel** — `website`, `social`, `app-store`, `email` (if email examples are uploaded — Phase 4 will handle uploads; for Phase 3 only website/social/app-store)
+- **Source URL** — keep for citation in `voice.md` provenance comments
+
+Stop scraping when you have ≥30 samples *or* you've exhausted the source list. Don't crawl indefinitely.
+
+### 4c. Inference
+
+From the corpus, derive:
+
+- **Voice attributes** (3–5 adjectives) — what consistently shows up across types and channels (e.g., "direct", "warm", "wry"). Each attribute must be supported by at least 3 specific samples.
+- **Voice anti-attributes** — what the brand explicitly avoids. Inferred from absences (no exclamation points anywhere → "Never overly enthusiastic") or contrasts with competitor patterns (don't speculate — anchor in evidence).
+- **Tone by context** — sample at least 3 contexts from the type buckets (typically `error`, `transactional`, `cta` or `headline`). For each, give one or two real examples and a short tone descriptor.
+- **Vocabulary** — preferred terms (words that recur with intent) and avoided terms (you can rarely prove a word is *avoided*, so use the absence cautiously — only flag avoided terms that the brand explicitly contrasts in marketing copy or that are obvious anti-patterns for the inferred voice).
+- **Microcopy patterns** — patterns visible in the samples for buttons, errors, empty states. Cite real examples.
+- **Channel deltas** — note material differences (e.g., "Twitter copy is shorter and more irreverent than the website").
+
+### 4d. Confidence levels
+
+Tag each major claim in `voice.md` with confidence based on supporting sample count:
+- **HIGH** — ≥10 samples back the claim
+- **MEDIUM** — 5–9 samples
+- **LOW** — <5 samples
+
+Express confidence inline in the prose where useful (e.g., "Voice is consistently warm and direct *(HIGH — 18 supporting samples across website + Twitter)*"), or in a small confidence-summary block at the top of `voice.md`.
+
+### 4e. Sample threshold
+
+If the total scraped samples is **<10**, do not generate inferred prose. Instead, write a stub `voice.md`:
+
+```markdown
+# Voice & Tone (stub)
+
+> ⚠️ **Insufficient samples for confident voice inference.** Captured {n} usable samples — needs ≥10. The samples are listed below for manual review.
+
+## Captured samples
+- "{sample 1}" *({type}, {channel}, {url})*
+- ...
+
+## Next steps
+Provide additional sources to /brand-extract:
+- Brand voice document or style guide PDF
+- Recent campaign decks
+- Email examples
+- Customer support templates
+```
+
+Then ask the practitioner to provide more sources before continuing.
+
+### 4f. Apply overwrite policy + write voice.md
+
+Same overwrite policy as Stage 4 token files (placeholder marker → overwrite freely; populated → prompt overwrite/merge/skip).
+
+For pitch mode, prepend the disclaimer:
+```
+> ⚠️ **PITCH MODE** — derived from public sources only. Cap inferred confidence at MEDIUM.
+```
+
+Build the file per `schema/brand/voice.schema.md`. The reference example at `tests/fixtures/wendys-voice-extraction-example.md` shows the target depth and citation style — match it. Use the `Write` tool to write the full file.
+
+End the file with a provenance block:
+```markdown
+<!--
+Generated by /brand-extract on YYYY-MM-DD.
+Sources: {website pages crawled}, {social platforms}, {app store listings}.
+Total samples: N (HIGH-confidence claims ≥10 samples; MEDIUM 5-9; LOW <5).
+-->
+```
+
+## 5. Write token files
 
 For each of the four target files (`.brand/tokens/colors.md`, `tokens/typography.md`, `tokens/spacing.md`, `tokens/surfaces.md`):
 
@@ -148,7 +249,7 @@ If `mode: pitch` in `.brandrc.yaml`, prepend the disclaimer:
 
 Use the `Write` tool to write the full content. Do not use `Edit` — token files are regenerated wholesale.
 
-## 5. Regenerate design.md (required — do not skip)
+## 6. Regenerate design.md (required — do not skip)
 
 After all four token files are written, regenerate `design.md` at the project root. **This is a required step, not optional.** `design.md` is a self-contained, spec-compliant artifact (per https://github.com/google-labs-code/design.md/blob/main/docs/spec.md) — it inlines the actual token values in the YAML frontmatter so external tools can read them. Without this step, `design.md` stays the empty skeleton from `init` and the extraction work is invisible to spec consumers.
 
@@ -164,16 +265,18 @@ If `xd-toolkit refresh-design` is unavailable (older toolkit version on the prac
 
 After regeneration, verify the file is no longer the placeholder by checking that the frontmatter contains at least one populated token map.
 
-## 6. Final summary
+## 7. Final summary
 
 Post a message to the user with:
 
-- **Counts:** how many color tokens, typography tokens, spacing tokens, surface tokens were extracted
-- **Sources used:** Figma (yes/no, which files), web (yes — which URL)
-- **Files written:** list the four token paths
+- **Token counts:** how many color tokens, typography tokens, spacing tokens, surface tokens were extracted
+- **Voice corpus:** total samples, breakdown by type (headlines / CTAs / body / errors / nav / microcopy / transactional) and channel (website / social / app-store)
+- **Confidence summary:** count of HIGH / MEDIUM / LOW claims in `voice.md`
+- **Sources used:** Figma (yes/no, which files), web pages crawled, social platforms, app stores
+- **Files written:** the four token files + `voice.md` + `design.md`
 - **Files skipped:** if any (with reason)
-- **Stage 1 / Stage 2 status:** ran / skipped / partial
-- **What's next:** "Phase 2 only extracted tokens. Voice (`voice.md`), overview (`overview.md`), conflicts (`conflicts.md`), and design-system repo scanning are coming in subsequent phases. Run `/brand-check` to see overall completeness."
+- **Stage 1 / Stage 2 / Stage 3 status:** ran / skipped / partial / stub (for sub-threshold voice)
+- **What's next:** "Phase 3 covers tokens and voice. Overview (`overview.md`), conflicts (`conflicts.md`), and design-system repo scanning are coming in subsequent phases. Run `/brand-check` to see overall completeness."
 
 Be concise. The summary is one short message, not a wall of text.
 
@@ -183,24 +286,27 @@ Be concise. The summary is one short message, not a wall of text.
 |---|---|
 | `claude mcp list` errors | Tell the user setup may be incomplete. Stop. |
 | Figma file private (Stage 1) | Skip Stage 1, note in summary, continue with Stage 2 |
-| Playwright blocked by CAPTCHA / login wall | Stop Stage 2, ask user for screenshots. Note: full screenshot flow is Phase 4. For Phase 2, just stop and report. |
-| Both Stage 1 and Stage 2 fail | Don't write any token files. Tell the user what failed and what to fix. |
+| Playwright blocked by CAPTCHA / login wall (Stage 2) | Stop Stage 2, ask user for screenshots. Note: full screenshot flow is Phase 4. |
+| Stage 3: a social URL is private/login-walled | Skip that one source, continue with the rest. Note in summary. |
+| Stage 3: total samples <10 | Write the stub `voice.md` per Section 4e. Don't infer. Ask for additional sources. |
+| Stage 3: snapshot returns sparse content (SPA with delayed render) | Wait 2 seconds via `mcp__playwright__browser_wait_for`, retry once. If still sparse, fall back to `browser_evaluate` selector script. |
+| All Stage 1, 2, and 3 fail | Don't write any files. Tell the user what failed and what to fix. |
 | Practitioner says "skip" on overwrite for a file | Honor it — leave that file alone, write the others |
-| Conflict between Figma and web values | Use Figma value; mention the web value in the prose with a note. Real conflict resolution is Phase 5. |
+| Conflict between Figma and web token values | Use Figma value; mention the web value in the prose with a note. Real conflict resolution is Phase 5. |
 
-## Phase 2 scope reminder
+## Phase 3 scope reminder
 
 Implemented in this phase:
 - Stage 1: Figma → tokens
 - Stage 2: Web → tokens (always run when website is set)
-- Token file writing with overwrite policy
+- Stage 3: Voice extraction (always run when website is set; uses social and app-store sources when present)
+- Token file + voice.md writing with overwrite policy
 - design.md regeneration
 
 **Not yet implemented** (do not attempt):
-- Stage 3: Voice extraction (`voice.md`)
 - Stage 4: Multimodal analysis (`overview.md`)
 - Stage 5: Conflict detection (`conflicts.md`)
 - Stage 6: Design-system repo scan (`components/`)
 - Stage 8: `.impeccable.md` regeneration
 
-If the user asks for any of these, say: "That lands in a later phase of /brand-extract. For now, /brand-extract handles tokens. The other files in `.brand/` need to be filled manually or wait for the next phase."
+If the user asks for any of these, say: "That lands in a later phase of /brand-extract. For now, /brand-extract handles tokens and voice. The other files in `.brand/` need to be filled manually or wait for the next phase."
