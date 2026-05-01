@@ -135,44 +135,76 @@ Express confidence inline in the prose where useful (e.g., "Voice is consistentl
 
 ### 4e. Sample threshold
 
-If the total scraped samples is **<10**, do not generate inferred prose. Instead, write a stub `voice.md`:
+If the total scraped samples is **<10**, do not generate inferred prose. Behavior depends on whether voice.md already has prescriptive content (see 4f):
+
+- **Placeholder voice.md (case 1):** write a stub for the observed-voice section listing the captured samples verbatim and asking for more sources. Do not invent attributes from <10 samples.
+- **Populated voice.md (cases 2/3):** append a sparse observed-voice section that includes only the Sources, Sample corpus, and a `> ⚠️ Insufficient samples (<10) — observed-voice claims withheld` note plus the raw sample list. Do not touch prescriptive sections.
+
+In both cases, ask the practitioner to provide more sources before re-running:
+- Additional `sources.website_pages` (deeper crawl of the live site)
+- Brand voice document or style guide PDF (Stage 4 territory once it ships)
+- Recent campaign decks, email examples, support templates
+
+### 4f. Write to voice.md — additive only
+
+**Stage 3 is descriptive, not prescriptive. It owns exactly one section: `## Observed Voice (live channels)`. It never modifies any other section of voice.md.**
+
+This is different from token files. Tokens are values — replacing them is fine. Voice.md may already contain prescriptive guidance (voice principles, tone spectrum rules, vocabulary, microcopy patterns, writing rules) sourced from a brand guide, campaign toolkit, or earlier multimodal analysis. That content is authoritative and Stage 3 must preserve it.
+
+**Three cases to handle:**
+
+1. **voice.md is a placeholder** (contains `<!-- Fill this file following the schema at schema/brand/voice.schema.md -->` marker, or is empty/zero-bytes):
+   Write the full file with prescriptive sections left as `<!-- TODO: populate from brand guide via Stage 4 (not yet implemented) -->` and the observed-voice section filled in from this stage.
+
+2. **voice.md has prescriptive content but no observed-voice section** (most common case after earlier `/new-project` runs that synthesized prescriptive content from uploaded assets):
+   Use `Edit` to **append** an `## Observed Voice (live channels)` section to the end of the file. Do not touch any existing section. Do not "merge" — keep prescriptive prose exactly as-is.
+
+3. **voice.md already has an observed-voice section** (Stage 3 was run before):
+   Use `Edit` to replace only the contents of the `## Observed Voice (live channels)` section. Use the `Edit` tool with the section's H2 line as part of `old_string` to scope the replacement. Do not touch other sections.
+
+**Never use `Write` to overwrite voice.md when prescriptive content exists.** If you're unsure whether prescriptive content is present, read the file first and look for any of: `## Voice Principles`, `## Tone Spectrum`, `## Vocabulary`, `## Microcopy Patterns`, `## Writing Rules`. If any are present, you're in case 2 or 3 — use `Edit`, not `Write`.
+
+**Section content per `schema/brand/voice.schema.md`:**
 
 ```markdown
-# Voice & Tone (stub)
+## Observed Voice (live channels)
 
-> ⚠️ **Insufficient samples for confident voice inference.** Captured {n} usable samples — needs ≥10. The samples are listed below for manual review.
+> Descriptive observations from live channels — complements (does not replace) the prescriptive guidance above. Captured by `/brand-extract` Stage 3 on YYYY-MM-DD.
 
-## Captured samples
-- "{sample 1}" *({type}, {channel}, {url})*
+**Sources:** {website pages}, {social platforms}, {app store listings}
+**Sample corpus:** {N} samples — {breakdown by type} | {breakdown by channel}
+**Confidence summary:** HIGH ({n}) · MEDIUM ({n}) · LOW ({n})
+
+### Observed attributes
+- **{attribute}** *(HIGH — {n} samples)* — {one-line characterisation with example}
 - ...
 
-## Next steps
-Provide additional sources to /brand-extract:
-- Brand voice document or style guide PDF
-- Recent campaign decks
-- Email examples
-- Customer support templates
+### Observed tone by context
+| Context | Observed tone | Example | Source |
+|---|---|---|---|
+| Error | ... | "..." | URL |
+| CTA | ... | "..." | URL |
+| ... |
+
+### Channel deltas
+- {Channel A vs. Channel B}: {observation}
+
+### Divergences from prescriptive
+> ⚠️ **Diverges from prescriptive:** Brand guide specifies sentence case for CTAs; observed live: title case ("Talk To a Pro") and mixed/all-caps H3s ("Lawn CARE PLANS"). Flag for Stage 5 conflict resolution.
 ```
 
-Then ask the practitioner to provide more sources before continuing.
+Include the divergences subsection only when there are real divergences to surface. Otherwise omit it.
 
-### 4f. Apply overwrite policy + write voice.md
+**Pitch mode** (when `mode: pitch`): inside the section, append a confidence-cap note: `> Pitch mode — confidence capped at MEDIUM.` Do not touch the file's top-level pitch disclaimer (if any) — that's owned by other stages.
 
-Same overwrite policy as Stage 4 token files (placeholder marker → overwrite freely; populated → prompt overwrite/merge/skip).
+**Provenance block** (only when writing the section for the first time, case 1 or 2): immediately after the `## Observed Voice (live channels)` content, before any subsequent section, place:
 
-For pitch mode, prepend the disclaimer:
-```
-> ⚠️ **PITCH MODE** — derived from public sources only. Cap inferred confidence at MEDIUM.
-```
-
-Build the file per `schema/brand/voice.schema.md`. The reference example at `tests/fixtures/wendys-voice-extraction-example.md` shows the target depth and citation style — match it. Use the `Write` tool to write the full file.
-
-End the file with a provenance block:
 ```markdown
 <!--
-Generated by /brand-extract on YYYY-MM-DD.
-Sources: {website pages crawled}, {social platforms}, {app store listings}.
-Total samples: N (HIGH-confidence claims ≥10 samples; MEDIUM 5-9; LOW <5).
+Observed Voice section generated by /brand-extract Stage 3 on YYYY-MM-DD.
+Sources: {websites}, {social platforms}, {app store listings}.
+Total samples: N (HIGH ≥10 · MEDIUM 5-9 · LOW <5).
+This section is regenerated on each Stage 3 run; the rest of voice.md is preserved.
 -->
 ```
 

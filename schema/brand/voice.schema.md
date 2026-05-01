@@ -60,6 +60,22 @@ Mechanical rules for consistency.
 | `Number formatting` | optional | Numerals vs. words, currency format, date format |
 | `Abbreviations` | optional | Which abbreviations are acceptable |
 
+### Observed Voice — Live Channels (optional)
+
+Owned by `/brand-extract` Stage 3 (descriptive, not prescriptive). Sits alongside the prescriptive sections above and never replaces them. When the brand guide and the live experience diverge, this section flags the divergence for Stage 5 conflict resolution.
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `Sources` | required | Channels scraped (website pages, social platforms, app stores) and date of capture |
+| `Sample corpus` | required | Total samples and breakdown by type (headlines / CTAs / body / errors / nav / microcopy / transactional) and channel |
+| `Confidence summary` | required | Counts of HIGH / MEDIUM / LOW claims |
+| `Observed attributes` | required | Voice traits visible in live copy, with confidence level and supporting sample count |
+| `Observed tone by context` | required | Real examples grouped by context (error / cta / transactional / etc.) |
+| `Channel deltas` | optional | Material differences across channels (e.g., social vs. website) |
+| `Divergences from prescriptive` | optional | Inline `> ⚠️ Diverges from prescriptive: ...` notes where observed copy contradicts the rules above |
+
+**Section is purely additive.** Stage 3 only writes here. It must not modify the prescriptive sections — those are owned by Stage 4 (multimodal brand-guide analysis) or by the practitioner.
+
 ---
 
 ## Example
