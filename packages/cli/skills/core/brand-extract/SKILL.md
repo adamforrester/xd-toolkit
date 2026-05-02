@@ -210,9 +210,9 @@ This section is regenerated on each Stage 3 run; the rest of voice.md is preserv
 
 ## 5. Write token files
 
-For each of the four target files (`.brand/tokens/colors.md`, `tokens/typography.md`, `tokens/spacing.md`, `tokens/surfaces.md`):
+**Scope:** This section applies only to the four token files: `.brand/tokens/colors.md`, `tokens/typography.md`, `tokens/spacing.md`, `tokens/surfaces.md`. **It does not apply to `voice.md`** — that's owned by Section 4f's additive-only policy. Do not prompt the practitioner with overwrite/merge/skip options for voice.md.
 
-### 4a. Apply the overwrite policy
+### 5a. Apply the overwrite policy
 
 Read the existing file. If it contains the placeholder marker `<!-- Fill this file following the schema at schema/brand/...schema.md -->`, the file is untouched scaffolding — overwrite without asking.
 
@@ -221,7 +221,7 @@ If the marker is **absent** and the file has content beyond just frontmatter, as
 
 Default to **skip** if the user is ambiguous. Only proceed when explicit.
 
-### 4b. Generate the file content
+### 5b. Generate the file content
 
 Build the file as: YAML frontmatter (between `---` delimiters) + a markdown body.
 
@@ -269,7 +269,7 @@ colors:
 
 Apply the same shape to `typography.md`, `spacing.md`, `surfaces.md` per their schemas in `schema/brand/`.
 
-### 4c. Pitch mode
+### 5c. Pitch mode
 
 If `mode: pitch` in `.brandrc.yaml`, prepend the disclaimer:
 
@@ -277,7 +277,7 @@ If `mode: pitch` in `.brandrc.yaml`, prepend the disclaimer:
 > ⚠️ **PITCH MODE** — derived from public sources only. Not validated against internal brand standards.
 ```
 
-### 4d. Write the file
+### 5d. Write the file
 
 Use the `Write` tool to write the full content. Do not use `Edit` — token files are regenerated wholesale.
 
