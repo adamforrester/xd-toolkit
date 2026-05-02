@@ -1,13 +1,13 @@
 ---
 name: brand-extract
-description: Extract a structured brand package from a client's Figma file, live website, and social profiles, populating .brand/tokens/*.md, .brand/voice.md, and regenerating design.md. Use when the user says "extract the brand", "/brand-extract", "build a brand package from these assets", "pull tokens from Figma", "analyze the voice", or after running /new-project for the first time. Currently implements Phase 3 (token extraction from Figma + web, plus voice extraction from website + social + app stores). Multimodal analysis, conflict detection, and design-system repo scanning are stages of the full pipeline that will land in subsequent phases.
+description: Extract a structured brand package from a client's Figma file, live website, social profiles, brand-guide PDF, and reference screenshots — populating .brand/tokens/*.md, .brand/voice.md, .brand/overview.md, and regenerating design.md. Use when the user says "extract the brand", "/brand-extract", "build a brand package from these assets", "pull tokens from Figma", "analyze the voice", "summarize the brand from this PDF", or after running /new-project for the first time. Currently implements Phase 4 (token extraction from Figma + web, voice extraction from website + social + app stores, and multimodal analysis of brand-guide PDF + screenshots). Conflict detection and design-system repo scanning are the remaining stages of the full pipeline.
 ---
 
-# /brand-extract — Phase 3 (tokens + voice)
+# /brand-extract — Phase 4 (tokens + voice + overview)
 
-You are running the brand-extract skill to populate this project's `.brand/tokens/*.md` files (from the client's Figma file when available + the live website) and `.brand/voice.md` (from the live website + social profiles + app store listings).
+You are running the brand-extract skill to populate this project's `.brand/` package: `tokens/*.md` (from the client's Figma file when available + the live website), `voice.md` (from the live website + social profiles + app store listings), and `overview.md` (from brand-guide PDF + reference screenshots via multimodal vision).
 
-**Phase 3 scope:** Stages 1, 2, and 3. Stages 4–8 (overview, conflicts, repo scan, .impeccable.md regen) are not yet implemented. Stop after Stage 3 and tell the user what's left for later phases.
+**Phase 4 scope:** Stages 1, 2, 3, and 4. Stages 5–8 (conflicts, repo scan, .impeccable.md regen) are not yet implemented. Stop after Stage 4 and tell the user what's left for later phases.
 
 The full design lives at `packages/brand-skills/skills/brand-extract/DESIGN.md` in the toolkit repo.
 
@@ -281,7 +281,108 @@ If `mode: pitch` in `.brandrc.yaml`, prepend the disclaimer:
 
 Use the `Write` tool to write the full content. Do not use `Edit` — token files are regenerated wholesale.
 
-## 6. Regenerate design.md (required — do not skip)
+## 6. Stage 4 — Multimodal analysis (overview.md)
+
+This stage reads brand-guide PDFs, reference screenshots, and the website screenshots already captured by Stage 2 to populate `.brand/overview.md` — brand identity, personality, audience, visual language, competitive context, aesthetic anti-patterns, and the brand self-test.
+
+Run this stage when **any** of these inputs are present:
+- `sources.brand_guide` (path to a PDF, relative to project root)
+- `sources.screenshots` (paths to reference images)
+- Stage 2 captured at least one website screenshot (always true if Stage 2 ran)
+
+If none of those are present, skip Stage 4 with a clear note and leave `overview.md` as the placeholder.
+
+### 6a. Read the inputs
+
+Use the `Read` tool — it handles PDFs and images natively.
+
+- **Brand guide PDF.** If `sources.brand_guide` is set, read up to 20 pages. Prioritize: cover, executive summary, mission/positioning, brand voice, visual identity, color, typography, photography, anti-patterns, do/don't pages. Use the `pages` parameter to read in batches if the PDF is long; do not read all 20 pages at once if you can target the key ones.
+- **Reference screenshots.** Read each path under `sources.screenshots` (cap at 10 — if more are listed, ask the practitioner which ones matter most).
+- **Web screenshots.** Read the top 3 captured by Stage 2 (homepage desktop + mobile, plus the most content-rich landing page from `sources.website_pages`).
+
+If the PDF is encrypted, corrupt, or fails to read, log "Stage 4: brand-guide PDF unreadable — falling back to screenshots only" and continue with whatever screenshots are available.
+
+### 6b. Extract per overview.md schema
+
+Synthesize content for each required section of `schema/brand/overview.schema.md`. Anchor every claim in specific source material — cite page numbers for the PDF, filenames for screenshots, URLs for web captures.
+
+**Brand Identity:**
+- Brand name, tagline, one-sentence positioning. The brand guide is authoritative; cross-check against the website hero copy.
+
+**Brand Personality:**
+- 3–5 trait adjectives. Each trait must appear in the brand guide either explicitly named or inferable from a personality description / tone-of-voice section.
+- Archetype if the guide names one (Jungian or otherwise). Do not invent.
+- 2–3 sentence description expanding on the traits.
+
+**Audience:**
+- Primary audience (demographics, psychographics, or behavioral description) — usually in a "who we serve" / "target audience" / "user" section of the guide.
+- Optional secondary audiences.
+- Audience context (insight that influences design).
+- Key use cases (the jobs users are getting done).
+
+**Visual Language:**
+- Direction (2–3 sentences on the visual approach). Read the visual identity section of the guide and cross-check against website screenshots.
+- 3–5 design principles, taken verbatim from the guide where possible.
+- Signature elements (distinctive visual hooks unique to this brand — see the guide's "key elements" section, plus what's actually visible on the website).
+
+**Competitive Context:**
+- Differentiation: how the brand positions vs. competitors.
+- Avoid-resemblance-to: specific brands or styles to not look like (the guide often calls these out explicitly).
+- **Aesthetic anti-patterns:** what the brand explicitly rejects. Mix the guide's stated rejections with inference from personality (e.g., a "confident, direct" brand is NOT "tentative, hedging"). Frame as `NOT corporate minimalist (too sterile)`, `NOT retro nostalgic (too backward-looking)`, etc.
+
+**Brand self-test (5–10 yes/no questions):**
+- Generate from the personality traits, visual direction, signature elements, and anti-patterns.
+- The first question is always: `Could this screen belong to a competitor? (should be NO)`.
+- The last question should be an overall feel check tied to visual atmosphere.
+- Each question must be falsifiable — a "no" answer means something specific needs to change.
+
+### 6c. Citation style
+
+Inline citations make the prose auditable and trustworthy. Use lightweight footnote-style references:
+
+```markdown
+**Personality traits:** Bold, playful, irreverent, confident, witty *(per p. 4 of brand-guide.pdf and the consistent voice across @Wendys Twitter samples)*.
+```
+
+For the source list at the bottom of `overview.md`, cite explicitly:
+
+```markdown
+<!--
+Generated by /brand-extract Stage 4 on YYYY-MM-DD.
+Sources:
+- brand-guide.pdf (pages 1, 4, 7, 12-14, 22)
+- assets/screenshot-hero-desktop.png
+- web capture: https://wendys.com (desktop + mobile)
+-->
+```
+
+### 6d. Apply overwrite policy
+
+`overview.md` is a single coherent document, not split prescriptive vs. descriptive like voice.md. Use the same overwrite policy as token files (Section 5a):
+
+- **Placeholder marker present** (`<!-- Fill this file following the schema at schema/brand/overview.schema.md -->`) — overwrite without prompting.
+- **Empty file** — overwrite without prompting.
+- **Populated, no marker** — prompt: **overwrite** / **merge** / **skip**. For merge, regenerate only the brand self-test block (it has the clear `## Brand self-test` heading delimiter); preserve all other prose.
+
+When in doubt, default to **skip** and leave the file alone.
+
+### 6e. Pitch mode
+
+In pitch mode (`mode: pitch`), prepend the disclaimer block to `overview.md`:
+
+```markdown
+> ⚠️ **PITCH MODE** — derived from public sources only. Not validated against internal brand standards.
+```
+
+Cap inferred confidence: if a personality trait or audience claim relies on inference (rather than a direct guide quote), note it inline as `*(inferred from public materials)*`.
+
+### 6f. Write the file
+
+Use the `Write` tool when overwriting (or scaffolding from placeholder). Use `Edit` when merging. Build the file per `schema/brand/overview.schema.md`. The Wendy's fixture at `tests/fixtures/wendys/.brand/overview.md` shows the target shape and citation density.
+
+After writing, verify the file is no longer the placeholder by checking that the brand identity, personality, and visual language sections are populated.
+
+## 7. Regenerate design.md (required — do not skip)
 
 After all four token files are written, regenerate `design.md` at the project root. **This is a required step, not optional.** `design.md` is a self-contained, spec-compliant artifact (per https://github.com/google-labs-code/design.md/blob/main/docs/spec.md) — it inlines the actual token values in the YAML frontmatter so external tools can read them. Without this step, `design.md` stays the empty skeleton from `init` and the extraction work is invisible to spec consumers.
 
@@ -297,18 +398,18 @@ If `xd-toolkit refresh-design` is unavailable (older toolkit version on the prac
 
 After regeneration, verify the file is no longer the placeholder by checking that the frontmatter contains at least one populated token map.
 
-## 7. Final summary
+## 8. Final summary
 
 Post a message to the user with:
 
 - **Token counts:** how many color tokens, typography tokens, spacing tokens, surface tokens were extracted
-- **Voice corpus:** total samples, breakdown by type (headlines / CTAs / body / errors / nav / microcopy / transactional) and channel (website / social / app-store)
-- **Confidence summary:** count of HIGH / MEDIUM / LOW claims in `voice.md`
-- **Sources used:** Figma (yes/no, which files), web pages crawled, social platforms, app stores
-- **Files written:** the four token files + `voice.md` + `design.md`
+- **Voice corpus:** total samples, breakdown by type (headlines / CTAs / body / errors / nav / microcopy / transactional) and channel (website / social / app-store), plus HIGH / MEDIUM / LOW claim counts
+- **Overview sources:** brand-guide PDF (yes/no, page count read), reference screenshots (count), web screenshots (count). Confidence note if PDF was absent.
+- **Sources used (overall):** Figma (yes/no, which files), web pages crawled, social platforms, app stores, PDFs, screenshots
+- **Files written:** four token files + `voice.md` + `overview.md` + `design.md`
 - **Files skipped:** if any (with reason)
-- **Stage 1 / Stage 2 / Stage 3 status:** ran / skipped / partial / stub (for sub-threshold voice)
-- **What's next:** "Phase 3 covers tokens and voice. Overview (`overview.md`), conflicts (`conflicts.md`), and design-system repo scanning are coming in subsequent phases. Run `/brand-check` to see overall completeness."
+- **Stage status:** Stage 1 / Stage 2 / Stage 3 / Stage 4 — ran / skipped / partial / stub
+- **What's next:** "Phase 4 covers tokens, voice, and overview. Conflict detection (`conflicts.md`) and design-system repo scanning are the remaining stages. Run `/brand-check` to see overall completeness."
 
 Be concise. The summary is one short message, not a wall of text.
 
@@ -318,25 +419,30 @@ Be concise. The summary is one short message, not a wall of text.
 |---|---|
 | `claude mcp list` errors | Tell the user setup may be incomplete. Stop. |
 | Figma file private (Stage 1) | Skip Stage 1, note in summary, continue with Stage 2 |
-| Playwright blocked by CAPTCHA / login wall (Stage 2) | Stop Stage 2, ask user for screenshots. Note: full screenshot flow is Phase 4. |
+| Playwright blocked by CAPTCHA / login wall (Stage 2) | Stop Stage 2, ask user for screenshots. Stage 4 can use those. |
 | Stage 3: a social URL is private/login-walled | Skip that one source, continue with the rest. Note in summary. |
 | Stage 3: total samples <10 | Write the stub `voice.md` per Section 4e. Don't infer. Ask for additional sources. |
 | Stage 3: snapshot returns sparse content (SPA with delayed render) | Wait 2 seconds via `mcp__playwright__browser_wait_for`, retry once. If still sparse, fall back to `browser_evaluate` selector script. |
-| All Stage 1, 2, and 3 fail | Don't write any files. Tell the user what failed and what to fix. |
+| Stage 4: brand-guide PDF unreadable (encrypted, corrupt) | Note it in summary. Continue with screenshots only. Lower confidence. |
+| Stage 4: PDF >20 pages | Read the prioritized pages (cover, mission, voice, visual identity, anti-patterns). Ask the practitioner if specific pages matter that you didn't read. |
+| Stage 4: no PDF, no screenshots, no Stage 2 captures | Skip Stage 4. Leave overview.md as placeholder. Ask the practitioner to provide a brand guide or screenshots. |
+| Stage 4: practitioner has hand-curated `overview.md` already | Default to skip. Only merge if explicitly requested — and merge replaces only the brand self-test block. |
+| All stages fail | Don't write any files. Tell the user what failed and what to fix. |
 | Practitioner says "skip" on overwrite for a file | Honor it — leave that file alone, write the others |
 | Conflict between Figma and web token values | Use Figma value; mention the web value in the prose with a note. Real conflict resolution is Phase 5. |
+| Overview claim contradicts a token value | Surface inline in overview.md prose. Real conflict resolution is Phase 5. |
 
-## Phase 3 scope reminder
+## Phase 4 scope reminder
 
 Implemented in this phase:
 - Stage 1: Figma → tokens
 - Stage 2: Web → tokens (always run when website is set)
 - Stage 3: Voice extraction (always run when website is set; uses social and app-store sources when present)
-- Token file + voice.md writing with overwrite policy
+- Stage 4: Multimodal analysis → overview.md (always run when at least one of: brand-guide PDF, reference screenshots, or Stage 2 web screenshots is available)
+- Token files + voice.md + overview.md writing with overwrite policy
 - design.md regeneration
 
 **Not yet implemented** (do not attempt):
-- Stage 4: Multimodal analysis (`overview.md`)
 - Stage 5: Conflict detection (`conflicts.md`)
 - Stage 6: Design-system repo scan (`components/`)
 - Stage 8: `.impeccable.md` regeneration
