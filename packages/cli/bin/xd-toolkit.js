@@ -7,6 +7,7 @@ import { doctorCommand } from '../src/commands/doctor.js';
 import { updateCommand } from '../src/commands/update.js';
 import { scoreCommand } from '../src/commands/score.js';
 import { refreshDesignCommand } from '../src/commands/refresh-design.js';
+import { refreshImpeccableCommand } from '../src/commands/refresh-impeccable.js';
 
 program
   .name('xd-toolkit')
@@ -54,5 +55,12 @@ program
   .option('--brand-path <path>', 'Override path to .brand/ directory')
   .option('--json', 'Output results as JSON')
   .action(refreshDesignCommand);
+
+program
+  .command('refresh-impeccable')
+  .description('Regenerate .impeccable.md at the project root from .brand/')
+  .option('--brand-path <path>', 'Override path to .brand/ directory')
+  .option('--json', 'Output results as JSON')
+  .action(refreshImpeccableCommand);
 
 program.parse();

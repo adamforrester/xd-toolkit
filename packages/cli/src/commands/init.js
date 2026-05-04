@@ -7,6 +7,7 @@ import { stringify as yamlStringify } from 'yaml';
 import { renderTemplate } from '../utils/template-renderer.js';
 import { copySkillsToProject, copyCommandsToProject, BUNDLED_SKILLS_DIR } from '../utils/skill-copier.js';
 import { generateDesignMd } from '../utils/design-md-generator.js';
+import { generateImpeccableMd } from '../utils/impeccable-md-generator.js';
 
 const __dirname = fileURLToPath(new URL('.', import.meta.url));
 const TEMPLATES_DIR = resolve(__dirname, '../../src/templates');
@@ -317,12 +318,12 @@ export async function initCommand(opts) {
     }
   }
 
-  // 4. .impeccable.md
-  writeFileSync(
-    join(projectDir, '.impeccable.md'),
-    `# Brand Context for ${answers.client}\n\n<!-- Populated by /brand-analyze or manually -->\n`,
-    'utf-8'
-  );
+  // 4. .impeccable.md (generated from .brand/ — placeholder content until /brand-extract runs)
+  const brandDirForImpeccable = answers.brandPath
+    ? resolve(projectDir, answers.brandPath)
+    : join(projectDir, '.brand');
+  const impeccableContent = generateImpeccableMd(brandDirForImpeccable, answers.client);
+  writeFileSync(join(projectDir, '.impeccable.md'), impeccableContent, 'utf-8');
   console.log(chalk.green('✓ .impeccable.md'));
   results.created.push('.impeccable.md');
 

@@ -1,13 +1,13 @@
 ---
 name: brand-extract
-description: Extract a structured brand package from a client's Figma file, live website, social profiles, brand-guide PDF, and reference screenshots — populating .brand/tokens/*.md, .brand/voice.md, .brand/overview.md, .brand/conflicts.md, and regenerating design.md. Use when the user says "extract the brand", "/brand-extract", "build a brand package from these assets", "pull tokens from Figma", "analyze the voice", "summarize the brand from this PDF", "find brand conflicts", or after running /new-project for the first time. Currently implements Phase 5 (tokens, voice, overview, and conflict detection). Design-system repo scanning and .impeccable.md regeneration are the remaining stages of the full pipeline.
+description: Extract a structured brand package from a client's Figma file, live website, social profiles, brand-guide PDF, and reference screenshots — populating .brand/tokens/*.md, .brand/voice.md, .brand/overview.md, .brand/conflicts.md, and regenerating design.md and .impeccable.md at the project root. Use when the user says "extract the brand", "/brand-extract", "build a brand package from these assets", "pull tokens from Figma", "analyze the voice", "summarize the brand from this PDF", "find brand conflicts", or after running /new-project for the first time. Currently implements Phase 7 (tokens, voice, overview, conflict detection, and .impeccable.md regen). Design-system repo scanning is the remaining stage of the full pipeline.
 ---
 
-# /brand-extract — Phase 5 (tokens + voice + overview + conflicts)
+# /brand-extract — Phase 7 (tokens + voice + overview + conflicts + .impeccable.md)
 
-You are running the brand-extract skill to populate this project's `.brand/` package: `tokens/*.md`, `voice.md`, `overview.md`, and `conflicts.md` — and to regenerate `design.md` at the project root.
+You are running the brand-extract skill to populate this project's `.brand/` package and regenerate the project-root interop artifacts (`design.md`, `.impeccable.md`).
 
-**Phase 5 scope:** Stages 1, 2, 3, 4, and 5. Stages 6–8 (design-system repo scan, .impeccable.md regen) are not yet implemented. Stop after Stage 5 and tell the user what's left for later phases.
+**Phase 7 scope:** Stages 1, 2, 3, 4, 5, and 8. Stage 6 (design-system repo scan) is the remaining stage. Stop after Stage 8 and tell the user what's left.
 
 The full design lives at `packages/brand-skills/skills/brand-extract/DESIGN.md` in the toolkit repo.
 
@@ -503,7 +503,23 @@ This section preserves practitioner-resolved entries on every re-run.
 -->
 ```
 
-## 9. Final summary
+## 9. Stage 8 — Refresh `.impeccable.md`
+
+After Stages 1–5 complete, regenerate `.impeccable.md` at the project root so the Impeccable skill picks up the new brand context immediately. This is required, not optional — without it, Impeccable continues running against stale brand context until the practitioner manually refreshes.
+
+Use the dedicated CLI command via the `Bash` tool:
+
+```bash
+xd-toolkit refresh-impeccable
+```
+
+The command reads `.brand/overview.md` and `.brand/voice.md`, builds a dense single-file summary (identity, personality, visual language, voice principles, anti-patterns, brand self-test, plus pointers to deeper files), and overwrites `.impeccable.md` at the project root. It exits 0 on success.
+
+If the command is unavailable (older toolkit version), fall back to building the file inline: read `.brand/overview.md` and condense it to ~200–400 tokens of dense brand context, with pointers (`See \`.brand/voice.md\` for full voice rules`) to deeper files. The Impeccable skill loads this file on every interaction, so density matters.
+
+Stages 7 (design.md) and 8 (.impeccable.md) regenerate the two project-root artifacts that external tools and other skills consume. After both run, the project's interop surface reflects the latest extraction.
+
+## 10. Final summary
 
 Post a message to the user with:
 
@@ -512,10 +528,10 @@ Post a message to the user with:
 - **Overview sources:** brand-guide PDF (yes/no, page count read), reference screenshots (count), web screenshots (count)
 - **Conflicts surfaced:** count of new `unresolved` conflicts, intentional adaptations confirmed, auto-resolutions
 - **Sources used (overall):** Figma, web pages, social, app stores, PDFs, screenshots
-- **Files written:** four token files + `voice.md` + `overview.md` + `conflicts.md` + `design.md`
+- **Files written:** four token files + `voice.md` + `overview.md` + `conflicts.md` + `design.md` + `.impeccable.md`
 - **Files skipped:** if any (with reason)
-- **Stage status:** Stage 1 / Stage 2 / Stage 3 / Stage 4 / Stage 5 — ran / skipped / partial / stub
-- **What's next:** "Phase 5 covers tokens, voice, overview, and conflicts. Design-system repo scan and `.impeccable.md` regeneration are the remaining stages. Run `/brand-check` to see overall completeness."
+- **Stage status:** Stage 1 / Stage 2 / Stage 3 / Stage 4 / Stage 5 / Stage 8 — ran / skipped / partial / stub
+- **What's next:** "Phase 7 covers tokens, voice, overview, conflicts, and `.impeccable.md`. Design-system repo scan is the remaining stage. Run `/brand-check` to see overall completeness."
 
 Be concise. The summary is one short message, not a wall of text.
 
@@ -542,7 +558,7 @@ Be concise. The summary is one short message, not a wall of text.
 | Conflict between Figma and web token values | Stage 5 captures it formally. In token file prose, note the divergence; in conflicts.md, file with `severity: token-level`. |
 | Overview claim contradicts a token value | Stage 5 captures it as `severity: structural`. |
 
-## Phase 5 scope reminder
+## Phase 7 scope reminder
 
 Implemented in this phase:
 - Stage 1: Figma → tokens
@@ -550,11 +566,11 @@ Implemented in this phase:
 - Stage 3: Voice extraction (always run when website is set; uses social and app-store sources when present)
 - Stage 4: Multimodal analysis → overview.md (always run when at least one of: brand-guide PDF, reference screenshots, or Stage 2 web screenshots is available)
 - Stage 5: Conflict detection → conflicts.md (additive, with practitioner walkthrough)
+- Stage 8: `.impeccable.md` regeneration (always runs after Stage 5)
 - Token files + voice.md + overview.md + conflicts.md writing with overwrite/additive policies
 - design.md regeneration
 
 **Not yet implemented** (do not attempt):
 - Stage 6: Design-system repo scan (`components/`)
-- Stage 8: `.impeccable.md` regeneration
 
 If the user asks for any of these, say: "That lands in a later phase of /brand-extract. For now, /brand-extract handles tokens and voice. The other files in `.brand/` need to be filled manually or wait for the next phase."
