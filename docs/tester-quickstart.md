@@ -7,7 +7,7 @@ Thanks for testing this. The toolkit is in early access — the foundation works
 An end-to-end suite for Experience Design practitioners who want AI agents to produce **brand-consistent, production-quality digital products**. It bundles:
 
 - 21 core skills (Impeccable + Vercel + figma-plugin-dev)
-- The Superpowers plugin (structured development practices)
+- 2 plugins: Superpowers (structured development) and Karpathy Guidelines (coding discipline)
 - 7 MCP servers (Figma Official, Figma Console, Playwright, GitHub, Netlify, Vercel, Context7)
 - Two slash commands (`/new-project`, `/brand-check`)
 - Optional add-ons: UX Design Skills Pack (63 skills), Design System Pack (21 skills + Storybook MCP), Brand Skills
@@ -56,7 +56,7 @@ You'll be prompted to:
 
 Setup will:
 - Install 7 core MCP servers (skipping any already present)
-- Install the Superpowers plugin
+- Install the Superpowers and Karpathy Guidelines plugins
 - Install whichever optional skill packs you selected
 - If you selected the Design System Pack, also install the Storybook MCP (only connects when Storybook is running locally)
 - Copy `/new-project` and `/brand-check` to `~/.claude/commands/` so they're available globally

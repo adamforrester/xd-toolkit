@@ -9,7 +9,9 @@ An end-to-end toolkit for **Experience Design practitioners** who want AI agents
 ## What's included
 
 - **21 core skills** — Impeccable (×18) + Vercel (×2) + figma-plugin-dev (×1)
-- **Superpowers plugin** — structured development practices (brainstorming, TDD, debugging, code review)
+- **2 plugins:**
+  - **Superpowers** — structured development practices (brainstorming, TDD, debugging, code review)
+  - **Karpathy Guidelines** — coding discipline (think before coding, simplicity first, surgical changes, goal-driven execution; 91k+ stars)
 - **7 MCP servers** — Figma Official, Figma Console, Playwright, GitHub, Netlify, Vercel, Context7
 - **3 slash commands** — `/new-project` (conversational client onboarding), `/brand-check` (completeness report), `/brand-extract` (token extraction from Figma + web)
 - **`.brand/` directory schema** — 16 schema files defining a tiered brand package (minimum / standard / comprehensive)
@@ -64,7 +66,7 @@ npm install
 npx xd-toolkit setup
 ```
 
-`setup` prompts you for optional packages, your Figma PAT, and your GitHub PAT, then installs MCP servers, the Superpowers plugin, selected skill packs, and global slash commands. Run `xd-toolkit doctor` afterwards to verify everything is connected.
+`setup` prompts you for optional packages, your Figma PAT, and your GitHub PAT, then installs MCP servers, the Superpowers and Karpathy Guidelines plugins, selected skill packs, and global slash commands. Run `xd-toolkit doctor` afterwards to verify everything is connected.
 
 ---
 

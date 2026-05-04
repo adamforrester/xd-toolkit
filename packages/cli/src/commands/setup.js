@@ -104,7 +104,7 @@ export async function setupCommand(opts) {
       message: 'Select packages',
       choices: [
         {
-          name: `Core Toolkit ${chalk.dim('— 23 skills, Superpowers plugin, 7 MCP servers')}`,
+          name: `Core Toolkit ${chalk.dim('— 23 skills, 2 plugins (Superpowers + Karpathy Guidelines), 7 MCP servers')}`,
           value: 'core',
           checked: true,
           disabled: 'always included',
@@ -242,6 +242,25 @@ export async function setupCommand(opts) {
       if (errLine) console.log(chalk.dim(`    ${errLine}`));
       console.log(chalk.dim(`    To retry manually: claude plugin install superpowers@${marketplaceName}`));
       results.skills.push({ name: 'superpowers', ok: false, error: install.stderr });
+    }
+  }
+
+  // Karpathy Guidelines — coding discipline plugin
+  const karpathyMarketplace = await addPluginMarketplace('forrestchang/andrej-karpathy-skills');
+  if (!karpathyMarketplace) {
+    console.log(chalk.yellow('⚠ Karpathy Guidelines: could not add marketplace'));
+    results.skills.push({ name: 'karpathy-guidelines', ok: false, error: 'marketplace add failed' });
+  } else {
+    const install = tryRun(`claude plugin install andrej-karpathy-skills@${karpathyMarketplace}`);
+    if (install.ok) {
+      console.log(chalk.green('✓ Karpathy Guidelines — coding discipline: think before coding, simplicity first, surgical changes, goal-driven execution'));
+      results.skills.push({ name: 'karpathy-guidelines', ok: true });
+    } else {
+      console.log(chalk.yellow('⚠ Karpathy Guidelines failed to install'));
+      const errLine = (install.stderr || install.stdout || '').split('\n').find(l => l.trim());
+      if (errLine) console.log(chalk.dim(`    ${errLine}`));
+      console.log(chalk.dim(`    To retry manually: claude plugin install andrej-karpathy-skills@${karpathyMarketplace}`));
+      results.skills.push({ name: 'karpathy-guidelines', ok: false, error: install.stderr });
     }
   }
 

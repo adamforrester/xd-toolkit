@@ -14,7 +14,7 @@ It's built for an agency context: multiple brands, multiple practitioners, varia
 ┌──────────────────────────────────────────────────────────────────┐
 │                                                                  │
 │  PACKAGE 1: Core Toolkit                                         │
-│  23 skills + 1 plugin + 7 MCP servers + Storybook (per-project) │
+│  23 skills + 2 plugins + 7 MCP servers + Storybook (per-project)│
 │  Installed per-practitioner (MCPs, plugin) + per-project (skills)│
 │  Brand-agnostic                                                  │
 │                                                                  │
@@ -751,13 +751,13 @@ npx xd-toolkit setup
 **What it does:**
 1. Checks Node.js version (18+ required)
 2. Prompts for which packages to install:
-   - **Core Toolkit** (always included) — 23 skills (Impeccable 18 + Vercel 2 + figma-plugin-dev 1 + vml-thrive-feedback 1 + brand-extract 1), Superpowers plugin, 7 MCP servers
+   - **Core Toolkit** (always included) — 23 skills (Impeccable 18 + Vercel 2 + figma-plugin-dev 1 + vml-thrive-feedback 1 + brand-extract 1), 2 plugins (Superpowers, Karpathy Guidelines), 7 MCP servers
    - **UX Design Skills Pack** (optional) — 63 skills, 27 commands for research, strategy, interaction design, design ops
    - **Design System Pack** (optional) — 21 skills for DS governance, auditing, documentation
    - **Brand Skills** (optional) — skills for generating .brand/ packages from client assets. For practitioners who run client onboarding.
 3. Collects tokens (Figma PAT, GitHub PAT) with links to where to get them
 4. Installs MCP servers (7 core + Storybook MCP if Design System Pack is selected)
-5. Installs Superpowers plugin (structured development practices)
+5. Installs Superpowers plugin (structured development practices) and Karpathy Guidelines plugin (coding discipline)
 6. Installs selected skill packs
 7. Installs slash commands globally (/new-project, /brand-check)
 8. Verifies everything with a health check
@@ -985,6 +985,7 @@ These are third-party tools we use as-is. We configure them, document how to set
 | Impeccable (18 skills) | pbakaus/impeccable | Install into every project. Impeccable reads `.impeccable.md` for brand context — we generate that file. No fork needed. |
 | Vercel engineering skills (2) | vercel-labs/agent-skills | Install into every project alongside Impeccable. |
 | Superpowers plugin | obra/superpowers (294k installs) | Install per-practitioner during setup. Structured development: brainstorming, TDD, debugging, code review via subagents. |
+| Karpathy Guidelines plugin | forrestchang/andrej-karpathy-skills (91k+ stars) | Install per-practitioner during setup. Coding discipline derived from Andrej Karpathy's LLM coding observations: think before coding, simplicity first, surgical changes, goal-driven execution. Critical for prototype-style vibe coding where agents tend to over-engineer. |
 | Design Cowork plugin | Anthropic (211k installs) | **Recommended** for Cowork users (not installed by setup). Design critique, UX writing, a11y audits, research synthesis, dev handoff. |
 | **Design System Ops (21 skills + 3 agents)** | murphytrueman/design-system-ops | **Optional DS Pack extension.** Covers token audit (with DTCG/Style Dictionary), component audit, DS health scoring, governance, documentation, design-to-code parity, migration workflows. Saves us 8-12 days of custom development. |
 | Figma Official MCP | Figma | Configure per-practitioner. Document setup. |

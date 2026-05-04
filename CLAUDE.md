@@ -8,7 +8,7 @@ See `docs/architecture.md` for the full architecture document covering:
 - Three packages (Core Toolkit, Brand Skills, Brand Packages)
 - Four component categories (MCP Servers, Skills, Instruction Files, Data Files)
 - The MCP stack (8 core + 1 optional across Design, Build/Test, Deploy, Context phases)
-- The skills stack (23 skills + Superpowers plugin + Brand Skills)
+- The skills stack (23 skills + 2 plugins (Superpowers, Karpathy Guidelines) + Brand Skills)
 - The `.brand/` directory structure and loading strategy
 - The E2E pipeline (Design -> Build -> Test -> Deploy)
 - Build plan (C1-C10 deliverables)

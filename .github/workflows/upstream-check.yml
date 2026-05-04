@@ -41,6 +41,7 @@ jobs:
             "figma/community-resources|Figma Community Skills|skills"
             "Owl-Listener/designer-skills|UX Design Skills Pack|skills"
             "obra/superpowers|Superpowers|plugin"
+            "forrestchang/andrej-karpathy-skills|Karpathy Guidelines|plugin"
           )
 
           for entry in "${REPOS[@]}"; do
