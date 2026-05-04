@@ -1,13 +1,21 @@
 ---
 name: brand-extract
-description: Extract a structured brand package from a client's Figma file, live website, social profiles, brand-guide PDF, and reference screenshots — populating .brand/tokens/*.md, .brand/voice.md, .brand/overview.md, .brand/conflicts.md, and regenerating design.md and .impeccable.md at the project root. Use when the user says "extract the brand", "/brand-extract", "build a brand package from these assets", "pull tokens from Figma", "analyze the voice", "summarize the brand from this PDF", "find brand conflicts", or after running /new-project for the first time. Currently implements Phase 7 (tokens, voice, overview, conflict detection, and .impeccable.md regen). Design-system repo scanning is the remaining stage of the full pipeline.
+description: Extract a complete brand package from a client's Figma file, live website, social profiles, brand-guide PDF, reference screenshots, and (for comprehensive tier) design-system codebase — populating .brand/tokens/*.md, .brand/voice.md, .brand/overview.md, .brand/components/*.md, .brand/conflicts.md, and regenerating design.md and .impeccable.md at the project root. Use when the user says "extract the brand", "/brand-extract", "build a brand package from these assets", "pull tokens from Figma", "analyze the voice", "summarize the brand from this PDF", "find brand conflicts", "scan the design system repo", or after running /new-project for the first time. Phase 8 — full pipeline: tokens, voice, overview, components (comprehensive tier), conflict detection, and both project-root artifacts (design.md and .impeccable.md) regenerated.
 ---
 
-# /brand-extract — Phase 7 (tokens + voice + overview + conflicts + .impeccable.md)
+# /brand-extract — Phase 8 (full pipeline)
 
-You are running the brand-extract skill to populate this project's `.brand/` package and regenerate the project-root interop artifacts (`design.md`, `.impeccable.md`).
+You are running the brand-extract skill end to end. The full pipeline writes/refreshes:
 
-**Phase 7 scope:** Stages 1, 2, 3, 4, 5, and 8. Stage 6 (design-system repo scan) is the remaining stage. Stop after Stage 8 and tell the user what's left.
+- `.brand/tokens/{colors,typography,spacing,surfaces}.md`
+- `.brand/voice.md` (additive Stage 3)
+- `.brand/overview.md`
+- `.brand/components/*.md` + `.brand/components/inventory.md` (comprehensive tier only)
+- `.brand/conflicts.md` (additive Stage 5)
+- `design.md` (project root, design.md spec)
+- `.impeccable.md` (project root, dense brand context for Impeccable)
+
+**Phase 8 scope:** all stages — 1, 2, 3, 4, 5, 6, 8. There is no Stage 7 in this numbering (it was reserved for an early "design-system repo scan" plan and was renamed to 6 once the work was scoped).
 
 The full design lives at `packages/brand-skills/skills/brand-extract/DESIGN.md` in the toolkit repo.
 
@@ -382,7 +390,99 @@ Use the `Write` tool when overwriting (or scaffolding from placeholder). Use `Ed
 
 After writing, verify the file is no longer the placeholder by checking that the brand identity, personality, and visual language sections are populated.
 
-## 7. Regenerate design.md (required — do not skip)
+## 7. Stage 6 — Design-system repo scan (comprehensive tier only)
+
+This stage runs only when **both** are true:
+- `.brandrc.yaml` `tier` is `comprehensive`
+- `.brandrc.yaml` `sources.design_system_repo` is set (local path or remote git URL)
+
+If either is false, skip Stage 6 with a one-line log and move to Section 8 (design.md regen).
+
+The job: inventory what components actually exist in the client's design system codebase and write per-component descriptions into `.brand/components/<name>.md`. This describes what's there for agents working on visual implementation — it does **not** audit quality, completeness, or DS conformance. That's a DS Pack concern.
+
+### 7a. Resolve and prepare the source
+
+For a **local path** (e.g., `./packages/design-system`):
+- Resolve relative to project root.
+- Verify it exists and is a directory; if not, log "Stage 6: path not found, skipping" and return.
+
+For a **remote git URL** (e.g., `https://github.com/client/design-system`):
+- Use `git clone --depth 1 {url} {tmpDir}` via the `Bash` tool, where `{tmpDir}` is `~/.xd-toolkit-tmp/ds-repo-{timestamp}`.
+- If the clone fails (auth, 404, network), log the error and skip Stage 6 — don't error out the whole pipeline.
+- Plan to clean up the temp directory in Section 7d.
+
+### 7b. Scan and inventory
+
+Read these patterns:
+
+- **Tokens.** Look for `tokens/`, `tokens.json`, `*.tokens.json`, `*.tokens.yaml`, `theme.json`, or a `style-dictionary.config.*`. Cross-check token values against the ones extracted by Stages 1+2 — flag any disagreement as a conflict candidate for Stage 5 (Section 9). Don't write a tokens file from this — the canonical token files live in `.brand/tokens/`.
+- **Component source files.** Try these paths in order until one matches: `src/components/*/`, `packages/*/src/`, `lib/components/*/`, `app/components/*/`, `components/*/`. For each component directory, expect a primary `index.{ts,tsx,js,jsx}` plus optional `*.stories.{ts,tsx}`, `*.test.*`, and a `README.md`.
+- **Prop APIs.** From the primary file, extract the component's props. For TypeScript: parse the exported interface or type. For JavaScript with PropTypes: read the `Component.propTypes` declaration. For JSDoc/TSDoc: pull the `@param` and `@property` lines.
+- **`package.json`.** Note any third-party component dependencies that the design system wraps (`@radix-ui/*`, `react-aria`, internal `@client/ds`). Practitioners use this to know what underlying primitives are in play.
+- **`figma.config.*` or `.figma/` directory.** Read Code Connect mappings — they link Figma component IDs to source file paths. Capture the mapping for use in Section 7c.
+- **`.storybook/main.{ts,js}`.** If present, note that Storybook is configured. Storybook MCP (when running) can introspect components further.
+
+Cap at the first 50 components scanned to avoid runaway work on huge libraries. If more exist, list them as references at the end of `.brand/components/inventory.md` rather than per-component docs.
+
+### 7c. Write per-component files
+
+For each scanned component, write `.brand/components/<kebab-case-name>.md` with this shape:
+
+```markdown
+---
+name: {ComponentName}
+source: packages/design-system/src/Button/index.tsx
+storybook_path: components-button--default        # optional
+figma_node_id: 123:456                            # optional, from Code Connect
+---
+
+# {ComponentName}
+
+## Purpose
+{One-paragraph description inferred from the component name, prop signature, and any JSDoc / TSDoc / README content found.}
+
+## Props
+| Name | Type | Required | Default | Description |
+|------|------|----------|---------|-------------|
+| `variant` | `"primary" | "secondary"` | yes | — | Visual variant |
+| ... |
+
+## Underlying primitives
+- {Third-party dependency name} (from package.json) — what this component composes from
+
+## Where to find it
+- Source: `{relative path from project root or repo root}`
+- Storybook: `{URL pattern if Storybook configured}`
+- Figma: `{Code Connect node ID, if present}`
+
+<!-- Inventoried by /brand-extract Stage 6 on YYYY-MM-DD from {repo URL or local path} -->
+```
+
+Also write `.brand/components/inventory.md` — a single-page index of every component found, grouped by category (form / layout / feedback / data display / etc., inferred from naming conventions). Include any components beyond the 50-cap as bare entries.
+
+### 7d. Cleanup
+
+If you cloned to a temp directory in Section 7a, remove it:
+
+```bash
+rm -rf {tmpDir}
+```
+
+Use the `Bash` tool. Do not leave clones behind in the user's home directory.
+
+### 7e. Apply overwrite policy
+
+`.brand/components/*.md` files are overwritten on every Stage 6 run — they describe what currently exists in the codebase. If a practitioner has hand-edited a component file (e.g., added usage notes), they should keep those notes in `.brand/composition/patterns.md` or `.brand/components/<name>-usage.md` (separate file), not in the auto-generated `<name>.md`.
+
+If the practitioner has hand-edited a `<name>.md` file (detect: file lacks the `<!-- Inventoried by /brand-extract Stage 6 -->` provenance marker, or contains content beyond the auto-generated shape), prompt before overwriting: **overwrite** (use new scan), **skip** (keep their edits, don't refresh the inventory for this one).
+
+`inventory.md` is always overwritten.
+
+### 7f. Feed conflicts forward
+
+Any token disagreements detected between the repo's `tokens.json` and `.brand/tokens/` are not resolved here — they're written to memory and surfaced in Section 9 (Stage 5 conflict detection) as `severity: token-level` conflicts with a `Source: design-system repo` citation.
+
+## 8. Regenerate design.md (required — do not skip)
 
 After all four token files are written, regenerate `design.md` at the project root. **This is a required step, not optional.** `design.md` is a self-contained, spec-compliant artifact (per https://github.com/google-labs-code/design.md/blob/main/docs/spec.md) — it inlines the actual token values in the YAML frontmatter so external tools can read them. Without this step, `design.md` stays the empty skeleton from `init` and the extraction work is invisible to spec consumers.
 
@@ -398,7 +498,7 @@ If `xd-toolkit refresh-design` is unavailable (older toolkit version on the prac
 
 After regeneration, verify the file is no longer the placeholder by checking that the frontmatter contains at least one populated token map.
 
-## 8. Stage 5 — Conflict detection (`conflicts.md`)
+## 9. Stage 5 — Conflict detection (`conflicts.md`)
 
 Reconcile what Stages 1–4 surfaced. Three things land in `.brand/conflicts.md`:
 
@@ -503,7 +603,7 @@ This section preserves practitioner-resolved entries on every re-run.
 -->
 ```
 
-## 9. Stage 8 — Refresh `.impeccable.md`
+## 10. Stage 8 — Refresh `.impeccable.md`
 
 After Stages 1–5 complete, regenerate `.impeccable.md` at the project root so the Impeccable skill picks up the new brand context immediately. This is required, not optional — without it, Impeccable continues running against stale brand context until the practitioner manually refreshes.
 
@@ -519,7 +619,7 @@ If the command is unavailable (older toolkit version), fall back to building the
 
 Stages 7 (design.md) and 8 (.impeccable.md) regenerate the two project-root artifacts that external tools and other skills consume. After both run, the project's interop surface reflects the latest extraction.
 
-## 10. Final summary
+## 11. Final summary
 
 Post a message to the user with:
 
@@ -528,10 +628,10 @@ Post a message to the user with:
 - **Overview sources:** brand-guide PDF (yes/no, page count read), reference screenshots (count), web screenshots (count)
 - **Conflicts surfaced:** count of new `unresolved` conflicts, intentional adaptations confirmed, auto-resolutions
 - **Sources used (overall):** Figma, web pages, social, app stores, PDFs, screenshots
-- **Files written:** four token files + `voice.md` + `overview.md` + `conflicts.md` + `design.md` + `.impeccable.md`
+- **Files written:** four token files + `voice.md` + `overview.md` + `components/*.md` (comprehensive tier) + `conflicts.md` + `design.md` + `.impeccable.md`
 - **Files skipped:** if any (with reason)
-- **Stage status:** Stage 1 / Stage 2 / Stage 3 / Stage 4 / Stage 5 / Stage 8 — ran / skipped / partial / stub
-- **What's next:** "Phase 7 covers tokens, voice, overview, conflicts, and `.impeccable.md`. Design-system repo scan is the remaining stage. Run `/brand-check` to see overall completeness."
+- **Stage status:** Stage 1 / 2 / 3 / 4 / 5 / 6 / 8 — ran / skipped / partial / stub
+- **What's next:** "Phase 8 is the complete pipeline. Run `/brand-check` to see brand-package completeness and any remaining gaps."
 
 Be concise. The summary is one short message, not a wall of text.
 
@@ -553,24 +653,30 @@ Be concise. The summary is one short message, not a wall of text.
 | Stage 5: practitioner can't resolve right now | Leave the conflict as `unresolved`. They can re-run later. |
 | Stage 5: a previously-resolved conflict re-surfaces | Treat as a new active conflict. Note in the new entry that it had been resolved on a prior date. |
 | Stage 5: only one source is present (e.g., no Figma, no PDF) | Cannot detect cross-source conflicts. Stage 5 writes "_No active conflicts as of {date}._" and notes the limited input in the provenance block. |
+| Stage 6: tier is not comprehensive | Skip silently. Note in summary. |
+| Stage 6: `sources.design_system_repo` not set | Skip silently. Note in summary. |
+| Stage 6: local path not found | Log "Stage 6: path not found", skip. Don't error the pipeline. |
+| Stage 6: remote git clone fails (auth, 404, network) | Log the error, skip Stage 6, continue. |
+| Stage 6: no recognizable component patterns in repo | Write `.brand/components/inventory.md` with "_No components detected by pattern scan as of {date}._" and skip per-component files. |
+| Stage 6: practitioner has hand-edited a component file | Detect via missing provenance marker. Prompt overwrite/skip per file. |
+| Stage 6: temp clone directory cleanup fails | Log a warning. Don't fail the pipeline. |
 | All stages fail | Don't write any files. Tell the user what failed and what to fix. |
 | Practitioner says "skip" on overwrite for a file | Honor it — leave that file alone, write the others |
 | Conflict between Figma and web token values | Stage 5 captures it formally. In token file prose, note the divergence; in conflicts.md, file with `severity: token-level`. |
 | Overview claim contradicts a token value | Stage 5 captures it as `severity: structural`. |
 
-## Phase 7 scope reminder
+## Phase 8 scope reminder
 
-Implemented in this phase:
+Implemented (complete pipeline):
 - Stage 1: Figma → tokens
-- Stage 2: Web → tokens (always run when website is set)
-- Stage 3: Voice extraction (always run when website is set; uses social and app-store sources when present)
-- Stage 4: Multimodal analysis → overview.md (always run when at least one of: brand-guide PDF, reference screenshots, or Stage 2 web screenshots is available)
+- Stage 2: Web → tokens (always when sources.website is set)
+- Stage 3: Voice extraction → voice.md `## Observed Voice` section (additive)
+- Stage 4: Multimodal analysis → overview.md
 - Stage 5: Conflict detection → conflicts.md (additive, with practitioner walkthrough)
-- Stage 8: `.impeccable.md` regeneration (always runs after Stage 5)
-- Token files + voice.md + overview.md + conflicts.md writing with overwrite/additive policies
+- Stage 6: Design-system repo scan → components/*.md + components/inventory.md (comprehensive tier only)
+- Stage 8: `.impeccable.md` regeneration (always runs)
 - design.md regeneration
 
-**Not yet implemented** (do not attempt):
-- Stage 6: Design-system repo scan (`components/`)
+There is no further Stage 7 — the numbering preserves the historical pipeline plan from `packages/brand-skills/skills/brand-extract/DESIGN.md`. Stage 6 covers what an earlier draft called Stage 7.
 
 If the user asks for any of these, say: "That lands in a later phase of /brand-extract. For now, /brand-extract handles tokens and voice. The other files in `.brand/` need to be filled manually or wait for the next phase."
