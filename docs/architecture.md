@@ -1002,6 +1002,14 @@ These are third-party tools we use as-is. We configure them, document how to set
 | Layout CLI | Layout.design | Install globally when stable. Brand Skills orchestrates it. |
 | UX Design Skills Pack (63 skills, 27 commands, 8 plugins) | Owl-Listener/designer-skills (664 stars) | Install per-practitioner. Covers research, strategy, UI, interaction, prototyping, design ops, toolkit, design systems. |
 
+### Things We Recommend (Practitioner Installs On Demand)
+
+Tools we don't auto-install but document and recommend. Practitioners run these via `npx` or install globally when their workflow calls for it.
+
+| Tool | Source | Why we recommend it |
+|------|--------|---------------------|
+| Unlighthouse CLI | [unlighthouse.dev](https://unlighthouse.dev) ([harlan-zw/unlighthouse](https://github.com/harlan-zw/unlighthouse)) | Pre-deployment site-wide audit. Crawls every page on a running site and runs full Lighthouse (performance, accessibility, SEO, best practices) on each. Fills the gap left by Playwright + axe-core MCP, which audits one page at a time during the build loop. Run with `npx unlighthouse --site [url] --no-cache`. Recommended thresholds: Accessibility ≥ 90 (block deploy), Performance ≥ 70, SEO ≥ 85, Best Practices ≥ 90. |
+
 ### Things We Create (Custom Development Required)
 
 These are the components we build from scratch. This is where our development effort goes.

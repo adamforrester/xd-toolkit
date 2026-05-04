@@ -177,6 +177,31 @@ This adds design critique, UX writing, accessibility audits, research synthesis,
 
 ---
 
+## Recommended CLI Tools
+
+Tools we don't auto-install but recommend keeping in your kit. Use them when their workflow comes up — don't bolt them onto every project.
+
+### Unlighthouse — site-wide pre-deployment audits
+
+[Unlighthouse](https://unlighthouse.dev) crawls every page on a running site and produces full Lighthouse reports (performance, accessibility, SEO, best practices) for each one. Per-page accessibility during the build loop is still handled by the Playwright + axe-core MCP that's already in your stack — Unlighthouse fills a different gap: catching regressions across the whole site right before deploy.
+
+Run it on demand with `npx` (no install needed):
+
+```bash
+npx unlighthouse --site http://localhost:3000 --no-cache
+```
+
+If you run it often, install globally:
+
+```bash
+npm install -g @unlighthouse/cli
+unlighthouse --site http://localhost:3000
+```
+
+It opens an interactive report in your browser. Recommended thresholds: Accessibility ≥ 90 (block deploy on violations), Performance ≥ 70, SEO ≥ 85, Best Practices ≥ 90.
+
+---
+
 ## Verify Everything
 
 After installing all MCPs, run:

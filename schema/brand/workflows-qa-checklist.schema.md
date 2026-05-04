@@ -33,6 +33,16 @@ Copy and content quality verification.
 |-------|----------|-------------|
 | `Checks` | optional | Voice consistency, placeholder text removal, link validation, image alt text |
 
+### Pre-deployment Site Audit (optional)
+
+Site-wide audit using [Unlighthouse](https://unlighthouse.dev) before deploying. Per-page checks (Playwright + axe-core MCP) are still the right tool during the build loop; Unlighthouse fills a different gap — it discovers every page on a running site and audits performance, accessibility, SEO, and best practices in one pass.
+
+| Field | Required | Description |
+|-------|----------|-------------|
+| `Command` | optional | The exact command to run. Default: `npx unlighthouse --site http://localhost:3000 --no-cache` (or the deployed preview URL). |
+| `Thresholds` | optional | Per-category minimums per page. Recommended starting points: Performance ≥ 70, Accessibility ≥ 90, SEO ≥ 85, Best Practices ≥ 90. |
+| `Required vs. recommended` | optional | Accessibility ≥ 90 should be required; performance and SEO can be recommended. Encode the distinction so agents know what to block on. |
+
 ---
 
 ## Example
@@ -64,4 +74,18 @@ Copy and content quality verification.
 - [ ] Button labels follow the verb + object pattern
 - [ ] Error messages follow the acknowledge + action formula
 - [ ] All links resolve (no 404s)
+
+## Pre-deployment Site Audit
+
+Run Unlighthouse against the running site before deploying:
+
+```bash
+npx unlighthouse --site http://localhost:3000 --no-cache
+```
+
+Thresholds (per page):
+- [ ] Accessibility ≥ 90  (**required** — block deploy on violations)
+- [ ] Performance ≥ 70    (recommended)
+- [ ] SEO ≥ 85            (recommended)
+- [ ] Best Practices ≥ 90 (recommended)
 ```

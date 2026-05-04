@@ -42,6 +42,7 @@ jobs:
             "Owl-Listener/designer-skills|UX Design Skills Pack|skills"
             "obra/superpowers|Superpowers|plugin"
             "forrestchang/andrej-karpathy-skills|Karpathy Guidelines|plugin"
+            "harlan-zw/unlighthouse|Unlighthouse CLI|cli-tool"
           )
 
           for entry in "${REPOS[@]}"; do
