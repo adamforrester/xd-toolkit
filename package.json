@@ -1,6 +1,6 @@
 {
   "name": "xd-toolkit",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "description": "End-to-end toolkit for XD practitioners to produce brand-consistent digital products using AI agents",
   "type": "module",
   "bin": {

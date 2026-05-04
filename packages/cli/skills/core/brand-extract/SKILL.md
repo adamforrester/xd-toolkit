@@ -1,13 +1,13 @@
 ---
 name: brand-extract
-description: Extract a structured brand package from a client's Figma file, live website, social profiles, brand-guide PDF, and reference screenshots — populating .brand/tokens/*.md, .brand/voice.md, .brand/overview.md, and regenerating design.md. Use when the user says "extract the brand", "/brand-extract", "build a brand package from these assets", "pull tokens from Figma", "analyze the voice", "summarize the brand from this PDF", or after running /new-project for the first time. Currently implements Phase 4 (token extraction from Figma + web, voice extraction from website + social + app stores, and multimodal analysis of brand-guide PDF + screenshots). Conflict detection and design-system repo scanning are the remaining stages of the full pipeline.
+description: Extract a structured brand package from a client's Figma file, live website, social profiles, brand-guide PDF, and reference screenshots — populating .brand/tokens/*.md, .brand/voice.md, .brand/overview.md, .brand/conflicts.md, and regenerating design.md. Use when the user says "extract the brand", "/brand-extract", "build a brand package from these assets", "pull tokens from Figma", "analyze the voice", "summarize the brand from this PDF", "find brand conflicts", or after running /new-project for the first time. Currently implements Phase 5 (tokens, voice, overview, and conflict detection). Design-system repo scanning and .impeccable.md regeneration are the remaining stages of the full pipeline.
 ---
 
-# /brand-extract — Phase 4 (tokens + voice + overview)
+# /brand-extract — Phase 5 (tokens + voice + overview + conflicts)
 
-You are running the brand-extract skill to populate this project's `.brand/` package: `tokens/*.md` (from the client's Figma file when available + the live website), `voice.md` (from the live website + social profiles + app store listings), and `overview.md` (from brand-guide PDF + reference screenshots via multimodal vision).
+You are running the brand-extract skill to populate this project's `.brand/` package: `tokens/*.md`, `voice.md`, `overview.md`, and `conflicts.md` — and to regenerate `design.md` at the project root.
 
-**Phase 4 scope:** Stages 1, 2, 3, and 4. Stages 5–8 (conflicts, repo scan, .impeccable.md regen) are not yet implemented. Stop after Stage 4 and tell the user what's left for later phases.
+**Phase 5 scope:** Stages 1, 2, 3, 4, and 5. Stages 6–8 (design-system repo scan, .impeccable.md regen) are not yet implemented. Stop after Stage 5 and tell the user what's left for later phases.
 
 The full design lives at `packages/brand-skills/skills/brand-extract/DESIGN.md` in the toolkit repo.
 
@@ -398,18 +398,124 @@ If `xd-toolkit refresh-design` is unavailable (older toolkit version on the prac
 
 After regeneration, verify the file is no longer the placeholder by checking that the frontmatter contains at least one populated token map.
 
-## 8. Final summary
+## 8. Stage 5 — Conflict detection (`conflicts.md`)
+
+Reconcile what Stages 1–4 surfaced. Three things land in `.brand/conflicts.md`:
+
+1. **Genuine conflicts** — sources disagree about the same thing and a choice is needed. Examples: brand guide says `#007749`, Figma says `#008542`, web computed style is `#00794a`. Or: brand guide rules sentence case, live site uses title case CTAs.
+2. **Intentional adaptations** — divergences that are *not* conflicts because the practitioner has a legitimate reason (licensed display font swapped for a free body font on web; simplified palette for email; relaxed tone on social).
+3. **Auto-resolutions** — previously-flagged conflicts that no longer reproduce because the source was fixed.
+
+Run this stage after design.md regenerates (Section 7) so design.md is the consolidated artifact and conflicts.md describes what was reconciled to produce it.
+
+### 8a. Inputs to compare
+
+Read these files into memory:
+- `.brand/tokens/colors.md`, `tokens/typography.md`, `tokens/spacing.md`, `tokens/surfaces.md` — frontmatter + prose
+- `.brand/voice.md` — both prescriptive sections AND the `## Observed Voice (live channels)` divergences subsection (Stage 3 already flagged candidates there)
+- `.brand/overview.md` — brand identity, personality, anti-patterns, visual direction
+- Stage 1 raw Figma values (still in memory if Stage 1 ran)
+- Stage 2 raw web computed styles (still in memory if Stage 2 ran)
+- Stage 4 brand-guide PDF citations (page references for prescriptive claims)
+
+If a file is missing or stub, note it as "no input from {file}" and continue.
+
+### 8b. Detect
+
+Apply these detection rules. Each is independent — run all of them and aggregate.
+
+**Token disagreements:**
+- For each named token (e.g., `colors.primary`), compare the value across Figma (Stage 1), web (Stage 2), and any value mentioned in the brand-guide PDF prose (Stage 4). If two or more sources disagree by more than a trivial threshold (>3% delta on color hex; non-trivial size delta on type), flag a `token-level` conflict.
+- A trivial delta (e.g., `#E2231A` vs. `#E22319`) is not worth flagging; note silently.
+
+**Voice rule disagreements:**
+- For each prescriptive rule in `voice.md` (capitalization, punctuation, vocabulary, microcopy patterns), check whether Stage 3's observed-voice divergences subsection contradicts it. The Stage 3 divergence callouts (`> ⚠️ Diverges from prescriptive: ...`) are pre-flagged candidates — promote them into formal conflicts here.
+- Also compare brand-guide prose (Stage 4) against the `## Voice Principles` and `## Writing Rules` sections for internal contradictions.
+
+**Structural disagreements:**
+- Brand guide positioning vs. live website hero copy (does the website speak the same brand vs. a sub-brand?).
+- Visual direction principles in `overview.md` vs. observed live atmosphere from Stage 4 screenshots.
+- Audience description vs. who the live site clearly addresses.
+
+**Intentional adaptation candidates:**
+- Font substitutions (display family in guide → body family on web) — usually intentional.
+- Palette simplifications between print and digital — usually intentional.
+- Tone shifts between channels (formal on website, casual on social) — usually intentional.
+
+When a divergence has the shape of an intentional adaptation, **do not file it as a conflict**. File it under "Intentional Adaptations" and ask the practitioner during the walkthrough whether to confirm.
+
+### 8c. Apply the source authority hierarchy
+
+For each conflict, propose a resolution grounded in the hierarchy from `schema/brand/conflicts.schema.md`:
+
+1. Practitioner-provided live brand guide (PDF, recent)
+2. Figma variables (if maintained by brand team)
+3. Live website CSS (current behavior)
+4. Social profiles
+
+If the project has a hierarchy override at the top of `conflicts.md`, use that instead.
+
+The recommended resolution should be one paragraph: which source wins, why, and what the consequence is for the prototype/build.
+
+### 8d. Walk the practitioner through (required interaction)
+
+Before writing `conflicts.md`, present each detected item to the practitioner and get explicit input:
+
+- For each **conflict**: show the title, sources in tension, recommended resolution. Ask: confirm the resolution, override it (and capture rationale), or mark it as `intentional-adaptation` if the practitioner says it's not actually a conflict.
+- For each **intentional adaptation candidate**: confirm it's intentional + capture the rationale.
+- For each conflict that previously existed and no longer reproduces: confirm the auto-resolution and move to the archive.
+
+This is the "structured conflict resolution" practitioners care about — keep the prompts crisp and one item at a time. Do not batch-prompt.
+
+If there are zero detected items, skip the walkthrough and write `_No active conflicts as of {date}._`.
+
+### 8e. Apply the additive policy
+
+`conflicts.md` is **additive** — Stage 5 must preserve practitioner-resolved entries on every re-run.
+
+Read the existing `conflicts.md` first. Build the new file as:
+
+1. **Header** — regenerate (date stamp, skill provenance)
+2. **Source Authority Hierarchy** — preserve any practitioner overrides; otherwise regenerate the standard table
+3. **Active Conflicts** — start fresh; populate with currently-detected `unresolved` items + any practitioner-overridden resolutions captured during the walkthrough
+4. **Intentional Adaptations** — preserve all existing entries; append newly-confirmed ones
+5. **Resolved Conflicts Archive** — preserve all existing entries; append any auto-resolutions detected this run
+
+**Never delete entries from Intentional Adaptations or Resolved Conflicts Archive.** Use the `Edit` tool to surgically update sections, or `Write` to rebuild the file from in-memory state — but verify the diff in either case.
+
+### 8f. Pitch mode
+
+In pitch mode (`mode: pitch`), do not run the practitioner walkthrough — there's no internal access to resolve conflicts authoritatively. Instead:
+- Detect conflicts as usual
+- Write all detected items as `unresolved` with `Recommended resolution: pending — pitch mode (public sources only)`
+- Surface the count in the Final summary so the practitioner can resolve later when client access is available
+
+### 8g. Provenance
+
+End the file with:
+
+```markdown
+<!--
+Generated by /brand-extract Stage 5 on YYYY-MM-DD.
+Inputs: .brand/tokens/*.md, .brand/voice.md, .brand/overview.md, Stage 1 Figma values, Stage 2 web computed styles, Stage 4 PDF citations.
+Detected: N conflicts, M intentional adaptations, K auto-resolutions.
+This section preserves practitioner-resolved entries on every re-run.
+-->
+```
+
+## 9. Final summary
 
 Post a message to the user with:
 
 - **Token counts:** how many color tokens, typography tokens, spacing tokens, surface tokens were extracted
-- **Voice corpus:** total samples, breakdown by type (headlines / CTAs / body / errors / nav / microcopy / transactional) and channel (website / social / app-store), plus HIGH / MEDIUM / LOW claim counts
-- **Overview sources:** brand-guide PDF (yes/no, page count read), reference screenshots (count), web screenshots (count). Confidence note if PDF was absent.
-- **Sources used (overall):** Figma (yes/no, which files), web pages crawled, social platforms, app stores, PDFs, screenshots
-- **Files written:** four token files + `voice.md` + `overview.md` + `design.md`
+- **Voice corpus:** total samples, breakdown by type and channel, plus HIGH / MEDIUM / LOW claim counts
+- **Overview sources:** brand-guide PDF (yes/no, page count read), reference screenshots (count), web screenshots (count)
+- **Conflicts surfaced:** count of new `unresolved` conflicts, intentional adaptations confirmed, auto-resolutions
+- **Sources used (overall):** Figma, web pages, social, app stores, PDFs, screenshots
+- **Files written:** four token files + `voice.md` + `overview.md` + `conflicts.md` + `design.md`
 - **Files skipped:** if any (with reason)
-- **Stage status:** Stage 1 / Stage 2 / Stage 3 / Stage 4 — ran / skipped / partial / stub
-- **What's next:** "Phase 4 covers tokens, voice, and overview. Conflict detection (`conflicts.md`) and design-system repo scanning are the remaining stages. Run `/brand-check` to see overall completeness."
+- **Stage status:** Stage 1 / Stage 2 / Stage 3 / Stage 4 / Stage 5 — ran / skipped / partial / stub
+- **What's next:** "Phase 5 covers tokens, voice, overview, and conflicts. Design-system repo scan and `.impeccable.md` regeneration are the remaining stages. Run `/brand-check` to see overall completeness."
 
 Be concise. The summary is one short message, not a wall of text.
 
@@ -427,23 +533,27 @@ Be concise. The summary is one short message, not a wall of text.
 | Stage 4: PDF >20 pages | Read the prioritized pages (cover, mission, voice, visual identity, anti-patterns). Ask the practitioner if specific pages matter that you didn't read. |
 | Stage 4: no PDF, no screenshots, no Stage 2 captures | Skip Stage 4. Leave overview.md as placeholder. Ask the practitioner to provide a brand guide or screenshots. |
 | Stage 4: practitioner has hand-curated `overview.md` already | Default to skip. Only merge if explicitly requested — and merge replaces only the brand self-test block. |
+| Stage 5: practitioner declines a recommended resolution | Capture their override + rationale, write the conflict with `status: resolved-with-rationale` and the practitioner's text. |
+| Stage 5: practitioner can't resolve right now | Leave the conflict as `unresolved`. They can re-run later. |
+| Stage 5: a previously-resolved conflict re-surfaces | Treat as a new active conflict. Note in the new entry that it had been resolved on a prior date. |
+| Stage 5: only one source is present (e.g., no Figma, no PDF) | Cannot detect cross-source conflicts. Stage 5 writes "_No active conflicts as of {date}._" and notes the limited input in the provenance block. |
 | All stages fail | Don't write any files. Tell the user what failed and what to fix. |
 | Practitioner says "skip" on overwrite for a file | Honor it — leave that file alone, write the others |
-| Conflict between Figma and web token values | Use Figma value; mention the web value in the prose with a note. Real conflict resolution is Phase 5. |
-| Overview claim contradicts a token value | Surface inline in overview.md prose. Real conflict resolution is Phase 5. |
+| Conflict between Figma and web token values | Stage 5 captures it formally. In token file prose, note the divergence; in conflicts.md, file with `severity: token-level`. |
+| Overview claim contradicts a token value | Stage 5 captures it as `severity: structural`. |
 
-## Phase 4 scope reminder
+## Phase 5 scope reminder
 
 Implemented in this phase:
 - Stage 1: Figma → tokens
 - Stage 2: Web → tokens (always run when website is set)
 - Stage 3: Voice extraction (always run when website is set; uses social and app-store sources when present)
 - Stage 4: Multimodal analysis → overview.md (always run when at least one of: brand-guide PDF, reference screenshots, or Stage 2 web screenshots is available)
-- Token files + voice.md + overview.md writing with overwrite policy
+- Stage 5: Conflict detection → conflicts.md (additive, with practitioner walkthrough)
+- Token files + voice.md + overview.md + conflicts.md writing with overwrite/additive policies
 - design.md regeneration
 
 **Not yet implemented** (do not attempt):
-- Stage 5: Conflict detection (`conflicts.md`)
 - Stage 6: Design-system repo scan (`components/`)
 - Stage 8: `.impeccable.md` regeneration
 
