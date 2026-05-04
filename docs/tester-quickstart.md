@@ -101,16 +101,18 @@ npx xd-toolkit score
 - Does `setup` finish cleanly with `7 MCP servers connected` (or 8 with DS Pack)?
 - Does `/new-project` produce a usable `.brand/` directory at the chosen tier?
 - Do all three off-ramp paths (Yes / Not now / Skip) leave a working project?
+- Does `/brand-extract` populate `.brand/tokens/`, `voice.md`, `overview.md`, and `conflicts.md` from your sources, and regenerate `design.md` and `.impeccable.md`?
 - Does `/brand-check` give a sensible completeness score?
 - Does Claude follow the rules in the generated `CLAUDE.md` when asked to build something? (E.g. ask it to build a Wendy's-branded landing page and check it doesn't substitute fonts or invent a logo.)
 
 ## Known limitations
 
-- **Brand Skills skills (C4–C8) are not built yet.** `/new-project`'s extraction phase relies on the model + Playwright doing it ad hoc. Dedicated `/brand-extract`, `/brand-analyze`, `/brand-audit`, `/brand-refresh` skills are coming.
-- **Layer 4 + Layer 5 end-to-end tests are blocked** on the above.
-- **No daily-workflow doc yet** — `docs/setup-guide.md` covers install, but ongoing use is documented via the slash commands themselves.
+- **`/brand-audit` (C7) is not yet built.** Manual review against `.brand/` is the current workflow for checking whether agent output stays on-brand.
+- **`/brand-score` slash command (C6) is partial** — `xd-toolkit score` (CLI) reports completeness; the in-session conversational version isn't built.
+- **Layer 5 (full E2E prototype build)** has not been run since `/brand-extract` shipped at v1.0.0.
+- **No daily-workflow doc yet** — install and per-skill usage are documented; an end-to-end "what a typical project looks like day to day" doc is still missing.
 - **Design System Pack** requires `git` on PATH (the installer clones from GitHub).
-- **Firecrawl MCP** is no longer auto-installed. Free tier doesn't offer enough credits to be worth the prompt. If you have a paid plan, add it manually (see `docs/architecture.md`).
+- **Firecrawl MCP** is not auto-installed. Free tier is too thin to be worth the prompt. Add manually if you have a paid plan (see `docs/architecture.md`).
 
 ## Reporting issues
 

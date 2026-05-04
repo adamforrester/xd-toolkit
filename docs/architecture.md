@@ -751,7 +751,7 @@ npx xd-toolkit setup
 **What it does:**
 1. Checks Node.js version (18+ required)
 2. Prompts for which packages to install:
-   - **Core Toolkit** (always included) — 23 skills (Impeccable 18 + Vercel 2 + figma-plugin-dev 1 + vml-thrive-feedback 1 + brand-extract 1), 2 plugins (Superpowers, Karpathy Guidelines), 7 MCP servers
+   - **Core Toolkit** (always included) — 23 skills (Impeccable family 20 + figma-plugin-dev 1 + vml-thrive-feedback 1 + brand-extract 1), 2 plugins (Superpowers, Karpathy Guidelines), 7 MCP servers
    - **UX Design Skills Pack** (optional) — 63 skills, 27 commands for research, strategy, interaction design, design ops
    - **Design System Pack** (optional) — 21 skills for DS governance, auditing, documentation
    - **Brand Skills** (optional) — skills for generating .brand/ packages from client assets. For practitioners who run client onboarding.
@@ -1014,20 +1014,20 @@ Tools we don't auto-install but document and recommend. Practitioners run these 
 
 These are the components we build from scratch. This is where our development effort goes.
 
-| # | Deliverable | What It Is | Effort |
-|---|------------|-----------|--------|
-| **C1** | **`.brand/` schema specification** | Documented spec for every file in the brand package: what fields, what format, required vs. optional, tiered completeness model (minimum → standard → comprehensive) | 3-5 days |
-| **C2** | **`xd-toolkit` CLI** | Two-level CLI: `setup` (global, once per practitioner — installs MCPs, skill packs, collects tokens, verifies health) and `init` (per-project — scaffolds .brand/, skills, instruction files, .brandrc.yaml). Also: `doctor` (global + project health checks), `update` (refresh skills without overwriting .brand/), `score` (brand package completeness). Supports `--mode pitch/standard/comprehensive`, `--brand-path` (shared brand packages across projects), `--figma-only` (brand context for Figma design work, no code scaffolding), and `--json` on all commands. | 5-8 days |
-| **C3** | **CLAUDE.md template** | The brand routing instructions — ~40-50 lines that tell agents when to load which brand files. Plus AGENTS.md, .cursorrules, copilot-instructions.md equivalents. | 1-2 days |
-| **C4** | **`/brand-extract` skill** | Orchestrates the extraction pipeline: Figma Console MCP (variable inventory) + Layout CLI (CSS tokens from URLs, optional) + multimodal vision (brand-guide PDFs, screenshots) + voice extraction via Playwright MCP (default) or Firecrawl (optional). Scrapes website, social profiles, and app store listings per `.brandrc.yaml` sources. Falls back to guided manual input when automated extraction fails. Supports `--public-only` flag for pitch scenarios. Component anatomy (specs CLI) is intentionally out of scope — that's a DS Pack concern. | 3-5 days |
-| **C5** | **`/brand-analyze` skill** | The core analysis skill. Reads extraction output + brand guide PDF (multimodal) + screenshots + copy samples. Synthesizes into `.brand/` directory files. Auto-generates `.impeccable.md` from overview. Infers voice from copy samples with confidence levels (HIGH/MEDIUM/LOW). Supports `--mode pitch` (minimum tier only) and `--mode comprehensive` (full analysis + existing codebase integration). Flags contradictions between sources. This is the most complex custom component. | 5-8 days |
-| **C6** | **`/brand-score` skill** | Completeness scoring across all brand package dimensions. Modeled on Layout.design's 0-100 approach. Reports which tier the package is at. | 2-3 days |
-| **C7** | **`/brand-audit` skill** | Evaluates agent output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces a brand adherence score. | 3-5 days |
-| **C8** | **`/brand-refresh` skill** | Re-runs analysis against updated client assets. Produces diff against existing brand package. Human reviews changes before committing. | 2-3 days |
-| **C9** | **Practitioner documentation** | Setup guide (MCP installation, CLI usage), daily workflow guide (how to use the toolkit), brand onboarding guide (how to run the Brand Skills), troubleshooting | 3-5 days |
-| **C10** | **MCP setup verification script** | A script that checks which MCPs are configured, which are missing, and prints the exact install commands for the practitioner's agent tool. Run via `xd-toolkit doctor`. | 1-2 days |
+| # | Deliverable | Status | What It Is |
+|---|------------|--------|-----------|
+| **C1** | **`.brand/` schema specification** | **Done** | Documented spec for every file in the brand package: what fields, what format, required vs. optional, tiered completeness model (minimum → standard → comprehensive). 17 schema files in `schema/brand/`. |
+| **C2** | **`xd-toolkit` CLI** | **Done** | `setup` (global, one-time), `init` (per-project), `doctor`, `update`, `score`, `refresh-design` (regenerates project-root `design.md` from `.brand/`), `refresh-impeccable` (regenerates `.impeccable.md`). Supports `--mode pitch/standard/comprehensive`, `--brand-path`, `--figma-only`, `--json`. |
+| **C3** | **Instruction file templates** | **Done** | CLAUDE.md, AGENTS.md, .cursorrules, copilot-instructions.md, .impeccable.md. Plus `design.md` per the [google-labs-code/design.md spec](https://github.com/google-labs-code/design.md) — the spec-compliant interop artifact, regenerated from `.brand/` by `xd-toolkit refresh-design` or by `/brand-extract` Stage 7. |
+| **C4** | **`/brand-extract` skill** | **Done (v1.0.0)** | Full extraction pipeline. Stage 1: Figma variables (Figma Console MCP). Stage 2: web computed styles (Playwright). Stage 3: voice extraction from website + social + app stores (additive `## Observed Voice` section in voice.md). Stage 4: multimodal analysis of brand-guide PDF + reference screenshots → overview.md (with merge-only-self-test policy on populated files). Stage 5: cross-source conflict detection → conflicts.md (additive, with practitioner walkthrough; preserves resolved entries on re-run). Stage 6: design-system repo scan → components/*.md (comprehensive tier only; local path or remote git URL). Stages 7+8: regenerate design.md and .impeccable.md after extraction. C5 (analyze) is folded in as Stages 3–4; C8 (refresh) is just re-running the same skill. |
+| **C5** | **`/brand-analyze` skill** | **Folded into C4** | No standalone skill — channel-aware voice inference and multimodal analysis are Stages 3 and 4 of `/brand-extract`. |
+| **C6** | **`/brand-score` skill** | **Partial** | `xd-toolkit score` CLI command exists and reports completeness. The in-session conversational slash-command version is not yet built. |
+| **C7** | **`/brand-audit` skill** | **Not started** | Evaluates agent output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces a brand-adherence score. ~3-5 days. |
+| **C8** | **`/brand-refresh` skill** | **Folded into C4** | Re-running `/brand-extract` is the refresh — it's additive on `voice.md` and `conflicts.md`, and respects the overwrite policy on tokens and overview. |
+| **C9** | **Practitioner documentation** | **Partial** | README, setup-guide, tester-quickstart, architecture, testing-and-scenarios all shipped. Daily-workflow guide (a single end-to-end "what a typical project looks like day to day" doc) still missing. |
+| **C10** | **MCP setup verification** | **Done** | `xd-toolkit doctor` command + `scripts/setup-mcps.sh`. |
 
-**Total custom development: ~30-45 days of effort.**
+**Status:** C1, C2, C3, C4, C10 done. C6 partial (CLI only). C7, C9 remaining (~3-5 days for `/brand-audit`; ~1-2 days for the daily-workflow doc).
 
 **What we don't build:** Design system skills (saved ~8-12 days by adopting Design System Ops), UX research skills (curated from community), all MCPs (third-party), all extraction tooling (third-party).
 

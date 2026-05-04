@@ -74,6 +74,18 @@ Test results from Layer 1-3 validation. Tested 2026-04-14.
 
 ---
 
-## Next: Layer 4 (Brand Skills) and Layer 5 (E2E)
+## Layer 4 (Brand Skills) — partial pass
 
-Layer 4 testing requires C4-C8 to be built. Layer 5 requires the full pipeline.
+`/brand-extract` shipped at v1.0.0 (C4 covers C5/C8 inline). Validated against TruGreen end-to-end:
+
+- **Stage 1 (Figma tokens)** — extracted via Figma Console MCP from Prism Foundations + AKQA Design Library. ✓
+- **Stage 2 (Web tokens)** — Playwright sampled trugreen.com computed styles, reconciled against Figma. ✓
+- **Stage 3 (Voice extraction)** — additive `## Observed Voice (live channels)` section appended to existing prescriptive voice.md. 11 prescriptive sections preserved. Surfaced casing divergence on live homepage. ✓
+- **Stage 4 (Multimodal overview)** — read brand-guide PDF + reference screenshots; merged self-test block only, preserved validated atmosphere/positioning prose. ✓
+- **Stage 5 (Conflict detection)** — surfaced 2 genuine conflicts (CTA casing, "Get started" wording), preserved 3 intentional adaptations from CHANGELOG; practitioner walkthrough captured resolutions. ✓
+- **Stage 8 (`.impeccable.md` regen)** — fired automatically after Stage 5; condensed brand context written to project root. ✓
+- **Stage 6 (DS repo scan)** — implementation-complete; not yet exercised on a real codebase (TruGreen DS package not yet available). Untested.
+
+## Next: Layer 5 (full E2E prototype build)
+
+Pending. With `/brand-extract` outputs in place plus `design.md` and `.impeccable.md` at the project root, the remaining test is a complete prototype build run-through — Impeccable consuming the brand context, building a representative page, then a `/brand-audit` (C7) pass to verify on-brand output. C7 isn't built yet, so this layer waits on it.

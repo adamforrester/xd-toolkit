@@ -79,16 +79,18 @@ Each component of the toolkit is tested independently, in dependency order. You 
 
 ---
 
-### Layer 4: Brand Skills (Test when C4-C8 are built)
+### Layer 4: Brand Skills
 
-**What you're testing:** Does the analysis pipeline produce a usable `.brand/` directory from real client assets?
+**Status:** `/brand-extract` shipped at v1.0.0. Validated against TruGreen end-to-end (Stages 1–5 + 8). Stage 6 (DS repo scan) is implementation-complete but client-untested. Use this layer to validate against additional clients across input-quality tiers.
+
+**What you're testing:** Does the extraction pipeline produce a usable `.brand/` directory from real client assets?
 
 **Method:**
 1. Pick three clients with different input quality:
-   - **Rich:** Client with Figma files, style guide, live site
+   - **Rich:** Client with Figma files, brand guide PDF, live site, and an existing component-library codebase
    - **Medium:** Client with a brand guide PDF and a live site, no Figma
    - **Thin:** Client with only a public website (the pitch scenario)
-2. Run `/brand-extract` + `/brand-analyze` for each.
+2. Run `/brand-extract` for each. (There is no separate `/brand-extract (Stages 3-4)` — that work is Stages 3–4 of `/brand-extract`.)
 3. Compare auto-generated `.brand/` files against what a knowledgeable designer would write by hand.
 4. Score each file on a 1-5 scale:
    - 1: Wrong or misleading
@@ -102,7 +104,7 @@ Each component of the toolkit is tested independently, in dependency order. You 
 - Medium client: average 3.0+ for minimum-tier files, 2.5+ for standard-tier
 - Thin client: average 2.5+ for minimum-tier files only
 
-**Improvement signal:** Track scores over time as you refine `/brand-analyze`. Each iteration should improve average scores by 0.3-0.5 points until you plateau around 3.5-4.0.
+**Improvement signal:** Track scores over time as you refine `/brand-extract`'s extraction prompts (especially Stages 3 and 4). Each iteration should improve average scores by 0.3-0.5 points until you plateau around 3.5-4.0.
 
 ---
 
@@ -157,7 +159,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
    - specs CLI → component anatomy from Figma (when access granted)
    - Figma MCP → variables (when access granted)
 
-4. /brand-analyze
+4. /brand-extract (Stages 3-4)
    - Reads brand guide PDF (multimodal)
    - Reads extraction output including copy samples
    - Screenshots live site for composition analysis
@@ -175,7 +177,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
 7. Commit .brand/ to repo → team starts producing work
 ```
 
-**Key challenge:** The client's assets often contradict each other. The style guide says one thing, the live site does another, and the stakeholder says something different. The Brand Skills analysis will surface these conflicts — the human enrichment step is where they get resolved. The `/brand-analyze` skill should flag contradictions explicitly rather than silently picking one.
+**Key challenge:** The client's assets often contradict each other. The style guide says one thing, the live site does another, and the stakeholder says something different. The Brand Skills analysis will surface these conflicts — the human enrichment step is where they get resolved. The `/brand-extract (Stages 3-4)` skill should flag contradictions explicitly rather than silently picking one.
 
 **Testing this scenario:** Use a real new client onboarding. Time the entire process. Measure brand package quality. The target is 4-8 hours from "received assets" to "brand package committed," down from what would otherwise be weeks of manual documentation.
 
@@ -216,7 +218,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
    - Screenshots of key pages for composition analysis
    - No Figma extraction, no specs CLI (no access)
 
-3. /brand-analyze --mode pitch
+3. /brand-extract (Stages 3-4) --mode pitch
    - Reads extraction output
    - Analyzes screenshots for composition patterns
    - Infers brand personality from visual language + copy tone
@@ -275,7 +277,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
    - Also scan existing codebase for: existing AGENTS.md/CLAUDE.md, 
      token files, component documentation, Storybook stories
 
-3. /brand-analyze --mode comprehensive
+3. /brand-extract (Stages 3-4) --mode comprehensive
    - Full analysis with all sources
    - Additionally: reads existing instruction files and incorporates 
      rules that are already documented
@@ -360,7 +362,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
    - Shapes the narrative for the specific client audience
 ```
 
-**Key difference from other scenarios:** The output is a consulting deliverable, not a `.brand/` package. The extraction pipeline is shared, but the downstream consumer is the DS Pack audit skills and the (future) `/ds-scope` skill, not `/brand-analyze`.
+**Key difference from other scenarios:** The output is a consulting deliverable, not a `.brand/` package. The extraction pipeline is shared, but the downstream consumer is the DS Pack audit skills and the (future) `/ds-scope` skill, not `/brand-extract (Stages 3-4)`.
 
 **Testing this scenario:** Run the audit skills against a known design system where you can verify the findings. Compare automated assessment against what a senior DS practitioner would write by hand. The automated version should surface the same issues — the human value-add is strategic framing and prioritization.
 

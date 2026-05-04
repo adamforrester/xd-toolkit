@@ -129,10 +129,11 @@ tests/fixtures/     Reference brand packages
 
 ## Known limitations
 
-- **Brand Skills skills (C4–C8) are not yet built.** `/new-project`'s brand extraction phase relies on the model + Playwright doing it ad hoc. Dedicated `/brand-extract`, `/brand-analyze`, `/brand-audit`, and `/brand-refresh` skills are the next milestone.
-- **Layer 4 + Layer 5 end-to-end tests are blocked** on the above.
-- **Daily-workflow documentation** is partial — install is documented; ongoing use is documented via the slash commands themselves.
-- **Firecrawl MCP** is no longer auto-installed (free tier is too thin to be worth the prompt). Add it manually if you have a paid plan — see `docs/architecture.md`.
+- **`/brand-audit` (C7) is not yet built.** A skill that scores agent output against the project's brand package (token compliance, voice consistency, anti-pattern checks) is on the roadmap. For now, manual review against `.brand/` is the workflow.
+- **`/brand-score` slash command (C6) is partial.** The `xd-toolkit score` CLI command exists and reports completeness; the in-session conversational version doesn't.
+- **Layer 5 (full E2E prototype build)** has not been run since `/brand-extract` shipped at v1.0.0. Stages 1–5 + 8 validated against TruGreen; Stage 6 (DS repo scan) is implementation-complete but client-untested.
+- **Daily-workflow documentation** is partial — install and per-skill usage are documented; a single end-to-end "what a typical project looks like day to day" doc is still missing.
+- **Firecrawl MCP** is not auto-installed (free tier is too thin to justify the prompt). Add manually if you have a paid plan — see `docs/architecture.md`.
 - **Not yet on npm.** Install from GitHub for now.
 
 Found a bug? Open an issue with `xd-toolkit doctor` output, your OS, and your Node version.
