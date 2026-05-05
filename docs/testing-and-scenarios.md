@@ -345,7 +345,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
    - /naming-audit → naming convention consistency
    - /drift-detection → where teams diverged and why
 
-3. /ds-scope (Phase 4+ custom skill — not built yet)
+3. /ds-scope (post-v1 roadmap — not built yet)
    - Reads all DS Pack audit outputs
    - Produces:
      - Executive summary (system maturity, key risks, competitive position)

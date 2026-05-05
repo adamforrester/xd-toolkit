@@ -479,7 +479,7 @@ cp -r design-system-ops/commands/* ~/.claude/commands/
 # Open the .plugin file directly — auto-installs
 ```
 
-### Extension: XD Manager Pack (Future — Phase 4+)
+### Extension: XD Manager Pack (Future — Roadmap (post-v1))
 
 For XD managers handling team operations — employee reviews, scoping, resource planning. Not part of the core toolkit pipeline but valuable for XD practice leadership.
 
@@ -1031,7 +1031,7 @@ These are the components we build from scratch. This is where our development ef
 
 **What we don't build:** Design system skills (saved ~8-12 days by adopting Design System Ops), UX research skills (curated from community), all MCPs (third-party), all extraction tooling (third-party).
 
-**Future custom development (Phase 4+):** XD Manager Pack skills (`/thrive-review`, `/scope`, and others TBD). These are separate workstreams with existing work started in other threads.
+**Future custom development (Roadmap (post-v1)):** XD Manager Pack skills (`/thrive-review`, `/scope`, and others TBD). These are separate workstreams with existing work started in other threads.
 
 ---
 
@@ -1069,7 +1069,7 @@ These are the components we build from scratch. This is where our development ef
 | 16 | Package UX Design Skills Pack | Test integration, document the optional extension, verify no conflicts with Impeccable | 1-2 days |
 | 17 | Claude.ai Project templates | Pre-configured Projects with brand knowledge for non-Code users | 1-2 days |
 
-### Phase 4+ (Future)
+### Roadmap (post-v1) (Future)
 
 **XD Manager Pack:**
 - `/thrive-review` — employee performance reviews via Thrive platform (work started in separate thread)

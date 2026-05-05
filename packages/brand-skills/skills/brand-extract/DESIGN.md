@@ -1,11 +1,6 @@
----
-name: brand-extract
-description: Extract a structured brand package from a client's existing assets — Figma files, live website, social profiles, brand-guide PDF, and reference screenshots — and write the results into the project's `.brand/` directory and a spec-compliant `design.md`. Use when starting a new client project, when `.brand/` files are empty placeholders, when the practitioner says "extract the brand", "analyze this brand", "build a brand package from these assets", or after running `/new-project` for the first time.
----
+# /brand-extract — Design Reference
 
-# /brand-extract
-
-> **Status:** Spec — implementation in progress. This file defines what the skill should do; the prompts and orchestration logic land in this directory as it's built.
+> **This is the design spec, not the active skill.** The shipped skill that Claude Code executes lives at `packages/cli/skills/core/brand-extract/SKILL.md` (bundled and deployed to every project via `xd-toolkit init`). This file captures the architectural intent and pipeline staging that informed the implementation. Read this when you want to understand *why* the skill is structured the way it is; read the SKILL.md when you want to know *what* the skill does at runtime.
 
 Build a complete `.brand/` package and a spec-compliant `design.md` from the inputs declared in `.brandrc.yaml`, plus any assets the practitioner uploads. The output respects the project's tier (minimum / standard / comprehensive).
 

@@ -7,6 +7,8 @@ argument-hint: "[client name]"
 
 You are guiding an XD practitioner through setting up a new client project with brand extraction. Be conversational and clear. Never assume they know what a CLI, MCP, or token file is.
 
+> **Note on phase numbering:** The "Phase N" headings below describe stages of *this* `/new-project` walkthrough — Phase 1 (project details) → Phase 5 (review). They are unrelated to the "Phase 8" pipeline numbering inside `/brand-extract`'s SKILL, which describes the toolkit's incremental build of the extraction stages. Don't conflate the two.
+
 ## Phase 1: Project Details
 
 Ask these questions one at a time. Don't dump them all at once.
