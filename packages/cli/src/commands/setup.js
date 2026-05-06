@@ -104,7 +104,7 @@ export async function setupCommand(opts) {
       message: 'Select packages',
       choices: [
         {
-          name: `Core Toolkit ${chalk.dim('— 23 skills, 2 plugins (Superpowers + Karpathy Guidelines), 7 MCP servers')}`,
+          name: `Core Toolkit ${chalk.dim('— 22 bundled skills + 3 plugins (Superpowers, Karpathy, brand-context) + 7 MCP servers')}`,
           value: 'core',
           checked: true,
           disabled: 'always included',
@@ -264,6 +264,50 @@ export async function setupCommand(opts) {
     }
   }
 
+  // brand-skills — standalone brand-extraction plugin + CLI (lives in its own repo)
+  console.log('');
+  console.log(chalk.bold('  Installing brand-skills (extraction pipeline)'));
+  console.log('');
+
+  // 1. The Claude Code plugin (slash commands /brand-context:extract and /brand-context:check)
+  const brandMarketplace = await addPluginMarketplace('adamforrester/brand-skills');
+  if (!brandMarketplace) {
+    console.log(chalk.yellow('⚠ brand-skills plugin: could not add marketplace'));
+    results.skills.push({ name: 'brand-skills-plugin', ok: false, error: 'marketplace add failed' });
+  } else {
+    const install = tryRun(`claude plugin install brand-context@${brandMarketplace}`);
+    if (install.ok) {
+      console.log(chalk.green('✓ brand-context plugin — /brand-context:extract, /brand-context:check'));
+      results.skills.push({ name: 'brand-skills-plugin', ok: true });
+    } else {
+      console.log(chalk.yellow('⚠ brand-context plugin failed to install'));
+      const errLine = (install.stderr || install.stdout || '').split('\n').find(l => l.trim());
+      if (errLine) console.log(chalk.dim(`    ${errLine}`));
+      console.log(chalk.dim(`    To retry manually: claude plugin install brand-context@${brandMarketplace}`));
+      results.skills.push({ name: 'brand-skills-plugin', ok: false, error: install.stderr });
+    }
+  }
+
+  // 2. The npm CLI (brand-cli — provides refresh-design, refresh-context, init, score, setup)
+  const cliInstall = tryRun('npm install -g github:adamforrester/brand-skills');
+  if (cliInstall.ok) {
+    const versionCheck = tryRun('brand-cli --version');
+    if (versionCheck.ok) {
+      console.log(chalk.green(`✓ brand-cli ${versionCheck.stdout} — brand-cli refresh-design, refresh-context, score, setup`));
+      results.skills.push({ name: 'brand-cli', ok: true });
+    } else {
+      console.log(chalk.yellow('⚠ brand-cli installed but not on PATH yet'));
+      console.log(chalk.dim('    Open a new terminal or run `source ~/.bash_profile` (or ~/.zshrc) to pick it up.'));
+      results.skills.push({ name: 'brand-cli', ok: true, warning: 'not on PATH yet' });
+    }
+  } else {
+    console.log(chalk.yellow('⚠ brand-cli npm install failed'));
+    const errLine = (cliInstall.stderr || '').split('\n').find(l => l.trim());
+    if (errLine) console.log(chalk.dim(`    ${errLine}`));
+    console.log(chalk.dim('    To retry manually: npm install -g github:adamforrester/brand-skills'));
+    results.skills.push({ name: 'brand-cli', ok: false, error: cliInstall.stderr });
+  }
+
   // ── Step 5c: Install slash commands globally ──
   console.log('');
   console.log(chalk.bold('  Installing slash commands'));
@@ -273,8 +317,8 @@ export async function setupCommand(opts) {
   if (cmdResult.ok) {
     console.log(chalk.green(`✓ ${cmdResult.count} slash commands installed to ~/.claude/commands/`));
     console.log(chalk.dim('    /new-project — set up a new client project'));
-    console.log(chalk.dim('    /brand-extract — extract tokens from Figma + website'));
-    console.log(chalk.dim('    /brand-check — check brand package completeness'));
+    console.log(chalk.dim('    /brand-context:extract — full brand-extraction pipeline (from brand-skills plugin)'));
+    console.log(chalk.dim('    /brand-context:check — check brand package completeness (from brand-skills plugin)'));
   } else {
     console.log(chalk.yellow(`⚠ Slash commands not installed: ${cmdResult.error}`));
   }

@@ -14,7 +14,7 @@ It's built for an agency context: multiple brands, multiple practitioners, varia
 ┌──────────────────────────────────────────────────────────────────┐
 │                                                                  │
 │  PACKAGE 1: Core Toolkit                                         │
-│  23 skills + 2 plugins + 7 MCP servers + Storybook (per-project)│
+│  22 skills + 3 plugins + 7 MCP servers + Storybook (per-project)│
 │  Installed per-practitioner (MCPs, plugin) + per-project (skills)│
 │  Brand-agnostic                                                  │
 │                                                                  │
@@ -751,7 +751,7 @@ npx xd-toolkit setup
 **What it does:**
 1. Checks Node.js version (18+ required)
 2. Prompts for which packages to install:
-   - **Core Toolkit** (always included) — 23 skills (Impeccable family 20 + figma-plugin-dev 1 + vml-thrive-feedback 1 + brand-extract 1), 2 plugins (Superpowers, Karpathy Guidelines), 7 MCP servers
+   - **Core Toolkit** (always included) — 22 bundled skills (Impeccable family 20 + figma-plugin-dev 1 + vml-thrive-feedback 1), 3 plugins (Superpowers, Karpathy Guidelines, brand-context from the standalone brand-skills repo), 7 MCP servers, plus the `brand-cli` npm CLI
    - **UX Design Skills Pack** (optional) — 63 skills, 27 commands for research, strategy, interaction design, design ops
    - **Design System Pack** (optional) — 21 skills for DS governance, auditing, documentation
    - **Brand Skills** (optional) — skills for generating .brand/ packages from client assets. For practitioners who run client onboarding.

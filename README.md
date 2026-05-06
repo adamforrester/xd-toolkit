@@ -8,17 +8,18 @@ An end-to-end toolkit for **Experience Design practitioners** who want AI agents
 
 ## What's included
 
-- **21 core skills** — Impeccable (×18) + Vercel (×2) + figma-plugin-dev (×1)
-- **2 plugins:**
+- **22 bundled skills** — Impeccable family (×20) + figma-plugin-dev (×1) + vml-thrive-feedback (×1)
+- **3 plugins** (all installed during setup):
   - **Superpowers** — structured development practices (brainstorming, TDD, debugging, code review)
   - **Karpathy Guidelines** — coding discipline (think before coding, simplicity first, surgical changes, goal-driven execution; 91k+ stars)
+  - **brand-context** — full brand-extraction pipeline (from the standalone [adamforrester/brand-skills](https://github.com/adamforrester/brand-skills) repo). Slash commands: `/brand-context:extract` and `/brand-context:check`
+- **`brand-cli`** — companion npm CLI from brand-skills, providing `brand-cli refresh-design`, `refresh-context`, `score`, `setup`, and `init`
 - **7 MCP servers** — Figma Official, Figma Console, Playwright, GitHub, Netlify, Vercel, Context7
-- **3 slash commands** — `/new-project` (conversational client onboarding), `/brand-check` (completeness report), `/brand-extract` (token extraction from Figma + web)
-- **`.brand/` directory schema** — 16 schema files defining a tiered brand package (minimum / standard / comprehensive)
+- **1 slash command bundled with xd-toolkit** — `/new-project` (conversational client onboarding). The `/brand-context:*` commands come from the brand-skills plugin.
+- **`.brand/` directory schema** — 17 schema files defining a tiered brand package (minimum / standard / comprehensive)
 - **Optional add-ons:**
   - UX Design Skills Pack (63 skills)
   - Design System Pack (21 skills + Storybook MCP)
-  - Brand Skills (skills for generating `.brand/` packages from client assets — in progress)
 
 ---
 

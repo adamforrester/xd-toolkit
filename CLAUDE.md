@@ -8,7 +8,7 @@ See `docs/architecture.md` for the full architecture document covering:
 - Three packages (Core Toolkit, Brand Skills, Brand Packages)
 - Four component categories (MCP Servers, Skills, Instruction Files, Data Files)
 - The MCP stack (8 core + 1 optional across Design, Build/Test, Deploy, Context phases)
-- The skills stack (23 skills + 2 plugins (Superpowers, Karpathy Guidelines) + Brand Skills)
+- The skills stack (22 bundled skills + 3 plugins (Superpowers, Karpathy Guidelines, brand-context) + brand-skills npm CLI)
 - The `.brand/` directory structure and loading strategy
 - The E2E pipeline (Design -> Build -> Test -> Deploy)
 - Build plan (C1-C10 deliverables)
@@ -24,7 +24,7 @@ packages/
     src/commands/   #   setup.js, init.js, doctor.js, update.js, score.js
     src/utils/      #   mcp-installer, skill-copier, template-renderer, token-validator
     src/templates/  #   Bundled .tmpl files for CLAUDE.md, AGENTS.md, etc.
-    skills/core/    #   Bundled 23 skills (Impeccable 20 + figma-plugin-dev 1 + vml-thrive-feedback 1 + brand-extract 1) + 2 plugins (Superpowers, Karpathy Guidelines)
+    skills/core/    #   Bundled 22 skills (Impeccable 20 + figma-plugin-dev 1 + vml-thrive-feedback 1) — installed alongside 3 plugins (Superpowers, Karpathy, brand-context)
   core/             # Package 1: Core Toolkit skills + instruction file templates
     templates/      #   Source templates (CLAUDE.md.tmpl, AGENTS.md.tmpl, etc.)
   brand-skills/    # Design reference for brand workflow skills (DESIGN.md spec; active skills live in cli/skills/core/)
@@ -49,7 +49,7 @@ docs/
 | # | Deliverable | Status | Notes |
 |---|------------|--------|-------|
 | C1 | `.brand/` schema specification | **Done** | 17 schema files in `schema/brand/` (added `conflicts.schema.md`) |
-| C2 | `xd-toolkit` CLI | **Done** | setup, init, doctor, update, score, refresh-design, refresh-impeccable commands working. 23 skills bundled. |
+| C2 | `xd-toolkit` CLI | **Done** | setup, init, doctor, update, score commands. 22 skills bundled. `refresh-design` and `refresh-impeccable` moved to the standalone `brand-cli` (from the brand-skills repo). |
 | C3 | Instruction file templates | **Done** | CLAUDE.md, AGENTS.md, .cursorrules, copilot-instructions.md, .impeccable.md, design.md (per [google-labs-code/design.md](https://github.com/google-labs-code/design.md)) |
 | C4 | `/brand-extract` skill | **Done (v1.0.0)** | Full pipeline (Stages 1–6 + 8): Figma + web tokens, voice, multimodal overview, conflict detection, design-system repo scan, design.md and .impeccable.md regen. Spec lives in `packages/brand-skills/skills/brand-extract/DESIGN.md`. |
 | C5 | `/brand-analyze` skill | **Folded into C4** | Channel-aware voice inference is Stage 3 of `/brand-extract`. Multimodal analysis is Stage 4. No separate `/brand-analyze` command; the work happens inline. |

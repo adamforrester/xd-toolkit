@@ -6,8 +6,6 @@ import { initCommand } from '../src/commands/init.js';
 import { doctorCommand } from '../src/commands/doctor.js';
 import { updateCommand } from '../src/commands/update.js';
 import { scoreCommand } from '../src/commands/score.js';
-import { refreshDesignCommand } from '../src/commands/refresh-design.js';
-import { refreshImpeccableCommand } from '../src/commands/refresh-impeccable.js';
 
 program
   .name('xd-toolkit')
@@ -49,18 +47,8 @@ program
   .option('--json', 'Output results as JSON')
   .action(scoreCommand);
 
-program
-  .command('refresh-design')
-  .description('Regenerate design.md at the project root from .brand/')
-  .option('--brand-path <path>', 'Override path to .brand/ directory')
-  .option('--json', 'Output results as JSON')
-  .action(refreshDesignCommand);
-
-program
-  .command('refresh-impeccable')
-  .description('Regenerate .impeccable.md at the project root from .brand/')
-  .option('--brand-path <path>', 'Override path to .brand/ directory')
-  .option('--json', 'Output results as JSON')
-  .action(refreshImpeccableCommand);
+// Note: `refresh-design` and `refresh-impeccable` moved to the standalone
+// brand-skills package as `brand-cli refresh-design` and
+// `brand-cli refresh-context` respectively. xd-toolkit setup installs them.
 
 program.parse();
