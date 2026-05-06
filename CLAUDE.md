@@ -54,7 +54,7 @@ docs/
 | C4 | `/brand-extract` skill | **Done (v1.0.0)** | Full pipeline (Stages 1–6 + 8): Figma + web tokens, voice, multimodal overview, conflict detection, design-system repo scan, design.md and .impeccable.md regen. Spec lives in `packages/brand-skills/skills/brand-extract/DESIGN.md`. |
 | C5 | `/brand-analyze` skill | **Folded into C4** | Channel-aware voice inference is Stage 3 of `/brand-extract`. Multimodal analysis is Stage 4. No separate `/brand-analyze` command; the work happens inline. |
 | C6 | `/brand-score` skill | **Partial** | CLI `xd-toolkit score` command exists. In-session slash-command version (`/brand-score`) not yet built. |
-| C7 | `/brand-audit` skill | Not started | Evaluates agent output against brand-specific criteria (token compliance, voice consistency). |
+| C7 | `/brand-audit` skill | **Done (brand-skills v0.4.0)** | Now `/brand-context:audit` in the brand-skills plugin. Six audit dimensions: token compliance, component reuse, composition anti-patterns, voice, visual atmosphere, conflict consistency. Severity-ranked findings + adherence score. Reports persisted to `.brand/audits/`. Report-only in v1; auto-fix is a future phase. |
 | C8 | `/brand-refresh` skill | **Folded into C4** | Re-running `/brand-extract` is the refresh — it's additive on `voice.md` and `conflicts.md`, and respects the overwrite policy on tokens and overview. No separate command needed. |
 | C9 | Practitioner documentation | **Partial** | README, setup-guide, tester-quickstart, architecture, testing-and-scenarios all shipped. Daily-workflow guide still not written. |
 | C10 | MCP setup verification | **Done** | `xd-toolkit doctor` command + `scripts/setup-mcps.sh` |
