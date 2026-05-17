@@ -20,7 +20,7 @@
     "commander": "^13.1.0",
     "inquirer": "^13.4.2",
     "ora": "^9.4.0",
-    "yaml": "^2.7.1"
+    "yaml": "^2.9.0"
   },
   "license": "MIT",
   "engines": {
