@@ -92,7 +92,7 @@ CLI-only flow (no conversational layer):
 ```bash
 mkdir my-client && cd my-client
 npx xd-toolkit init --client "My Client" --mode standard
-npx xd-toolkit score
+brand-cli score   # completeness scoring (from the brand-skills CLI)
 ```
 
 ---
@@ -103,6 +103,7 @@ npx xd-toolkit score
 |---|---|
 | [`docs/tester-quickstart.md`](docs/tester-quickstart.md) | First-time tester guide |
 | [`docs/setup-guide.md`](docs/setup-guide.md) | Step-by-step setup walkthrough |
+| [`docs/daily-workflow.md`](docs/daily-workflow.md) | What a typical project looks like day to day |
 | [`docs/architecture.md`](docs/architecture.md) | Full architecture: packages, MCP stack, skills, workflows |
 | [`docs/testing-and-scenarios.md`](docs/testing-and-scenarios.md) | Test strategy and four agency scenarios |
 | [`schema/brand/`](schema/brand/) | Schema specs for every `.brand/` file |
@@ -114,11 +115,11 @@ npx xd-toolkit score
 
 ```
 packages/
-  cli/              CLI source (setup, init, doctor, update, score)
+  cli/              CLI source (setup, init, doctor, update)
   core/             Core Toolkit skill + instruction file templates
-  brand-skills/    Brand Skills skills (in progress)
+  brand-skills/    Design reference for brand workflow skills (active skills live in the standalone brand-skills repo)
 schema/
-  brand/            .brand/ directory schema (16 files)
+  brand/            .brand/ directory schema (17 files)
 extensions/
   ds-pack/          Optional Design System Pack
   ux-design-skills/ Optional UX Design Skills Pack
@@ -131,7 +132,7 @@ tests/fixtures/     Reference brand packages
 ## Known limitations
 
 - **`/brand-context:audit` is report-only.** Brand-adherence scoring against `.brand/` is shipped (brand-skills v0.4.0); auto-fix mode (offer to apply low-risk fixes inline) is a future phase.
-- **`/brand-score` slash command (C6) is partial.** The `xd-toolkit score` CLI command exists and reports completeness; the in-session conversational version doesn't.
+- **Brand auditing and scoring live in the brand-skills repo.** The xd-toolkit CLI no longer ships a `score` command — use `brand-cli score` (completeness) or `/brand-context:audit` (adherence) instead. Both come from the brand-skills plugin/CLI that xd-toolkit installs.
 - **Layer 5 (full E2E prototype build)** has not been run since `/brand-extract` shipped at v1.0.0. Stages 1–5 + 8 validated against TruGreen; Stage 6 (DS repo scan) is implementation-complete but client-untested.
 - **Daily-workflow documentation** is partial — install and per-skill usage are documented; a single end-to-end "what a typical project looks like day to day" doc is still missing.
 - **Firecrawl MCP** is not auto-installed (free tier is too thin to justify the prompt). Add manually if you have a paid plan — see `docs/architecture.md`.

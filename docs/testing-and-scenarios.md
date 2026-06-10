@@ -172,7 +172,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
    - Adds institutional knowledge from the intake interview
    - Fills gaps the analysis couldn't infer
 
-6. /brand-score → verify completeness before starting work
+6. brand-cli score → verify completeness before starting work
 
 7. Commit .brand/ to repo → team starts producing work
 ```
@@ -303,7 +303,7 @@ The toolkit must handle four distinct starting conditions that agencies encounte
    - If existing Storybook exists, configure Storybook MCP
    - If existing CI/CD exists, add token compliance linting
 
-7. /brand-score → should achieve comprehensive tier (80%+)
+7. brand-cli score → should achieve comprehensive tier (80%+)
 ```
 
 **Key challenge:** Not disrupting working workflows. An existing client project has momentum. The brand package should slot in alongside existing tooling, not require a rebuild. The `--mode comprehensive` analysis should detect and preserve existing instruction files rather than overwriting them.

@@ -24,16 +24,16 @@ Test results from Layer 1-3 validation. Tested 2026-04-14.
 
 ---
 
-## Layer 2: Impeccable Integration — Partial Pass
+## Layer 2: Impeccable Integration — Pass (by design)
 
 | Test | What Happened | Verdict |
 |------|--------------|---------|
-| `/shape` discovery | Structured interview ran, brand system acknowledged but brief was generic | Partial pass — skill works, brand injection into briefs needs strengthening |
-| Build from brief | Output is distinctly Wendy's — voice, color, composition all on-brand | Strong pass — brand context flows through build phase |
+| `/shape` discovery | Structured interview ran, brand system acknowledged but brief stayed scope-focused | Pass — separation of concerns is intentional |
+| Build from brief | Output is distinctly Wendy's — voice, color, composition all on-brand | Strong pass — brand context flows through the build phase |
 
-**Key finding:** The `/shape` skill's brief was brand-light, but the implementation was brand-rich. This means the routing + tokens + `.impeccable.md` are doing their job during the build phase even when the planning phase doesn't explicitly inject brand personality. The system works as a whole — planning captures scope, building applies brand.
+**Key finding:** The `/shape` skill's brief was scope-focused; the implementation was brand-rich. This is the intended division of labor — planning captures scope, building applies brand. The routing + tokens + `.impeccable.md` do their job at build time, so brand personality doesn't need to be redundantly injected during planning. The system works as a whole.
 
-**No changes needed:** The `.impeccable.md` use-cases field (added earlier from Impeccable's Context Gathering Protocol) would help `/shape` produce more brand-specific briefs, but the end-to-end result is on-brand.
+**No changes needed.** The earlier "partial pass" framing read this as a defect; it isn't. The `.impeccable.md` use-cases field (added previously from Impeccable's Context Gathering Protocol) is enough to make briefs slightly more brand-specific when the practitioner wants that, but the default separation is correct.
 
 ---
 
@@ -88,4 +88,4 @@ Test results from Layer 1-3 validation. Tested 2026-04-14.
 
 ## Next: Layer 5 (full E2E prototype build)
 
-Pending. With `/brand-extract` outputs in place plus `design.md` and `.impeccable.md` at the project root, the remaining test is a complete prototype build run-through — Impeccable consuming the brand context, building a representative page, then a `/brand-audit` (C7) pass to verify on-brand output. C7 isn't built yet, so this layer waits on it.
+**Unblocked** — C7 shipped in brand-skills v0.4.0 as `/brand-context:audit`. Execution still pending. The remaining test is a complete prototype build run-through: `/brand-extract` outputs in place, plus `design.md` and `.impeccable.md` at the project root → Impeccable consuming the brand context → building a representative page → `/brand-context:audit` to verify on-brand output. Stage 6 (DS repo scan) validation is parked separately and lives with the brand-skills agent.

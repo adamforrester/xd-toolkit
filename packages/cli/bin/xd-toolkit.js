@@ -5,7 +5,6 @@ import { setupCommand } from '../src/commands/setup.js';
 import { initCommand } from '../src/commands/init.js';
 import { doctorCommand } from '../src/commands/doctor.js';
 import { updateCommand } from '../src/commands/update.js';
-import { scoreCommand } from '../src/commands/score.js';
 
 program
   .name('xd-toolkit')
@@ -41,14 +40,11 @@ program
   .option('--json', 'Output results as JSON')
   .action(updateCommand);
 
-program
-  .command('score')
-  .description('Report brand package completeness')
-  .option('--json', 'Output results as JSON')
-  .action(scoreCommand);
-
-// Note: `refresh-design` and `refresh-impeccable` moved to the standalone
-// brand-skills package as `brand-cli refresh-design` and
-// `brand-cli refresh-context` respectively. xd-toolkit setup installs them.
+// Note: brand auditing/scoring lives in the standalone brand-skills repo
+// (slash command /brand-context:audit and CLI brand-cli score). The legacy
+// `xd-toolkit score` command was removed — brand-skills owns this surface.
+// `refresh-design` and `refresh-impeccable` moved there too as
+// `brand-cli refresh-design` and `brand-cli refresh-context`.
+// xd-toolkit setup installs all of them.
 
 program.parse();

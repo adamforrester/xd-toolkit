@@ -510,9 +510,9 @@ The skill detects which tools are available and uses the best method. If both Pl
 |-------|---------|--------------|
 | `/brand-extract` | User | Orchestrates extraction pipeline: Figma Console MCP (variable inventory → token files) + Layout CLI (CSS tokens from URLs, optional) + multimodal vision (brand-guide PDFs, screenshots) + **voice extraction** (Playwright MCP default, Firecrawl optional). Voice extraction scrapes 30-50 copy samples from live site + social profiles + app store listings, grouped by type (headlines, CTAs, body copy, error messages, nav labels, microcopy) and channel. Falls back to guided manual input if automated extraction yields fewer than 10 usable samples. Always prompts practitioner for supplementary sources (brand docs, email examples, campaign materials) after extraction. Sources configured in `.brandrc.yaml`. Supports `--public-only` flag for pitch scenarios. Does **not** orchestrate specs CLI — that's a DS Pack tool for component anatomy, which sits at a different layer than brand tokens. |
 | `/brand-analyze` | User | Core analysis: reads extraction output + brand guide PDF (multimodal) + screenshots. Synthesizes into `.brand/` directory. Auto-generates `.impeccable.md`. Scores completeness. **Voice inference:** reads copy samples from extraction, infers formality level, sentence structure patterns, vocabulary preferences, humor/seriousness spectrum, active vs. passive voice, user address mode (you/we/brand name), error/negative state handling. Maps voice registers per channel (website/social/email/brand story), noting where voice is consistent vs. where it diverges. Outputs to `.brand/voice.md` with source samples cited for human validation. Every inference marked with confidence: HIGH (directly observed pattern) / MEDIUM (inferred from limited samples) / LOW (guessed from single instance). Supports `--mode pitch` (minimum tier + confidence markers only) and `--mode comprehensive` (full analysis + existing codebase integration). |
-| `/brand-audit` | User | Evaluates output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces brand adherence score. |
-| `/brand-score` | User | Completeness scoring across all brand package dimensions (modeled on Layout.design's 0-100 approach). |
-| `/brand-refresh` | User | Re-analyzes updated assets, produces diff against existing brand package. |
+| `/brand-context:audit` | User | **Lives in the brand-skills plugin, not xd-toolkit.** Evaluates output against brand-specific criteria across six dimensions (token compliance, component reuse, composition anti-patterns, voice, visual atmosphere, conflict consistency). Produces a severity-ranked finding list and a brand adherence score; reports persisted to `.brand/audits/`. Report-only in v1. |
+| `brand-cli score` (CLI) | User | **Lives in the brand-skills CLI, not xd-toolkit.** Completeness scoring across all brand package dimensions. The legacy `xd-toolkit score` command was removed; brand-skills owns this surface. |
+| `/brand-refresh` | User | Re-analyzes updated assets, produces diff against existing brand package. (Folded into `/brand-context:extract` — re-running it acts as the refresh.) |
 
 ---
 
@@ -847,14 +847,16 @@ Output: clear pass/fail for each check with fix instructions.
 
 Updates Core Toolkit skills without overwriting `.brand/` or project-specific customizations. Re-deploys to all tool directories.
 
-#### Command: `xd-toolkit score`
+#### Brand scoring (moved to brand-skills)
 
-Reports brand package completeness: which tier (minimum/standard/comprehensive), percentage complete, specific gaps.
+The xd-toolkit CLI no longer ships a `score` command. Brand auditing and scoring are owned by the standalone brand-skills repo:
 
 ```bash
-npx xd-toolkit score          # Human-readable
-npx xd-toolkit score --json   # → { "tier": "standard", "completeness": 72, "gaps": [...] }
+brand-cli score          # Completeness scoring (was xd-toolkit score)
+brand-cli score --json   # → { "tier": "standard", "completeness": 72, "gaps": [...] }
 ```
+
+For brand-adherence scoring (against existing output), use the `/brand-context:audit` slash command.
 
 #### All commands support `--json`
 
@@ -1017,17 +1019,17 @@ These are the components we build from scratch. This is where our development ef
 | # | Deliverable | Status | What It Is |
 |---|------------|--------|-----------|
 | **C1** | **`.brand/` schema specification** | **Done** | Documented spec for every file in the brand package: what fields, what format, required vs. optional, tiered completeness model (minimum → standard → comprehensive). 17 schema files in `schema/brand/`. |
-| **C2** | **`xd-toolkit` CLI** | **Done** | `setup` (global, one-time), `init` (per-project), `doctor`, `update`, `score`, `refresh-design` (regenerates project-root `design.md` from `.brand/`), `refresh-impeccable` (regenerates `.impeccable.md`). Supports `--mode pitch/standard/comprehensive`, `--brand-path`, `--figma-only`, `--json`. |
+| **C2** | **`xd-toolkit` CLI** | **Done** | `setup` (global, one-time), `init` (per-project), `doctor`, `update`. Supports `--mode pitch/standard/comprehensive`, `--brand-path`, `--figma-only`, `--json`. Brand-specific commands (`score`, `refresh-design`, `refresh-context`) all moved to the standalone `brand-cli` (from the brand-skills repo). |
 | **C3** | **Instruction file templates** | **Done** | CLAUDE.md, AGENTS.md, .cursorrules, copilot-instructions.md, .impeccable.md. Plus `design.md` per the [google-labs-code/design.md spec](https://github.com/google-labs-code/design.md) — the spec-compliant interop artifact, regenerated from `.brand/` by `xd-toolkit refresh-design` or by `/brand-extract` Stage 7. |
 | **C4** | **`/brand-extract` skill** | **Done (v1.0.0)** | Full extraction pipeline. Stage 1: Figma variables (Figma Console MCP). Stage 2: web computed styles (Playwright). Stage 3: voice extraction from website + social + app stores (additive `## Observed Voice` section in voice.md). Stage 4: multimodal analysis of brand-guide PDF + reference screenshots → overview.md (with merge-only-self-test policy on populated files). Stage 5: cross-source conflict detection → conflicts.md (additive, with practitioner walkthrough; preserves resolved entries on re-run). Stage 6: design-system repo scan → components/*.md (comprehensive tier only; local path or remote git URL). Stages 7+8: regenerate design.md and .impeccable.md after extraction. C5 (analyze) is folded in as Stages 3–4; C8 (refresh) is just re-running the same skill. |
 | **C5** | **`/brand-analyze` skill** | **Folded into C4** | No standalone skill — channel-aware voice inference and multimodal analysis are Stages 3 and 4 of `/brand-extract`. |
-| **C6** | **`/brand-score` skill** | **Partial** | `xd-toolkit score` CLI command exists and reports completeness. The in-session conversational slash-command version is not yet built. |
-| **C7** | **`/brand-audit` skill** | **Not started** | Evaluates agent output against brand-specific criteria: token compliance, component usage, composition patterns, voice consistency. Produces a brand-adherence score. ~3-5 days. |
+| **C6** | **`/brand-score` skill** | **Removed from xd-toolkit** | Brand auditing/scoring is owned entirely by the brand-skills repo. `brand-cli score` reports completeness; `/brand-context:audit` reports adherence. The legacy `xd-toolkit score` command was removed. |
+| **C7** | **`/brand-context:audit` skill** | **Done (brand-skills v0.4.0)** | Six audit dimensions: token compliance, component reuse, composition anti-patterns, voice, visual atmosphere, conflict consistency. Severity-ranked findings + adherence score. Reports persisted to `.brand/audits/`. Report-only in v1; auto-fix is a future phase. |
 | **C8** | **`/brand-refresh` skill** | **Folded into C4** | Re-running `/brand-extract` is the refresh — it's additive on `voice.md` and `conflicts.md`, and respects the overwrite policy on tokens and overview. |
-| **C9** | **Practitioner documentation** | **Partial** | README, setup-guide, tester-quickstart, architecture, testing-and-scenarios all shipped. Daily-workflow guide (a single end-to-end "what a typical project looks like day to day" doc) still missing. |
+| **C9** | **Practitioner documentation** | **Done** | README, setup-guide, tester-quickstart, architecture, testing-and-scenarios, and daily-workflow all shipped. |
 | **C10** | **MCP setup verification** | **Done** | `xd-toolkit doctor` command + `scripts/setup-mcps.sh`. |
 
-**Status:** C1, C2, C3, C4, C10 done. C6 partial (CLI only). C7, C9 remaining (~3-5 days for `/brand-audit`; ~1-2 days for the daily-workflow doc).
+**Status:** C1, C2, C3, C4, C7, C9, C10 done. C5/C8 folded into C4. C6 removed (brand-skills owns auditing/scoring). All C-deliverables shipped.
 
 **What we don't build:** Design system skills (saved ~8-12 days by adopting Design System Ops), UX research skills (curated from community), all MCPs (third-party), all extraction tooling (third-party).
 
@@ -1053,7 +1055,7 @@ These are the components we build from scratch. This is where our development ef
 |---|------|------------|--------|
 | 6 | Build `/brand-extract` | **C4** | 3-5 days |
 | 7 | Build `/brand-analyze` | **C5** — the core analysis skill | 5-8 days |
-| 8 | Build `/brand-score` | **C6** | 2-3 days |
+| 8 | ~~Build `/brand-score`~~ | ~~**C6**~~ | Removed — brand-skills owns auditing/scoring (`brand-cli score`). |
 | 9 | Build `/brand-audit` | **C7** | 3-5 days |
 | 10 | Build `xd-toolkit update` | **C2** (update command) | 2-3 days |
 | 11 | Test end-to-end on 2-3 clients | Full onboarding → production → validate | 5-8 days |
@@ -1138,7 +1140,7 @@ The design-to-Claude-Code handoff is particularly relevant — designs package i
 | # | Question | Recommendation |
 |---|----------|----------------|
 | 1 | **specs CLI: free vs. PRO? (DS Pack)** | Start free. PRO adds token resolution + subcomponent references. Evaluate when DS Pack workflows hit free-tier limits — not a Brand Skills decision. Contact Nathan Curtis / DirectedEdges for agency pricing. |
-| 2 | **How prescriptive is the `.brand/` schema?** | Tiered: minimum (overview + tokens + voice), standard (+ components + composition), comprehensive (+ specs + workflows). `/brand-score` reports which tier. |
+| 2 | **How prescriptive is the `.brand/` schema?** | Tiered: minimum (overview + tokens + voice), standard (+ components + composition), comprehensive (+ specs + workflows). `brand-cli score` reports which tier. |
 | 3 | **Should we publish the toolkit publicly?** | Yes — recommended. Skills are markdown files on top of public tools. The competitive advantage is the Brand Skills methodology and client-specific brand packages (never public), not the skill files. Public removes the org-seat bottleneck for 95 practitioners. |
 | 4 | **GitHub org repo or personal repo?** | Start with a team-owned personal GitHub repo (e.g., under your account or a shared "vml-xd" account). Move to org repo if/when seats become available. The toolkit works identically either way. |
 | 5 | **Storybook: required or optional?** | Optional per-project. Include MCP config in `xd-toolkit init` only if project has Storybook dependency. |

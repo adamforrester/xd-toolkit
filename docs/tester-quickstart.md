@@ -93,7 +93,7 @@ To verify CLI-only flow (no conversational layer):
 ```bash
 mkdir test-cli && cd test-cli
 npx xd-toolkit init --client "Test" --tier minimum
-npx xd-toolkit score
+brand-cli score   # completeness scoring lives in the brand-skills CLI
 ```
 
 ## What to test
@@ -107,8 +107,8 @@ npx xd-toolkit score
 
 ## Known limitations
 
-- **`/brand-audit` (C7) is not yet built.** Manual review against `.brand/` is the current workflow for checking whether agent output stays on-brand.
-- **`/brand-score` slash command (C6) is partial** — `xd-toolkit score` (CLI) reports completeness; the in-session conversational version isn't built.
+- **`/brand-context:audit` (C7) is shipped, report-only.** Auto-fix mode is a future phase. Use the report to manually correct on-brand drift.
+- **Brand auditing/scoring lives in brand-skills, not xd-toolkit.** Use `brand-cli score` for completeness and `/brand-context:audit` for adherence. The legacy `xd-toolkit score` command was removed.
 - **Layer 5 (full E2E prototype build)** has not been run since `/brand-extract` shipped at v1.0.0.
 - **No daily-workflow doc yet** — install and per-skill usage are documented; an end-to-end "what a typical project looks like day to day" doc is still missing.
 - **Design System Pack** requires `git` on PATH (the installer clones from GitHub).
