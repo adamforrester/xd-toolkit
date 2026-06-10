@@ -1,16 +1,17 @@
 # XD Toolkit — Tester Quickstart
 
-Thanks for testing this. The toolkit is in early access — the foundation works end-to-end, but the Brand Skills skills (extraction, scoring, audit, refresh) are still in build. This guide gets you through what's ready today.
+Thanks for testing this. The toolkit is in early access — the foundation and brand-skills pipeline both work end-to-end. Layer 5 (full E2E prototype build run-through) is unblocked but not yet executed; if you complete one, capture findings in [test-results.md](test-results.md). This guide gets you through everything that's ready today.
 
 ## What this is
 
 An end-to-end suite for Experience Design practitioners who want AI agents to produce **brand-consistent, production-quality digital products**. It bundles:
 
-- 21 core skills (Impeccable + Vercel + figma-plugin-dev)
-- 2 plugins: Superpowers (structured development) and Karpathy Guidelines (coding discipline)
+- 22 core skills (Impeccable family ×20 + figma-plugin-dev + vml-thrive-feedback)
+- 3 plugins: Superpowers (structured development), Karpathy Guidelines (coding discipline), brand-context (full brand-extraction pipeline from the standalone brand-skills repo)
+- `brand-cli` — companion npm CLI from brand-skills (`refresh-design`, `refresh-context`, `score`, `setup`, `init`)
 - 7 MCP servers (Figma Official, Figma Console, Playwright, GitHub, Netlify, Vercel, Context7)
-- Two slash commands (`/new-project`, `/brand-check`)
-- Optional add-ons: UX Design Skills Pack (63 skills), Design System Pack (21 skills + Storybook MCP), Brand Skills
+- Slash commands: `/new-project` (xd-toolkit), `/brand-context:extract` and `/brand-context:check` (brand-skills plugin)
+- Optional add-ons: UX Design Skills Pack (63 skills), Design System Pack (21 skills + Storybook MCP)
 
 ## Prerequisites
 
@@ -56,10 +57,11 @@ You'll be prompted to:
 
 Setup will:
 - Install 7 core MCP servers (skipping any already present)
-- Install the Superpowers and Karpathy Guidelines plugins
+- Install the Superpowers, Karpathy Guidelines, and brand-context plugins
 - Install whichever optional skill packs you selected
 - If you selected the Design System Pack, also install the Storybook MCP (only connects when Storybook is running locally)
-- Copy `/new-project` and `/brand-check` to `~/.claude/commands/` so they're available globally
+- Install the `brand-cli` npm CLI globally
+- Copy `/new-project` to `~/.claude/commands/` so it's available globally (the `/brand-context:*` commands come from the brand-context plugin)
 
 After setup, run `npx xd-toolkit doctor` to verify everything is connected.
 
@@ -83,7 +85,7 @@ This walks through:
 Then:
 
 ```
-/brand-check
+/brand-context:check
 ```
 
 Reports completeness against the tier you chose and surfaces gaps.
@@ -101,16 +103,16 @@ brand-cli score   # completeness scoring lives in the brand-skills CLI
 - Does `setup` finish cleanly with `7 MCP servers connected` (or 8 with DS Pack)?
 - Does `/new-project` produce a usable `.brand/` directory at the chosen tier?
 - Do all three off-ramp paths (Yes / Not now / Skip) leave a working project?
-- Does `/brand-extract` populate `.brand/tokens/`, `voice.md`, `overview.md`, and `conflicts.md` from your sources, and regenerate `design.md` and `.impeccable.md`?
-- Does `/brand-check` give a sensible completeness score?
+- Does `/brand-context:extract` populate `.brand/tokens/`, `voice.md`, `overview.md`, and `conflicts.md` from your sources, and regenerate `design.md` and `.impeccable.md`?
+- Does `/brand-context:check` give a sensible completeness score?
+- Does `/brand-context:audit` produce useful severity-ranked findings against built output?
 - Does Claude follow the rules in the generated `CLAUDE.md` when asked to build something? (E.g. ask it to build a Wendy's-branded landing page and check it doesn't substitute fonts or invent a logo.)
 
 ## Known limitations
 
 - **`/brand-context:audit` (C7) is shipped, report-only.** Auto-fix mode is a future phase. Use the report to manually correct on-brand drift.
 - **Brand auditing/scoring lives in brand-skills, not xd-toolkit.** Use `brand-cli score` for completeness and `/brand-context:audit` for adherence. The legacy `xd-toolkit score` command was removed.
-- **Layer 5 (full E2E prototype build)** has not been run since `/brand-extract` shipped at v1.0.0.
-- **No daily-workflow doc yet** — install and per-skill usage are documented; an end-to-end "what a typical project looks like day to day" doc is still missing.
+- **Layer 5 (full E2E prototype build)** has not been run since `/brand-context:extract` shipped at v1.0.0. C7 (`/brand-context:audit`) is now shipped, so this layer is unblocked — capture findings in [test-results.md](test-results.md) if you complete one.
 - **Design System Pack** requires `git` on PATH (the installer clones from GitHub).
 - **Firecrawl MCP** is not auto-installed. Free tier is too thin to be worth the prompt. Add manually if you have a paid plan (see `docs/architecture.md`).
 
