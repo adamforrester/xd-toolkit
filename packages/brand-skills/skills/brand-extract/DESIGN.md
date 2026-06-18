@@ -1,6 +1,6 @@
 # /brand-extract — Design Reference
 
-> **This is the design spec, not the active skill.** The shipped skill that Claude Code executes lives at `packages/cli/skills/core/brand-extract/SKILL.md` (bundled and deployed to every project via `xd-toolkit init`). This file captures the architectural intent and pipeline staging that informed the implementation. Read this when you want to understand *why* the skill is structured the way it is; read the SKILL.md when you want to know *what* the skill does at runtime.
+> **This is the design spec, not the active skill.** As of v2.0.0, the shipped skill lives in the standalone [`adamforrester/brand-skills`](https://github.com/adamforrester/brand-skills) repo and is delivered to projects as the `brand-context` Claude Code plugin (slash commands `/brand-context:extract` and `/brand-context:check`), installed by `xd-toolkit setup` when the brand-skills package is selected. This file captures the architectural intent and pipeline staging that informed the implementation. Read this when you want to understand *why* the skill is structured the way it is; read the plugin's `SKILL.md` in the brand-skills repo when you want to know *what* the skill does at runtime.
 
 Build a complete `.brand/` package and a spec-compliant `design.md` from the inputs declared in `.brandrc.yaml`, plus any assets the practitioner uploads. The output respects the project's tier (minimum / standard / comprehensive).
 
