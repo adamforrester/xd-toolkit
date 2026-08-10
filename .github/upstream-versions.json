@@ -1,8 +1,8 @@
 {
-  "DirectedEdges/specs": "specs-cli@0.25.0",
+  "DirectedEdges/specs": "specs-cli@0.26.0",
   "JustasMonkev/mcp-accessibility-scanner": "2.0.9",
   "harlan-zw/unlighthouse": "v0.18.0",
-  "microsoft/playwright-mcp": "v0.0.78",
+  "microsoft/playwright-mcp": "v0.0.79",
   "murphytrueman/design-system-ops": "v1.2.0",
   "obra/superpowers": "v6.2.0",
   "pbakaus/impeccable": "ext-v1.3.1",
