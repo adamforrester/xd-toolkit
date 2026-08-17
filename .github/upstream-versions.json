@@ -4,7 +4,7 @@
   "harlan-zw/unlighthouse": "v0.18.0",
   "microsoft/playwright-mcp": "v0.0.79",
   "murphytrueman/design-system-ops": "v1.2.0",
-  "obra/superpowers": "v6.2.0",
-  "pbakaus/impeccable": "ext-v1.3.1",
-  "southleft/figma-console-mcp": "v1.39.1"
+  "obra/superpowers": "v6.3.0",
+  "pbakaus/impeccable": "skill-v4.1.1",
+  "southleft/figma-console-mcp": "v1.40.0"
 }
