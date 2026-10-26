@@ -1,10 +1,10 @@
 {
-  "DirectedEdges/specs": "specs-cli@0.32.0",
+  "DirectedEdges/specs": "specs-cli@0.35.0",
   "JustasMonkev/mcp-accessibility-scanner": "2.0.9",
   "harlan-zw/unlighthouse": "v0.19.1",
   "microsoft/playwright-mcp": "v0.0.83",
   "murphytrueman/design-system-ops": "v2.0.0",
-  "obra/superpowers": "v7.0.0",
-  "pbakaus/impeccable": "cli-v4.6.0",
-  "southleft/figma-console-mcp": "v1.40.9"
+  "obra/superpowers": "v7.0.1",
+  "pbakaus/impeccable": "engine-v0.1.17",
+  "southleft/figma-console-mcp": "v1.41.2"
 }
